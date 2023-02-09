@@ -1,0 +1,23 @@
+body, html {
+    height: 100%;
+}
+
+.header {
+    background-color: Gray;
+    height: 10%
+}
+
+.content {
+    height: 80%;
+}
+
+.footer {
+    background-color: yellow;
+    height: 10%
+}
+
+.img {
+    width: 400px;
+    height: 400px;
+    background-image: url("../images/webpack.png");
+}
