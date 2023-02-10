@@ -1,0 +1,31 @@
+<html xmlns:th="http://www.thymeleaf.org">
+        <div th:id="spinner" th:fragment="spinnerFragment" class="d-flex justify-content-center"
+             style="z-index: 1000;position: fixed;width: 100%;height: 100%;top: 50%;display: none;visibility: hidden"
+        >
+            <script type="module" th:src="@{/dist/config.js}"></script>
+            <link rel="stylesheet" th:href="@{/lib/tmpl/dist/css/adminlte.min.css}"/>
+
+            <div class="spinner-grow text-primary" role="status">
+                <span class="visually-hidden"></span>
+            </div>
+            <div class="spinner-grow text-secondary" role="status">
+                <span class="visually-hidden"></span>
+            </div>
+            <div class="spinner-grow text-success" role="status">
+                <span class="visually-hidden"></span>
+            </div>
+            <div class="spinner-grow text-danger" role="status">
+                <span class="visually-hidden"></span>
+            </div>
+            <div class="spinner-grow text-warning" role="status">
+                <span class="visually-hidden"></span>
+            </div>
+            <div class="spinner-grow text-info" role="status">
+                <span class="visually-hidden"></span>
+            </div>
+            <div class="spinner-grow text-dark" role="status">
+                <span class="visually-hidden"></span>
+            </div>
+        </div>
+
+</html>

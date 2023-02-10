@@ -1,26 +1,14 @@
-import "../css/style.css";
-import "../scss/main.scss";
-import "../css/reset.min.css";
+import '../css/style.css';
+import '../css/reset.min.css';
+import '../lib/tmpl/fonts/sanspro.css';
+import '../lib/tmpl/icon/ionicons.min.css';
+import '../lib/tmpl/plugins/fontawesome-free/css/all.min.css';
+import '../lib/tmpl/plugins/jquery-ui/jquery-ui.css';
+import '../lib/tuiComp/tui-tree.css';
+import '../lib/tuiComp/tui-pagination.css';
+import '../lib/tuiComp/tui-grid.css';
 
-import detail from '../js/module/alert';
+import '../lib/jquery/jquery.min';
+import '../lib/tmpl/plugins/bootstrap/js/bootstrap.bundle.min';
+import '../lib/tmpl/dist/js/adminlte';
 
-//Babel 적용 예제
-// ES5
-const myArrary = [1, 2, 3, 4];
-let arr1 = myArrary.map(function (item) {
-  return item;
-});
-console.log(arr1);
-
-// ES6
-let arr2 = myArrary.map((item) => item);
-console.log(arr2);
-
-//Define Plugin 적용 예제
-console.log(process.env.NODE_ENV);
-console.log(VERSION);
-console.log(MAX_COUNT);
-console.log(api.domain);
-
-// 모듈 임폴트
-console.log(detail('철수', 20));

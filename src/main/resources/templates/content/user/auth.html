@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}"
+>
+<head>
+    <title>권한 관리</title>
+    <script type="module" th:src="@{/dist/auth.js}"></script>
+</head>
+
+<div layout:fragment="content" id="container">
+    <form name="authViewFrm">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-4">
+                        <label for="searchStr">권한명/ 권한코드</label>
+                        <input type="text" class="form-control" id="searchStr" name="search_str">
+                    </div>
+                    <div class="col-4">
+                        <input type="text" class="form-control" style="display: none">
+                        <label for="viewUseYn">사용여부</label>
+                        <select class="custom-select rounded-0" id="viewUseYn" name="use_yn"></select>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer ">
+                <div class="row justify-content-end">
+                    <div class="col-2">
+                        <button type="button" class="btn btn-block btn-success btn-sm" id="writeBtn" data-toggle="modal">권한 추가</button>
+                    </div>
+                    <div class="col-2 ">
+                        <button type="button" class="btn btn-block btn-primary btn-sm" id="searchBtn">조회</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <input type="hidden" id="pagePer" name="page_per" th:value="10"/>
+
+    <!-- 그리드 영역-->
+    <div id="grid"></div>
+
+    <!-- 페이징 영역 -->
+    <div id="pagination" class="tui-pagination"></div>
+
+    <!-- 입력화면 (modal) -->
+    <form id="authWriteFrm">
+        <div class="modal fade" id="authWrite">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">권한 등록</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group row">
+                            <div class="col-6">
+                                <label for="writeAuthNm">* 권한명</label>
+                                <input type="text" class="form-control" id="writeAuthNm" name="auth_nm" placeholder="권한명">
+                            </div>
+                            <div class="col-6">
+                                <label for="writeAuthCd">* 권한코드</label>
+                                <input type="text" class="form-control" id="writeAuthCd" name="auth_cd" placeholder="권한코드">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-6">
+                                <label for="writeMemo">비고</label>
+                                <input type="text" class="form-control" id="writeMemo" name="memo" placeholder="비고">
+                            </div>
+                            <div class="col-6">
+                                <label for="writeOrd">순서</label>
+                                <input type="text" class="form-control" id="writeOrd" name="ord" placeholder="순서">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-12 text-lg-center" id="writeMsg"></div>
+                        </div>
+                        <div class="modal-footer justify-content-end">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+                            <button type="button" class="btn btn-primary" id="insertBtn">저장</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- 수정화면 (modal) -->
+    <form id="authEditFrm">
+        <div class="modal fade" id="authEdit">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">권한 수정</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group row">
+                            <div class="col-6">
+                                <label for="editAuthNm">* 권한명</label>
+                                <input type="text" class="form-control" id="editAuthNm" name="auth_nm" placeholder="권한명">
+                                <input type="hidden" class="form-control" id="editAuthIdntfKey" name="auth_idntf_key">
+                            </div>
+                            <div class="col-6">
+                                <label for="editAuthCd">* 권한코드</label>
+                                <input type="text" class="form-control" id="editAuthCd" name="auth_cd" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-6">
+                                <label for="editOrd">순서</label>
+                                <input type="text" class="form-control" id="editOrd" name="ord" placeholder="순서">
+                            </div>
+                            <div class="col-6">
+                                <label for="editUseYn">* 사용여부</label>
+                                <select class="custom-select rounded-0" id="editUseYn" name="use_yn"></select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-12">
+                                <label for="editMemo">비고</label>
+                                <input type="text" class="form-control" id="editMemo" name="memo" placeholder="비고">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-12 text-lg-center" id="editMsg"></div>
+                        </div>
+                        <div class="modal-footer justify-content-end">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+                            <button type="button" class="btn btn-primary" id="editBtn">저장</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+</html>

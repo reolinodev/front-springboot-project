@@ -1,23 +1,70 @@
-body, html {
-    height: 100%;
+#msg {
+    color : red;
 }
 
-.header {
-    background-color: Gray;
-    height: 10%
+#container {
+    padding: 10px;
+    overflow-x:hidden;
 }
 
-.content {
-    height: 80%;
+.card-body iframe{
+    border: 0;
+    width: 100%;
+    overflow-x:hidden;
+    overflow-y:hidden;
+    overflow:auto;
+    width:100%;
+    min-height:800px;
+    padding: 10px ;
 }
 
-.footer {
-    background-color: yellow;
-    height: 10%
+.logout {
+    text-decoration: underline;
+    color: #0f6674;
 }
 
-.img {
-    width: 400px;
-    height: 400px;
-    background-image: url("../images/webpack.png");
+.form-group label {
+    margin-bottom: 10px;
+}
+
+.guide-word {
+    font-size: 0.8em;
+    margin: 10px;
+    color: #dc3545;
+}
+
+#dataPicker1 {
+    width: 45%;
+    height: calc(2.25rem + 2px);
+    border: 1px solid #ced4da;
+}
+#dataPicker2 {
+    width: 45%;
+    height: calc(2.25rem + 2px);
+    border: 1px solid #ced4da;
+}
+.tui-datepicker-input * {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    z-index: 100;
+}
+
+.tui-datepicker {
+    z-index: 99;
+}
+
+.tui-datepicker-input.tui-has-focus {
+    width: 100%;
+    height: calc(2.25rem + 2px);
+}
+
+.login {
+    background: #101829;
+}
+
+#niceLogo {
+    background-image: url("../images/niceSymbol.jpg");
+    width: 71px;
+    height: 71px;
 }

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin</title>
+    <script type="module" th:src="@{/dist/config.js}"></script>
+    <script type="module" th:src="@{/dist/pwChange.js}"></script>
+    <link rel="stylesheet" th:href="@{/lib/tmpl/dist/css/adminlte.min.css}"/>
+</head>
+<body class="hold-transition login-page">
+<div class="login-box">
+    <div class="card card-outline card-primary">
+        <div class="card-header text-center">
+            <a href="#" class="h1"><b>관리자 템플릿</b></a>
+        </div>
+        <div class="card-body">
+            <p class="login-box-msg">비밀번호 변경</p>
+            <form name="frm" id="frm" method="POST">
+                <input type="hidden" name="url" id="url"/>
+                <div class="input-group mb-3">
+                    <label for="loginId"></label>
+                    <input type="text" name="login_id" id="loginId" class="form-control" placeholder="아이디"/>
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-user"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <label for="userPw"></label>
+                    <input type="password" name="user_pw" id="userPw" class="form-control" placeholder="비밀번호"/>
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-lock"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <label for="userPwRe"></label>
+                    <input type="password" id="userPwRe" class="form-control" placeholder="비밀번호 재입력"/>
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-lock"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group mb-3" style="height: 15px">
+                    <span id="msg"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-6">
+                        <button type="button" class="btn btn-secondary btn-block" id="returnBtn">
+                            돌아가기
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn btn-primary btn-block" id="pwChangeBtn">
+                            등록
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<!--
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>NICE</title>
+        <script type="module" th:src="@{/dist/config.js}"></script>
+        <script type="module" th:src="@{/dist/pwChange.js}"></script>
+        <link rel="stylesheet" th:href="@{/lib/tmpl/dist/css/adminlte.min.css}"/>
+    </head>
+
+    <body class="" style="background:#101829">
+        <div style="padding: 10px;width: 100%;height: 70px;">
+            <div id="niceLogo" style="background-size: 50px 50px; background-repeat: no-repeat ;"></div>
+        </div>
+
+        <div style="height: 10px; width: 100%; background: #3244E8"></div>
+
+        <div class="hold-transition login-page" style="background:#101829;height: 80vh;">
+            <div class="login-box" style="width: 500px">
+                <div class="card card-outline card-primary" style="background: #3244E8;border-top: none;">
+                    <div class="card-header text-center" style="padding: 50px 50px 30px 50px; border-bottom: none">
+                        <a href="#" class="h1" style="font-size: 2.3rem;color: #ffffff"><b>비밀번호 변경</b></a>
+                    </div>
+
+                    <div class="card-body">
+                        <form name="frm" id="frm" method="POST">
+                            <div class="input-group mb-3">
+                                <input
+                                    type="text"
+                                    name="login_id"
+                                    id="loginId"
+                                    class="form-control"
+                                    placeholder="ID를 입력하세요."
+                                    style="height: 50px;"
+                                />
+                                <div class="input-group-append">
+                                    <div class="input-group-text">
+                                        <span class="fas fa-user"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="input-group mb-3">
+                                <input
+                                    type="password"
+                                    name="user_pw"
+                                    id="userPw"
+                                    class="form-control"
+                                    placeholder="비밀번호를 입력하세요."
+                                    style="height: 50px;"
+                                />
+                                <div class="input-group-append">
+                                    <div class="input-group-text">
+                                        <span class="fas fa-lock"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="input-group mb-3">
+                                <input
+                                    type="password"
+                                    id="userPwRe"
+                                    class="form-control"
+                                    placeholder="비밀번호를 재입력하세요."
+                                    style="height: 50px;"
+                                />
+                                <div class="input-group-append">
+                                    <div class="input-group-text">
+                                        <span class="fas fa-lock"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="input-group mb-3" style="height: 15px">
+                                <div id="msg" style="width: 100%;text-align: center;color:#ffffff"></div>
+                                <input type="hidden" name="url" id="url"/>
+                            </div>
+
+                            <div class="row" style="padding-bottom: 20px;padding-top: 10px;">
+                                <div class="col-6">
+                                    <button
+                                        type="button"
+                                        class="btn btn-secondary btn-block"
+                                        id="returnBtn"
+                                        style="height: 50px;"
+                                    >
+                                        돌아가기
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button
+                                        type="button"
+                                        class="btn btn-primary btn-block"
+                                        id="pwChangeBtn"
+                                        style="height: 50px;background-color: #1F2A58;border-color: #1F2A58;"
+                                    >
+                                        등록
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+-->

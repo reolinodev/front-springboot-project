@@ -1,0 +1,15 @@
+<html
+    lang="ko"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+    <head>
+        <title>NICE</title>
+        <script type="module" th:src="@{/dist/config.js}"></script>
+        <link rel="stylesheet" th:href="@{/lib/tmpl/dist/css/adminlte.min.css}"/>
+    </head>
+    <body>
+        <div th:replace="fragments/spinner :: spinnerFragment"></div>
+        <div layout:fragment="content"></div>
+    </body>
+</html>

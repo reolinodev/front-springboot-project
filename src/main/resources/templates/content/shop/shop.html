@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}"
+>
+<head>
+    <title>계열사별 매장조회</title>
+    <script type="module" th:src="@{/dist/shop.js}"></script>
+</head>
+
+<div layout:fragment="content" id="container">
+    <!-- 조회 화면 -->
+    <form id="shopViewFrm" name="shopViewFrm">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-4">
+                        <label for="corpSvcCd">계열사서비스</label>
+                        <select class="custom-select rounded-0" id="corpSvcCd" name="corp_svc_cd"></select>
+                    </div>
+                    <div class="col-4">
+                        <label for="idntfKey">식별키</label>
+                        <input type="text" class="form-control" id="idntfKey" name="idntf_key">
+                    </div>
+                    <div class="col-4">
+                        <label for="brno">사업자등록번호</label>
+                        <input type="text" class="form-control" id="brno" name="brno">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <label for="rfBfShopNm">매장명</label>
+                        <input type="text" class="form-control" id="rfBfShopNm" name="rf_bf_shop_nm">
+                    </div>
+                    <div class="col-4">
+                        <label for="mastKey">마스터키</label>
+                        <input type="text" class="form-control" id="mastKey" name="mast_key">
+                    </div>
+                    <div class="col-4">
+                        <label for="delYn">삭제여부</label>
+                        <select class="custom-select rounded-0" id="delYn" name="del_yn"></select>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer ">
+                <div class="row justify-content-end">
+                    <div class="col-2 ">
+                        <button type="button" class="btn btn-block btn-secondary btn-sm" id="writeBtn" data-toggle="modal" data-target="#shopWrite">매장추가</button>
+                    </div>
+                    <div class="col-2 ">
+                        <button type="button" class="btn btn-block btn-success btn-sm" id="downloadBtn">목록다운로드</button>
+                    </div>
+                    <div class="col-2 ">
+                        <button type="button" class="btn btn-block btn-primary btn-sm" id="searchBtn">조회</button>
+                    </div>
+                </div>
+                <div class="row justify-content-end">
+                    <div style="color: #e83e8c;padding: 5px 5px 0px 0;;font-size: 0.9rem;">* 목록 다운로드는 데이터 양에 따라 시간이 걸릴 수 있습니다.</div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <input type="hidden" id="status" th:value="${status}">
+    <input type="hidden" id="pagePer" name="page_per" th:value="10"/>
+
+    <!-- 그리드 영역-->
+    <div id="grid"></div>
+
+    <!-- 페이징 영역 -->
+    <div id="pagination" class="tui-pagination"></div>
+
+    <!-- 입력화면 (modal) -->
+    <form id="shopWriteFrm" name="shopWriteFrm">
+        <div class="modal fade" id="shopWrite">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">매장 등록</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-group row">
+                            <div class="col-4">
+                                <label for="writeCorpSvcCd">* 계열사서비스</label>
+                                <select class="custom-select rounded-0" id="writeCorpSvcCd" name="corp_svc_cd"></select>
+                            </div>
+                            <div class="col-4">
+                                <label for="writeShopNm">* 매장명</label>
+                                <input type="text" class="form-control" id="writeShopNm" name="shop_nm" placeholder="매장명">
+                            </div>
+                            <div class="col-4">
+                                <label for="writeIdntfKey">* 매장식별키</label>
+                                <input type="text" class="form-control" id="writeIdntfKey" name="idntf_key" placeholder="매장식별키">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-4">
+                                <label for="writeBrno">* 사업자등록번호</label>
+                                <input type="text" class="form-control" id="writeBrno" name="brno" placeholder="사업자등록번호">
+                            </div>
+                            <div class="col-4">
+                                <label for="writeShopTelno">전화번호</label>
+                                <input type="text" class="form-control" id="writeShopTelno" name="shop_telno" placeholder="전화번호">
+                            </div>
+                            <div class="col-4">
+                                <label for="writeShopStCd">매장상태</label>
+                                <select class="custom-select rounded-0" id="writeShopStCd" name="shop_st_cd"></select>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-7">
+                                <label for="writeShopAddr">* 주소</label>
+                                <input type="text" class="form-control" id="writeShopAddr" name="shop_addr" placeholder="주소">
+                            </div>
+                            <div class="col-5">
+                                <label for="writeShopDaddr">* 상세주소</label>
+                                <input type="text" class="form-control" id="writeShopDaddr" name="shop_daddr" placeholder="상세주소">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-4">
+                                <label for="writeShopCtrtBgngYmdDiv">계약시작일자</label>
+                                <div id="writeShopCtrtBgngYmdDiv"></div>
+                            </div>
+                            <div class="col-4">
+                                <label for="writeShopCtrtEndYmdDiv">계약종료일자</label>
+                                <div id="writeShopCtrtEndYmdDiv"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-4">
+                                <label for="writeTrmDiv">단말기구분</label>
+                                <select class="custom-select rounded-0" id="writeTrmDiv" name="trm_div"></select>
+                            </div>
+                            <div class="col-4">
+                                <label for="writeTrmStCd">단말기상태</label>
+                                <select class="custom-select rounded-0" id="writeTrmStCd" name="trm_st_cd"></select>
+                            </div>
+                            <div class="col-4">
+                                <label for="writeSrvDiv">서비스구분</label>
+                                <select class="custom-select rounded-0" id="writeSrvDiv" name="srv_div"></select>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-4">
+                                <label for="writeShopBizNm">사업자명</label>
+                                <input type="text" class="form-control" id="writeShopBizNm" name="shop_biz_nm" placeholder="사업자명">
+                            </div>
+                            <div class="col-4">
+                                <label for="writeTrmStCd">VAN사</label>
+                                <select class="custom-select rounded-0" id="writeVanCd" name="van_cd"></select>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group row">
+                            <div class="col-12 text-lg-center" id="writeMsg"></div>
+                        </div>
+
+                        <div class="modal-footer justify-content-end">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+                            <button type="button" class="btn btn-primary" id="submitBtn">저장</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+</html>

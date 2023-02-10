@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}"
+>
+<head>
+    <title>사용자 권한 관리</title>
+    <script type="module" th:src="@{/dist/userAuth.js}"></script>
+</head>
+
+<div layout:fragment="content" id="container">
+    <form name="authUserViewFrm">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-4">
+                        <label for="viewAuthId">권한명</label>
+                        <select class="custom-select rounded-0" id="viewAuthId" name="auth_idntf_key"></select>
+                    </div>
+                    <div class="col-4">
+                        <label for="searchStr">아이디/이름</label>
+                        <input type="text" class="form-control" id="searchStr" name="search_str">
+                    </div>
+                    <div class="col-4">
+                        <input type="text" class="form-control" style="display: none"> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
+                        <label for="viewCorpCd">계열사</label>
+                        <select class="custom-select rounded-0" id="viewCorpCd" name="corp_cd"></select>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer ">
+                <div class="row justify-content-end">
+                    <div class="col-2">
+                        <button type="button" class="btn btn-block btn-danger btn-sm" id="deleteBtn" style="display: none">삭제</button>
+                    </div>
+                    <div class="col-2">
+                        <button type="button" class="btn btn-block btn-success btn-sm" id="writeBtn">등록</button>
+                    </div>
+                    <div class="col-2 ">
+                        <button type="button" class="btn btn-block btn-primary btn-sm" id="searchBtn">조회</button>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-end" style="padding: 10px 20px; color: red">
+                * 권한을 삭제하려면 삭제할 권한명으로 먼저 조회하세요.
+            </div>
+        </div>
+    </form>
+
+    <input type="hidden" id="pagePer" name="page_per" th:value="10"/>
+
+    <!-- 그리드 영역-->
+    <div id="grid"></div>
+
+    <!-- 페이징 영역 -->
+    <div id="pagination" class="tui-pagination"></div>
+</div>
+
+</html>

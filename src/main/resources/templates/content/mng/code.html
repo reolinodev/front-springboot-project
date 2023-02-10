@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}"
+>
+<head>
+    <title>코드 관리 등록</title>
+    <script type="module" th:src="@{/dist/code.js}"></script>
+</head>
+
+<div layout:fragment="content" id="container">
+    <form name="codeGrpFrm">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">코드 그룹</h3>
+                        <div class="row justify-content-end">
+                            <div class="col-4">
+                                <button type="button" class="btn btn-block btn-success btn-sm" id="codeGrpAddBtn">추가</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-header">
+                        <div class="row justify-content-end">
+                            <div class="col-5">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control" id="searchStr" name="search_str" placeholder="코드그룹명/코드그룹값">
+                                    <input type="text" class="form-control" style="display: none"> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <select class="custom-select rounded-0" id="useYn" name="use_yn"></select>
+                            </div>
+                            <div class="col-3">
+                                <button type="button" class="btn btn-block btn-primary btn-sm" id="searchGrpBtn">조회</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <input type="hidden" class="form-control" id="pagePer" name="page_per" value="10">
+
+                        <!-- 그리드 영역-->
+                        <div id="grid"></div>
+
+                        <!-- 페이징 영역 -->
+                        <div id="pagination" class="tui-pagination"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">코드</h3>
+                        <div class="row justify-content-end">
+                            <div class="col-3">
+                                <button type="button" class="btn btn-block btn-warning btn-sm" id="addBtn">추가</button>
+                            </div>
+                            <div class="col-3">
+                                <button type="button" class="btn btn-block btn-danger btn-sm" id="delBtn">삭제</button>
+                            </div>
+                            <div class="col-3">
+                                <button type="button" class="btn btn-block btn-success btn-sm" id="saveBtn">저장</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- 그리드 영역-->
+                        <div id="grid2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- 입력화면 (modal) -->
+    <form name="codeGrpWriteFrm">
+        <div class="modal fade" id="codeGrpWrite">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">코드 그룹 등록</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group row">
+                            <div class="col-6">
+                                <input type="text" class="form-control" id="writeCodeGrpNm" name="cd_grp_nm" placeholder="코드그룹명을 입력하세요.">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control" id="writeCodeGrpVal" name="cd_grp_val" placeholder="코드그룹값을 입력하세요.">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-12 text-lg-center" id="writeMsg"></div>
+                        </div>
+                        <div class="modal-footer justify-content-end">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+                            <button type="button" class="btn btn-primary" id="writeCodeGrpBtn">저장</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- 수정화면 (modal) -->
+    <form name="codeGrpEditFrm">
+        <div class="modal fade" id="codeGrpEdit">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">코드 그룹 수정</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group row">
+                            <div class="col-4">
+                                <input type="text" class="form-control" id="editCodeGrpNm" name="cd_grp_nm" placeholder="코드 그룹명을 입력하세요.">
+                                <input type="hidden" class="form-control" id="editCodeGrpId" name="cd_grp_idntf_key">
+                            </div>
+                            <div class="col-4">
+                                <input type="text" class="form-control" id="editCodeGrpVal" name="cd_grp_val" readonly>
+                            </div>
+                            <div class="col-4">
+                                <select class="custom-select rounded-0" id="editUseYn" name="use_yn"></select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-12 text-lg-center" id="editMsg"></div>
+                        </div>
+                        <div class="modal-footer justify-content-end">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+                            <button type="button" class="btn btn-primary" id="editCodeGrpBtn">저장</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+</html>

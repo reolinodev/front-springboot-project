@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}"
+>
+<head>
+    <title>마스터DB 조회</title>
+    <script type="module" th:src="@{/dist/master.js}"></script>
+</head>
+
+<div layout:fragment="content" id="container">
+    <!-- 조회 화면 -->
+    <form id="masterViewFrm" name="masterViewFrm">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-4">
+                        <label for="mastKey">마스터키</label>
+                        <input type="text" class="form-control" id="mastKey" name="mast_key">
+                    </div>
+                    <div class="col-4">
+                        <label for="brno">사업자등록번호</label>
+                        <input type="text" class="form-control" id="brno" name="brno">
+                    </div>
+                    <div class="col-4">
+                        <label for="viewSvcYn">서비스여부</label>
+                        <select class="custom-select rounded-0" id="viewSvcYn" name="svc_yn"></select>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer ">
+                <div class="row justify-content-end">
+                    <div class="col-2 ">
+                        <button type="button" class="btn btn-block btn-primary btn-sm" id="searchBtn">조회</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <input type="hidden" id="status" th:value="${status}">
+    <input type="hidden" id="pagePer" name="page_per" th:value="10"/>
+
+    <!-- 그리드 영역-->
+    <div id="grid"></div>
+
+    <!-- 페이징 영역 -->
+    <div id="pagination" class="tui-pagination"></div>
+</div>
+
+</html>

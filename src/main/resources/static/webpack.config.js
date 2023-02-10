@@ -1,15 +1,44 @@
 const path = require('path');
 const webpack = require('webpack');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+
+const childProcess = require('child_process');
+
+const removeNewLine = buffer => {
+    return buffer.toString().replace('\n', '');
+};
+
+const env = process.env.NODE_ENV;
 
 module.exports = {
     mode: 'development',
 
     entry: {
         config: '/js/config.js',
+        login: '/js/login/login.js',
+        pwChange: '/js/login/pwChange.js',
+        head: '/js/main/head.js',
+        user: '/js/user/user.js',
+        auth: '/js/user/auth.js',
+        userAuth: '/js/user/userAuth.js',
+        userAuthWrite: '/js/user/userAuthWrite.js',
+        code: '/js/mng/code.js',
+        dtHis: '/js/mng/dtHis.js',
+        dtHisDetail: '/js/mng/dtHisDetail.js',
+        menu: '/js/menu/menu.js',
+        authMenu: '/js/menu/authMenu.js',
+        board: '/js/board/board.js',
+        post: '/js/board/post.js',
+        postEdit: '/js/board/postEdit.js',
+        postView: '/js/board/postView.js',
+        postWrite: '/js/board/postWrite.js',
+        shop: '/js/shop/shop.js',
+        shopDetail: '/js/shop/shopDetail.js',
+        master: '/js/shop/master.js',
+        masterDetail: '/js/shop/masterDetail.js',
     },
     output: {
-        path: path.resolve(`${__dirname  }/dist`),
+        path: path.resolve(`${__dirname}/dist`),
         filename: '[name].js',
         clean: true,
     },
@@ -63,8 +92,13 @@ module.exports = {
         }),
         new webpack.DefinePlugin({
             VERSION: JSON.stringify('v.1.0.0'),
-            MAX_COUNT: JSON.stringify(999),
-            'api.domain': JSON.stringify('http://127.0.0.1'),
+            'api.domain': JSON.stringify('http://localhost:8080'),
+        }),
+        new webpack.ProvidePlugin({
+            $: 'jquery',
+            moment: 'moment',
+            _: 'lodash',
+            Swal: 'sweetalert2',
         }),
     ],
 };

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}"
+>
+<head>
+    <title>이력 관리</title>
+    <script type="module" th:src="@{/dist/dtHis.js}"></script>
+</head>
+
+<div layout:fragment="content" id="container">
+    <!-- 조회 화면 -->
+    <form id="dtHisFrm" name="dtHisFrm">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-3">
+                        <label for="dtGbCd">구분</label>
+                        <select class="custom-select rounded-0" id="dtGbCd" name="dt_gb_cd"></select>
+                    </div>
+                    <div class="col-3">
+                        <label for="corpSvcCd">계열사서비스코드</label>
+                        <select class="custom-select rounded-0" id="corpSvcCd" name="corp_svc_cd"></select>
+                    </div>
+                    <div class="col-3">
+                        <label for="fileNm">파일명</label>
+                        <input type="text" class="form-control" id="fileNm" name="file_nm">
+                        <input type="text" class="form-control" style="display: none"> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
+                    </div>
+                    <div class="col-3">
+                        <label for="tbNm">테이블명</label>
+                        <input type="text" class="form-control" id="tbNm" name="tb_nm">
+                        <input type="text" class="form-control" style="display: none"> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 10px;">
+                    <div class="col-3">
+                        <label for="grdCd">단계</label>
+                        <select class="custom-select rounded-0" id="grdCd" name="grd_cd"></select>
+                    </div>
+                    <div class="col-3">
+                        <label for="stCd">상태</label>
+                        <select class="custom-select rounded-0" id="stCd" name="st_cd"></select>
+                    </div>
+                    <div class="col-6">
+                        <label>정보기준일자</label>
+                        <div id="dateRange"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer ">
+                <div class="row justify-content-end">
+                    <div class="col-2 ">
+                        <button type="button" class="btn btn-block btn-primary btn-sm" id="searchBtn">조회</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <input type="hidden" id="status" th:value="${status}">
+    <input type="hidden" id="pagePer" name="page_per" th:value="10"/>
+
+    <!-- 그리드 영역-->
+    <div id="grid"></div>
+
+    <!-- 페이징 영역 -->
+    <div id="pagination" class="tui-pagination"></div>
+</div>
+
+</html>
