@@ -7,7 +7,7 @@ import {
 import {getApi} from '../module/api';
 
 let mainUrl;
-let apiDomain = '/';
+const apiDomain = getApi();
 
 /**
  *  logout : 로그아웃
@@ -24,7 +24,7 @@ const getUserData = () => {
     const accessToken = localStorage.getItem('accessToken');
 
     $.ajax({
-        url: apiDomain + '/api/main/user',
+        url: `${apiDomain}/api/main/user`,
         type: 'GET',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Content-type', 'application/json');
@@ -93,7 +93,7 @@ const getNavList = authId => {
     };
 
     $.ajax({
-        url: apiDomain + '/api/main/nav',
+        url: `${apiDomain}/api/main/nav`,
         type: 'POST',
         data: JSON.stringify(params),
         beforeSend: function (xhr) {
@@ -239,8 +239,6 @@ const calcHeight = () => {
 
 $(document).ready(() => {
     calcHeight();
-
-    apiDomain = getApi();
 
     getUserData();
 

@@ -1,8 +1,8 @@
-import { setCodeSelBox, setCommSelBox } from '../module/component';
-import { setBasicTree } from '../module/tree';
-import { checkKr } from '../module/validation';
-import { mainViewTokenInvalidate, setAccessToken } from "../module/router";
-import { spinnerHide, spinnerShow } from "../module/spinner";
+import {setCodeSelBox, setCommSelBox} from '../module/component';
+import {setBasicTree} from '../module/tree';
+import {checkKr} from '../module/validation';
+import {mainViewTokenInvalidate, setAccessToken} from '../module/router';
+import {spinnerHide, spinnerShow} from '../module/spinner';
 
 let tree;
 
@@ -10,17 +10,16 @@ let tree;
  * search : 메뉴트리 조회
  */
 const search = () => {
-
     spinnerShow();
 
-    const accessToken = window.localStorage.getItem("accessToken");
+    const accessToken = window.localStorage.getItem('accessToken');
 
     $.ajax({
         url: `/api/menu/menu/tree`,
         type: 'GET',
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Content-type","application/json");
-            xhr.setRequestHeader("Authorization",accessToken);
+            xhr.setRequestHeader('Content-type', 'application/json');
+            xhr.setRequestHeader('Authorization', accessToken);
         },
         success(result) {
             setMenuList(result.data);
@@ -28,13 +27,16 @@ const search = () => {
             spinnerHide();
         },
         error(request, status, error) {
-            console.log(`code:${request.status}\n` + `message:${request.responseText}\n` + `error:${error}`);
+            console.log(
+                `code:${request.status}\n` +
+                    `message:${request.responseText}\n` +
+                    `error:${error}`
+            );
 
-            if(request.status === 401){
+            if (request.status === 401) {
                 setAccessToken(request.responseJSON);
                 search();
-            }
-            else if(request.status === 403){
+            } else if (request.status === 403) {
                 mainViewTokenInvalidate();
             }
 
@@ -46,7 +48,7 @@ const search = () => {
 /**
  * setMenuList : 조회된 데이터 트리 데이터로 정제 후 트리컴퍼넌트 호출
  */
-const setMenuList = (list) => {
+const setMenuList = list => {
     const menu = [];
 
     for (const data of list) {
@@ -76,31 +78,33 @@ const setMenuList = (list) => {
 /**
  * searchMenuInfo : 메뉴 상세 정보 조회하기
  */
-const searchMenuInfo = (menuIdntfKey) => {
-
+const searchMenuInfo = menuIdntfKey => {
     spinnerShow();
 
-    const accessToken = window.localStorage.getItem("accessToken");
+    const accessToken = window.localStorage.getItem('accessToken');
 
     $.ajax({
         url: `/api/menu/menu/${menuIdntfKey}`,
         type: 'GET',
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Content-type","application/json");
-            xhr.setRequestHeader("Authorization",accessToken);
+            xhr.setRequestHeader('Content-type', 'application/json');
+            xhr.setRequestHeader('Authorization', accessToken);
         },
         success(result) {
             setMenuData(result.data);
             spinnerHide();
         },
         error(request, status, error) {
-            console.log(`code:${request.status}\n` + `message:${request.responseText}\n` + `error:${error}`);
+            console.log(
+                `code:${request.status}\n` +
+                    `message:${request.responseText}\n` +
+                    `error:${error}`
+            );
 
-            if(request.status === 401){
+            if (request.status === 401) {
                 setAccessToken(request.responseJSON);
                 searchMenuInfo(menuIdntfKey);
-            }
-            else if(request.status === 403){
+            } else if (request.status === 403) {
                 mainViewTokenInvalidate();
             }
 
@@ -112,7 +116,7 @@ const searchMenuInfo = (menuIdntfKey) => {
 /**
  * setMenuData : 조회된 메뉴 데이터 화면에 매핑
  */
-const setMenuData = (data) => {
+const setMenuData = data => {
     $('#menuIdntfKey').val(data.menu_idntf_key);
     $('#menuLv').val(data.menu_lv);
     $('#menuNm').val(data.menu_nm);
@@ -128,7 +132,7 @@ const setMenuData = (data) => {
         $('#menuType2').prop('checked', true);
         const url = data.url;
         const boardKey = url.substring(url.lastIndexOf('/') + 1);
-        if(boardKey !== '' ){
+        if (boardKey !== '') {
             $('#boardId').val(boardKey);
         }
         $('#boardId').show();
@@ -191,7 +195,6 @@ const initMenuAdd = () => {
  * delMenuProc : 메뉴 삭제
  */
 const delMenuProc = () => {
-
     spinnerShow();
 
     const param = {
@@ -199,20 +202,20 @@ const delMenuProc = () => {
         menu_lv: $('#menuLv').val(),
     };
 
-    const accessToken = window.localStorage.getItem("accessToken");
+    const accessToken = window.localStorage.getItem('accessToken');
 
     $.ajax({
         url: '/api/menu/menu/',
         type: 'DELETE',
         data: JSON.stringify(param),
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Content-type","application/json");
-            xhr.setRequestHeader("Authorization",accessToken);
+            xhr.setRequestHeader('Content-type', 'application/json');
+            xhr.setRequestHeader('Authorization', accessToken);
         },
     }).then(
-        (data) => {
+        data => {
             alert(data.header.message);
-            if (data.header.resultCode === 'ok') {
+            if (data.header.result_code === 'ok') {
                 search();
             }
 
@@ -222,24 +225,24 @@ const delMenuProc = () => {
             if (request.status === 500) {
                 console.log(
                     `code:${request.status}\n` +
-                    `message:${request.responseText}\n` +
-                    `error:${error}`
+                        `message:${request.responseText}\n` +
+                        `error:${error}`
                 );
             } else if (request.status === 400) {
-                const { errorList } = request.responseJSON;
+                const {errorList} = request.responseJSON;
                 if (errorList !== undefined) {
                     if (errorList.lengh !== 0) {
-                        const { message } = errorList[0];
+                        const {message} = errorList[0];
                         alert(message);
                     }
                 } else {
                     const data = request.responseJSON.header;
                     alert(data.message);
                 }
-            } else if(request.status === 401){
+            } else if (request.status === 401) {
                 setAccessToken(request.responseJSON);
                 delMenuProc();
-            } else if(request.status === 403){
+            } else if (request.status === 403) {
                 mainViewTokenInvalidate();
             }
 
@@ -297,20 +300,20 @@ const saveMenuProc = () => {
         url = `/api/menu/menu/${$('#menuIdntfKey').val()}`;
     }
 
-    const accessToken = window.localStorage.getItem("accessToken");
+    const accessToken = window.localStorage.getItem('accessToken');
 
     $.ajax({
         url,
         type: 'PUT',
         data: JSON.stringify(param),
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Content-type","application/json");
-            xhr.setRequestHeader("Authorization",accessToken);
+            xhr.setRequestHeader('Content-type', 'application/json');
+            xhr.setRequestHeader('Authorization', accessToken);
         },
     }).then(
-        (data) => {
+        data => {
             alert(data.header.message);
-            if (data.header.resultCode === 'ok') {
+            if (data.header.result_code === 'ok') {
                 search();
             }
 
@@ -318,29 +321,33 @@ const saveMenuProc = () => {
         },
         (request, status, error) => {
             if (request.status === 500) {
-                console.log(`code:${request.status}\n` + `message:${request.responseText}\n` + `error:${error}`);
+                console.log(
+                    `code:${request.status}\n` +
+                        `message:${request.responseText}\n` +
+                        `error:${error}`
+                );
             } else if (request.status === 400) {
-                const { errorList } = request.responseJSON;
+                const {errorList} = request.responseJSON;
                 if (errorList !== undefined) {
                     if (errorList.lengh !== 0) {
-                        const { message } = errorList[0];
+                        const {message} = errorList[0];
                         alert(message);
                     }
                 } else {
                     const data = request.responseJSON.header;
                     alert(data.message);
                 }
-            } else if(request.status === 401){
+            } else if (request.status === 401) {
                 setAccessToken(request.responseJSON);
                 saveMenuProc();
-            } else if(request.status === 403){
+            } else if (request.status === 403) {
                 mainViewTokenInvalidate();
             }
 
             spinnerHide();
         }
     );
-}
+};
 
 $(document).ready(() => {
     setCodeSelBox('useYn', 'USE_YN', '', 'Y');
@@ -367,8 +374,7 @@ $(document).ready(() => {
     // 메뉴 레벨 변경시 상위 메뉴 검색
     $('#menuLv').change(() => {
         if ($('#menuLv').val() === '2') {
-            const params = {
-            };
+            const params = {};
             const option = {
                 oTxt: 'menu_nm',
                 oVal: 'menu_idntf_key',
@@ -405,19 +411,19 @@ $(document).ready(() => {
             return;
         }
 
-        if(confirm("선택된 메뉴를 삭제하시겠습니까?")){
+        if (confirm('선택된 메뉴를 삭제하시겠습니까?')) {
             delMenuProc();
         }
     });
 
     $("input[name='menu_type']").change(() => {
         const menuType = $("input[name='menu_type']:checked").val();
-        $("#url").val('');
-        $("#boardId").val('');
-        if(menuType === 'URL') {
-            $("#boardId").hide();
-        }else {
-            $("#boardId").show();
+        $('#url').val('');
+        $('#boardId').val('');
+        if (menuType === 'URL') {
+            $('#boardId').hide();
+        } else {
+            $('#boardId').show();
         }
     });
 
@@ -425,9 +431,8 @@ $(document).ready(() => {
     $('#boardId').change(() => {
         const boardId = $('#boardId').val();
 
-        if(boardId !== ''){
-            $("#url").val(`/page/board/post/`+boardId);
+        if (boardId !== '') {
+            $('#url').val(`/page/board/post/` + boardId);
         }
     });
-
 });

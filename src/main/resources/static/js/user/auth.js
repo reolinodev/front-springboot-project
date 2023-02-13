@@ -1,10 +1,10 @@
-import { setCodeSelBox } from '../module/component';
-import Page, { setPagination } from '../module/pagination';
-import { serializeFormJson } from '../module/json';
-import { setBasicGrid, setGridClickEvent } from '../module/grid';
-import { checkKr } from '../module/validation';
-import { mainViewTokenInvalidate, setAccessToken } from "../module/router";
-import {spinnerHide, spinnerShow} from "../module/spinner";
+import {setCodeSelBox} from '../module/component';
+import Page, {setPagination} from '../module/pagination';
+import {serializeFormJson} from '../module/json';
+import {setBasicGrid, setGridClickEvent} from '../module/grid';
+import {checkKr} from '../module/validation';
+import {mainViewTokenInvalidate, setAccessToken} from '../module/router';
+import {spinnerHide, spinnerShow} from '../module/spinner';
 
 let page = new Page(1, false, 10, 0);
 let grid;
@@ -18,22 +18,21 @@ const pageInit = () => {
  * search : 조회
  */
 const search = () => {
-
     spinnerShow();
 
     const params = serializeFormJson('authViewFrm');
     params.current_page = page.currentPage;
     params.page_per = page.pagePer;
 
-    const accessToken = window.localStorage.getItem("accessToken");
+    const accessToken = window.localStorage.getItem('accessToken');
 
     $.ajax({
         url: '/api/auth/',
         type: 'POST',
         data: JSON.stringify(params),
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Content-type","application/json");
-            xhr.setRequestHeader("Authorization",accessToken);
+            xhr.setRequestHeader('Content-type', 'application/json');
+            xhr.setRequestHeader('Authorization', accessToken);
         },
         success(result) {
             const gridData = result.data;
@@ -50,13 +49,16 @@ const search = () => {
             spinnerHide();
         },
         error(request, status, error) {
-            console.log(`code:${request.status}\n` + `message:${request.responseText}\n` + `error:${error}`);
+            console.log(
+                `code:${request.status}\n` +
+                    `message:${request.responseText}\n` +
+                    `error:${error}`
+            );
 
-            if(request.status === 401){
+            if (request.status === 401) {
                 setAccessToken(request.responseJSON);
                 search();
-            }
-            else if(request.status === 403){
+            } else if (request.status === 403) {
                 mainViewTokenInvalidate();
             }
 
@@ -71,12 +73,29 @@ const search = () => {
 const setGridLayout = () => {
     // 헤더 생성
     const columns = [
-        { header: 'No', name: 'rnum', width: 50, align: 'center' },
-        { header: 'SEQ', name: 'auth_idntf_key', width: 100, align: 'center', hidden: true },
-        { header: '권한코드', name: 'auth_cd', align: 'center', renderer: { styles: {color: '#0863c8', textDecoration : 'underline', cursor: 'pointer'}}},
-        { header: '권한명', name: 'auth_nm', align: 'center' },
-        { header: '순서', name: 'ord', align: 'center' },
-        { header: '사용여부', name: 'use_yn_nm', width: 150, align: 'center' },
+        {header: 'No', name: 'rnum', width: 50, align: 'center'},
+        {
+            header: 'SEQ',
+            name: 'auth_idntf_key',
+            width: 100,
+            align: 'center',
+            hidden: true,
+        },
+        {
+            header: '권한코드',
+            name: 'auth_cd',
+            align: 'center',
+            renderer: {
+                styles: {
+                    color: '#0863c8',
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                },
+            },
+        },
+        {header: '권한명', name: 'auth_nm', align: 'center'},
+        {header: '순서', name: 'ord', align: 'center'},
+        {header: '사용여부', name: 'use_yn_nm', width: 150, align: 'center'},
     ];
     // 데이터
     const gridData = [];
@@ -87,13 +106,13 @@ const setGridLayout = () => {
 /**
  * pagingCallback : 페이징 콜백
  */
-const pagingCallback = (returnPage) => {
+const pagingCallback = returnPage => {
     page.currentPage = returnPage;
     search();
 };
 
 const $writeAuthNm = $('#writeAuthNm');
-const $writeAuthCd= $('#writeAuthCd');
+const $writeAuthCd = $('#writeAuthCd');
 const $writeOrd = $('#writeOrd');
 const $writeMemo = $('#writeMemo');
 
@@ -130,19 +149,19 @@ const insertProc = () => {
         memo: $writeMemo.val(),
     };
 
-    const accessToken = window.localStorage.getItem("accessToken");
+    const accessToken = window.localStorage.getItem('accessToken');
 
     $.ajax({
         url: '/api/auth/',
         type: 'PUT',
         data: JSON.stringify(param),
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Content-type","application/json");
-            xhr.setRequestHeader("Authorization",accessToken);
+            xhr.setRequestHeader('Content-type', 'application/json');
+            xhr.setRequestHeader('Authorization', accessToken);
         },
     }).then(
-        (data) => {
-            if (data.header.resultCode === 'ok') {
+        data => {
+            if (data.header.result_code === 'ok') {
                 alert(data.header.message);
                 search();
                 closeModal();
@@ -154,22 +173,26 @@ const insertProc = () => {
         },
         (request, status, error) => {
             if (request.status === 500) {
-                console.log(`code:${request.status}\n` + `message:${request.responseText}\n` + `error:${error}`);
+                console.log(
+                    `code:${request.status}\n` +
+                        `message:${request.responseText}\n` +
+                        `error:${error}`
+                );
             } else if (request.status === 400) {
-                const { errorList } = request.responseJSON;
+                const {errorList} = request.responseJSON;
                 if (errorList !== undefined) {
                     if (errorList.lengh !== 0) {
-                        const { message } = errorList[0];
+                        const {message} = errorList[0];
                         $('#writeMsg').html(message);
                     }
                 } else {
                     const data = request.responseJSON.header;
                     $('#writeMsg').html(data.message);
                 }
-            } else if(request.status === 401){
+            } else if (request.status === 401) {
                 setAccessToken(request.responseJSON);
                 insertProc();
-            } else if(request.status === 403){
+            } else if (request.status === 403) {
                 mainViewTokenInvalidate();
             }
 
@@ -188,18 +211,17 @@ const $editUseYn = $('#editUseYn');
 /**
  * authEdit : 권한 수정 화면 호출
  */
-const authEdit = (authIdntfKey) => {
-
+const authEdit = authIdntfKey => {
     spinnerShow();
 
-    const accessToken = window.localStorage.getItem("accessToken");
+    const accessToken = window.localStorage.getItem('accessToken');
 
     $.ajax({
         url: `/api/auth/${authIdntfKey}`,
         type: 'GET',
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Content-type","application/json");
-            xhr.setRequestHeader("Authorization",accessToken);
+            xhr.setRequestHeader('Content-type', 'application/json');
+            xhr.setRequestHeader('Authorization', accessToken);
         },
         success(result) {
             setEditData(result.data);
@@ -207,13 +229,16 @@ const authEdit = (authIdntfKey) => {
             spinnerHide();
         },
         error(request, status, error) {
-            console.log(`code:${request.status}\n` + `message:${request.responseText}\n` + `error:${error}`);
+            console.log(
+                `code:${request.status}\n` +
+                    `message:${request.responseText}\n` +
+                    `error:${error}`
+            );
 
-            if(request.status === 401){
+            if (request.status === 401) {
                 setAccessToken(request.responseJSON);
                 authEdit(authIdntfKey);
-            }
-            else if(request.status === 403){
+            } else if (request.status === 403) {
                 mainViewTokenInvalidate();
             }
 
@@ -225,7 +250,7 @@ const authEdit = (authIdntfKey) => {
 /**
  * setEditData : 에디트 데이터 셋
  */
-const setEditData = (data) => {
+const setEditData = data => {
     $editAuthIdntfKey.val(data.auth_idntf_key);
     $editAuthNm.val(data.auth_nm);
     $editAuthCd.val(data.auth_cd);
@@ -241,7 +266,6 @@ const setEditData = (data) => {
  *  editProc : 권한 수정
  */
 const editProc = () => {
-
     spinnerShow();
 
     const param = {
@@ -252,7 +276,7 @@ const editProc = () => {
         use_yn: $editUseYn.val(),
     };
 
-    const accessToken = window.localStorage.getItem("accessToken");
+    const accessToken = window.localStorage.getItem('accessToken');
 
     $.ajax({
         url: `/api/auth/${$editAuthIdntfKey.val()}`,
@@ -260,12 +284,12 @@ const editProc = () => {
         data: JSON.stringify(param),
 
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Content-type","application/json");
-            xhr.setRequestHeader("Authorization",accessToken);
+            xhr.setRequestHeader('Content-type', 'application/json');
+            xhr.setRequestHeader('Authorization', accessToken);
         },
     }).then(
-        (data) => {
-            if (data.header.resultCode === 'ok') {
+        data => {
+            if (data.header.result_code === 'ok') {
                 alert(data.header.message);
                 search();
                 closeModal();
@@ -277,22 +301,26 @@ const editProc = () => {
         },
         (request, status, error) => {
             if (request.status === 500) {
-                console.log(`code:${request.status}\n` + `message:${request.responseText}\n` + `error:${error}`);
+                console.log(
+                    `code:${request.status}\n` +
+                        `message:${request.responseText}\n` +
+                        `error:${error}`
+                );
             } else if (request.status === 400) {
-                const { errorList } = request.responseJSON;
+                const {errorList} = request.responseJSON;
                 if (errorList !== undefined) {
                     if (errorList.lengh !== 0) {
-                        const { message } = errorList[0];
+                        const {message} = errorList[0];
                         $('#editMsg').html(message);
                     }
                 } else {
                     const data = request.responseJSON.header;
                     $('#editMsg').html(data.message);
                 }
-            } else if(request.status === 401){
+            } else if (request.status === 401) {
                 setAccessToken(request.responseJSON);
                 editProc();
-            } else if(request.status === 403){
+            } else if (request.status === 403) {
                 mainViewTokenInvalidate();
             }
 
@@ -327,7 +355,6 @@ $(document).ready(() => {
 
     // 등록버튼 클릭시 모달을 초기화한다.
     $('#writeBtn').click(() => {
-
         initAuthMngWrite();
 
         window.$('#authWrite').modal('show');
@@ -343,12 +370,12 @@ $(document).ready(() => {
         editProc();
     });
 
-    const searchStrInput = document.getElementById("searchStr");
+    const searchStrInput = document.getElementById('searchStr');
 
-    searchStrInput.addEventListener("keyup", function (event) {
+    searchStrInput.addEventListener('keyup', function (event) {
         if (event.keyCode === 13) {
             event.preventDefault();
-            document.getElementById("searchBtn").click();
+            document.getElementById('searchBtn').click();
         }
     });
 

@@ -1,7 +1,7 @@
 import {pageRouter} from '../module/router';
 import {getApi} from '../module/api';
 
-let apiDomain = getApi();
+const apiDomain = getApi();
 const $loginId = $('#loginId');
 const $userPw = $('#userPw');
 const $userPwRe = $('#userPwRe');
@@ -42,7 +42,7 @@ const pwChangeProc = () => {
     const accessToken = localStorage.getItem('accessToken');
 
     $.ajax({
-        url: apiDomain + '/api/user/user-pw',
+        url: `${apiDomain}/api/user/user-pw`,
         type: 'PUT',
         data: JSON.stringify(param),
         beforeSend: function (xhr) {

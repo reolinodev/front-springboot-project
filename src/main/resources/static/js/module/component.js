@@ -1,4 +1,5 @@
 import {mainViewTokenInvalidate, setAccessToken} from './router';
+import {getApi} from './api';
 
 /**
  * setCommonSelectBox : 공통코드를 사용한 셀렉트 박스 생성
@@ -6,19 +7,14 @@ import {mainViewTokenInvalidate, setAccessToken} from './router';
  */
 export function setCodeSelBox(id, codeGrp, type, selectedValue) {
     let str = '';
+    const apiDomain = getApi();
 
     if (type === 'ALL') str += `<option value="">-- 전체 --</option>`;
     else if (type === 'SEL') str += `<option value="">-- 선택 --</option>`;
 
-    const accessToken = window.localStorage.getItem('accessToken');
-
     $.ajax({
-        url: `/api/mng/code/item/${codeGrp}`,
+        url: `${apiDomain}/api/item/code/${codeGrp}`,
         type: 'GET',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
     }).then(
         result => {
             const dataList = result.data;
@@ -26,11 +22,11 @@ export function setCodeSelBox(id, codeGrp, type, selectedValue) {
             for (let i = 0; i < dataList.length; i++) {
                 if (
                     selectedValue !== '' &&
-                    selectedValue === dataList[i].cd_val
+                    selectedValue === dataList[i].code_val
                 ) {
-                    str += `<option value="${dataList[i].cd_val}" selected> ${dataList[i].cd_nm}</option>`;
+                    str += `<option value="${dataList[i].code_val}" selected> ${dataList[i].code_nm}</option>`;
                 } else {
-                    str += `<option value="${dataList[i].cd_val}"> ${dataList[i].cd_nm}</option>`;
+                    str += `<option value="${dataList[i].code_val}"> ${dataList[i].code_nm}</option>`;
                 }
             }
 
@@ -54,11 +50,6 @@ export function setCodeSelBox(id, codeGrp, type, selectedValue) {
                     const data = request.responseJSON.header;
                     $('#msg').html(data.message);
                 }
-            } else if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                setCodeSelBox(id, codeGrp, type, selectedValue);
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
             }
         }
     );
@@ -70,6 +61,7 @@ export function setCodeSelBox(id, codeGrp, type, selectedValue) {
  */
 export function setCodeSelBoxCall(id, codeGrp, type, selectedValue, callBack) {
     let str = '';
+    const apiDomain = getApi();
 
     if (type === 'ALL') str += `<option value="">-- 전체 --</option>`;
     else if (type === 'SEL') str += `<option value="">-- 선택 --</option>`;
@@ -77,7 +69,7 @@ export function setCodeSelBoxCall(id, codeGrp, type, selectedValue, callBack) {
     const accessToken = window.localStorage.getItem('accessToken');
 
     $.ajax({
-        url: `/api/mng/code/item/${codeGrp}`,
+        url: `${apiDomain}/api/item/code/${codeGrp}`,
         type: 'GET',
         beforeSend: function (xhr) {
             xhr.setRequestHeader('Content-type', 'application/json');

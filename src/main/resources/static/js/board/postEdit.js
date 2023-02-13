@@ -1,8 +1,8 @@
-import { setBasicEditor } from '../module/editor';
-import { setCodeSelBox } from '../module/component';
-import { serializeFormJson } from '../module/json';
-import { mainViewTokenInvalidate, setAccessToken } from "../module/router";
-import { spinnerHide, spinnerShow } from "../module/spinner";
+import {setBasicEditor} from '../module/editor';
+import {setCodeSelBox} from '../module/component';
+import {serializeFormJson} from '../module/json';
+import {mainViewTokenInvalidate, setAccessToken} from '../module/router';
+import {spinnerHide, spinnerShow} from '../module/spinner';
 
 let editor;
 let content = '';
@@ -28,19 +28,19 @@ const saveProc = () => {
 
     const params = serializeFormJson('postEditFrm');
 
-    const accessToken = window.localStorage.getItem("accessToken");
+    const accessToken = window.localStorage.getItem('accessToken');
 
     $.ajax({
         url: `/api/post/${$('#postId').val()}`,
         type: 'PUT',
         data: JSON.stringify(params),
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Content-type","application/json");
-            xhr.setRequestHeader("Authorization",accessToken);
+            xhr.setRequestHeader('Content-type', 'application/json');
+            xhr.setRequestHeader('Authorization', accessToken);
         },
     }).then(
-        (data) => {
-            if (data.header.resultCode === 'ok') {
+        data => {
+            if (data.header.result_code === 'ok') {
                 alert(data.header.message);
                 pageMove();
             } else {
@@ -51,22 +51,26 @@ const saveProc = () => {
         },
         (request, status, error) => {
             if (request.status === 500) {
-                console.log(`code:${request.status}\n` + `message:${request.responseText}\n` + `error:${error}`);
+                console.log(
+                    `code:${request.status}\n` +
+                        `message:${request.responseText}\n` +
+                        `error:${error}`
+                );
             } else if (request.status === 400) {
-                const { errorList } = request.responseJSON;
+                const {errorList} = request.responseJSON;
                 if (errorList !== undefined) {
                     if (errorList.lengh !== 0) {
-                        const { message } = errorList[0];
+                        const {message} = errorList[0];
                         alert(message);
                     }
                 } else {
                     const data = request.responseJSON.header;
                     alert(data.message);
                 }
-            } else if(request.status === 401){
+            } else if (request.status === 401) {
                 setAccessToken(request.responseJSON);
                 saveProc();
-            } else if(request.status === 403){
+            } else if (request.status === 403) {
                 mainViewTokenInvalidate();
             }
 
@@ -76,18 +80,17 @@ const saveProc = () => {
 };
 
 const pageMove = () => {
-    const boardKey = $("#boardKey").val();
+    const boardKey = $('#boardKey').val();
 
     let url = `/page/board/post/back`;
-    if(boardKey !== ''){
-        url = `/page/board/post/back/`+boardKey
+    if (boardKey !== '') {
+        url = `/page/board/post/back/` + boardKey;
     }
 
     location.href = url;
-}
+};
 
 $(document).ready(() => {
-
     content = $('#postText').val();
     editor = setBasicEditor('editor', content, 500);
 

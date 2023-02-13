@@ -1,9 +1,9 @@
-import { setCodeSelBox, setCommSelBox } from '../module/component';
-import Page, { setPagination } from '../module/pagination';
-import { setCheckBoxGrid } from '../module/grid';
-import { serializeFormJson } from '../module/json';
-import { mainViewTokenInvalidate, setAccessToken } from "../module/router";
-import { spinnerHide, spinnerShow } from "../module/spinner";
+import {setCodeSelBox, setCommSelBox} from '../module/component';
+import Page, {setPagination} from '../module/pagination';
+import {setCheckBoxGrid} from '../module/grid';
+import {serializeFormJson} from '../module/json';
+import {mainViewTokenInvalidate, setAccessToken} from '../module/router';
+import {spinnerHide, spinnerShow} from '../module/spinner';
 
 let page = new Page(1, false, 10, 0);
 let grid;
@@ -15,13 +15,23 @@ let pagination;
 const setGridLayout = () => {
     // 헤더 생성
     const columns = [
-        { header: 'No', name: 'rnum', width: 100, align: 'center' },
-        { header: '권한 식별자', name: 'auth_idntf_key', align: 'center', hidden: true },
-        { header: '사용자 식별자', name: 'user_idntf_key', align: 'center', hidden: true },
-        { header: '권한명', name: 'auth_nm', align: 'center' },
-        { header: '아이디', name: 'login_id', align: 'center' },
-        { header: '이름', name: 'user_nm', align: 'center' },
-        { header: '계열사', name: 'corp_nm', align: 'center' },
+        {header: 'No', name: 'rnum', width: 100, align: 'center'},
+        {
+            header: '권한 식별자',
+            name: 'auth_idntf_key',
+            align: 'center',
+            hidden: true,
+        },
+        {
+            header: '사용자 식별자',
+            name: 'user_idntf_key',
+            align: 'center',
+            hidden: true,
+        },
+        {header: '권한명', name: 'auth_nm', align: 'center'},
+        {header: '아이디', name: 'login_id', align: 'center'},
+        {header: '이름', name: 'user_nm', align: 'center'},
+        {header: '계열사', name: 'corp_nm', align: 'center'},
     ];
     // 데이터
     const gridData = [];
@@ -32,7 +42,7 @@ const setGridLayout = () => {
 /**
  * pagingCallback : 페이징 콜백
  */
-const pagingCallback = (returnPage) => {
+const pagingCallback = returnPage => {
     page.currentPage = returnPage;
     search();
 };
@@ -41,22 +51,21 @@ const pagingCallback = (returnPage) => {
  * search : 조회
  */
 const search = () => {
-
     spinnerShow();
 
     const params = serializeFormJson('authUserViewFrm');
     params.current_page = page.currentPage;
     params.page_per = page.pagePer;
 
-    const accessToken = window.localStorage.getItem("accessToken");
+    const accessToken = window.localStorage.getItem('accessToken');
 
     $.ajax({
         url: '/api/userAuth/',
         type: 'POST',
         data: JSON.stringify(params),
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Content-type","application/json");
-            xhr.setRequestHeader("Authorization",accessToken);
+            xhr.setRequestHeader('Content-type', 'application/json');
+            xhr.setRequestHeader('Authorization', accessToken);
         },
         success(result) {
             const gridData = result.data;
@@ -77,13 +86,16 @@ const search = () => {
             spinnerHide();
         },
         error(request, status, error) {
-            console.log(`code:${request.status}\n` + `message:${request.responseText}\n` + `error:${error}`);
+            console.log(
+                `code:${request.status}\n` +
+                    `message:${request.responseText}\n` +
+                    `error:${error}`
+            );
 
-            if(request.status === 401){
+            if (request.status === 401) {
                 setAccessToken(request.responseJSON);
                 search();
-            }
-            else if(request.status === 403){
+            } else if (request.status === 403) {
                 mainViewTokenInvalidate();
             }
 
@@ -116,19 +128,19 @@ const delProc = () => {
         user_arr: userArr,
     };
 
-    const accessToken = window.localStorage.getItem("accessToken");
+    const accessToken = window.localStorage.getItem('accessToken');
 
     $.ajax({
         url: '/api/userAuth/',
         type: 'DELETE',
         data: JSON.stringify(params),
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Content-type","application/json");
-            xhr.setRequestHeader("Authorization",accessToken);
+            xhr.setRequestHeader('Content-type', 'application/json');
+            xhr.setRequestHeader('Authorization', accessToken);
         },
     }).then(
-        (data) => {
-            if (data.header.resultCode === 'ok') {
+        data => {
+            if (data.header.result_code === 'ok') {
                 alert(data.header.message);
                 pageInit();
                 search();
@@ -138,22 +150,26 @@ const delProc = () => {
         },
         (request, status, error) => {
             if (request.status === 500) {
-                console.log(`code:${request.status}\n` + `message:${request.responseText}\n` + `error:${error}`);
+                console.log(
+                    `code:${request.status}\n` +
+                        `message:${request.responseText}\n` +
+                        `error:${error}`
+                );
             } else if (request.status === 400) {
-                const { errorList } = request.responseJSON;
+                const {errorList} = request.responseJSON;
                 if (errorList !== undefined) {
                     if (errorList.lengh !== 0) {
-                        const { message } = errorList[0];
+                        const {message} = errorList[0];
                         alert(message);
                     }
                 } else {
                     const data = request.responseJSON.header;
                     alert(data.message);
                 }
-            } else if(request.status === 401){
+            } else if (request.status === 401) {
                 setAccessToken(request.responseJSON);
                 delProc();
-            } else if(request.status === 403){
+            } else if (request.status === 403) {
                 mainViewTokenInvalidate();
             }
 
@@ -204,12 +220,12 @@ $(document).ready(() => {
     // 페이징 세팅
     pagination = setPagination(page, pagingCallback);
 
-    const searchStrInput = document.getElementById("searchStr");
+    const searchStrInput = document.getElementById('searchStr');
 
-    searchStrInput.addEventListener("keyup", function (event) {
+    searchStrInput.addEventListener('keyup', function (event) {
         if (event.keyCode === 13) {
             event.preventDefault();
-            document.getElementById("searchBtn").click();
+            document.getElementById('searchBtn').click();
         }
     });
 

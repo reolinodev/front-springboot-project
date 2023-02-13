@@ -29,7 +29,7 @@ const certification = () => {
     };
 
     $.ajax({
-        url: apiDomain + '/api/certification',
+        url: `${apiDomain}/api/certification`,
         type: 'POST',
         data: JSON.stringify(params),
         headers: {'Content-Type': 'application/json'},
@@ -74,7 +74,7 @@ const login = () => {
     };
 
     $.ajax({
-        url: apiDomain + '/api/login',
+        url: `${apiDomain}/api/login`,
         type: 'POST',
         data: JSON.stringify(params),
         beforeSend: function (xhr) {
