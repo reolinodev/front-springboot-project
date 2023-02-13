@@ -19,9 +19,6 @@ public class PageController {
     @Value("${api.url}")
     private String apiUrl;
 
-    @Value("${menu.type}")
-    private String menuType;
-
 
     /***
      * 1.로그인 화면 : /page/login
@@ -34,14 +31,21 @@ public class PageController {
         return "forward:"+ url;
     }
 
+    /**
+     * 로그인 화면
+     */
+
     @GetMapping("/page/login")
     public ModelAndView loginView() {
         ModelAndView mav = new ModelAndView();
         mav.addObject("apiUrl", apiUrl);
-        mav.addObject("menuType", menuType);
         mav.setViewName("pages/login");
         return mav;
     }
+
+    /**
+     * 비밀번호 화면
+     */
 
     @PostMapping("/page/pwChange")
     public ModelAndView pwChangeView() {
@@ -50,24 +54,17 @@ public class PageController {
         return mav;
     }
 
-    //삭제예정
-    @GetMapping("/page/pwChange")
-    public ModelAndView pwChangeView2() {
+
+
+    /**
+     * 메인 화면
+     */
+    @PostMapping(value = "/page/main")
+    public ModelAndView mainView()   {
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("pages/pwChange");
+        mav.setViewName("content/main");
         return mav;
     }
-
-//
-//    /**
-//     * 메인 화면
-//     */
-//    @PostMapping(value = "/page/main")
-//    public ModelAndView mainView()   {
-//        ModelAndView mav = new ModelAndView();
-//        mav.setViewName("content/main");
-//        return mav;
-//    }
 
 //    /***
 //     * 1.사용자 관리 화면 : /page/user/user

@@ -1,4 +1,4 @@
-import { mainViewTokenInvalidate, setAccessToken } from "./router";
+import {mainViewTokenInvalidate, setAccessToken} from './router';
 
 /**
  * setCommonSelectBox : 공통코드를 사용한 셀렉트 박스 생성
@@ -10,17 +10,17 @@ export function setCodeSelBox(id, codeGrp, type, selectedValue) {
     if (type === 'ALL') str += `<option value="">-- 전체 --</option>`;
     else if (type === 'SEL') str += `<option value="">-- 선택 --</option>`;
 
-    const accessToken = window.localStorage.getItem("accessToken");
+    const accessToken = window.localStorage.getItem('accessToken');
 
     $.ajax({
         url: `/api/mng/code/item/${codeGrp}`,
         type: 'GET',
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Content-type","application/json");
-            xhr.setRequestHeader("Authorization",accessToken);
+            xhr.setRequestHeader('Content-type', 'application/json');
+            xhr.setRequestHeader('Authorization', accessToken);
         },
     }).then(
-        (result) => {
+        result => {
             const dataList = result.data;
 
             for (let i = 0; i < dataList.length; i++) {
@@ -38,22 +38,26 @@ export function setCodeSelBox(id, codeGrp, type, selectedValue) {
         },
         (request, status, error) => {
             if (request.status === 500) {
-                console.log(`code:${request.status}\n` + `message:${request.responseText}\n` + `error:${error}`);
+                console.log(
+                    `code:${request.status}\n` +
+                        `message:${request.responseText}\n` +
+                        `error:${error}`
+                );
             } else if (request.status === 400) {
-                const { errorList } = request.responseJSON;
+                const {errorList} = request.responseJSON;
                 if (errorList !== undefined) {
                     if (errorList.lengh !== 0) {
-                        const { message } = errorList[0];
+                        const {message} = errorList[0];
                         $('#msg').html(message);
                     }
                 } else {
                     const data = request.responseJSON.header;
                     $('#msg').html(data.message);
                 }
-            } else if(request.status === 401){
+            } else if (request.status === 401) {
                 setAccessToken(request.responseJSON);
                 setCodeSelBox(id, codeGrp, type, selectedValue);
-            } else if(request.status === 403){
+            } else if (request.status === 403) {
                 mainViewTokenInvalidate();
             }
         }
@@ -65,23 +69,22 @@ export function setCodeSelBox(id, codeGrp, type, selectedValue) {
  * 생성할 아이디, 코드, 타입(전체, 선택, ''), 선택된 값('')
  */
 export function setCodeSelBoxCall(id, codeGrp, type, selectedValue, callBack) {
-
     let str = '';
 
     if (type === 'ALL') str += `<option value="">-- 전체 --</option>`;
     else if (type === 'SEL') str += `<option value="">-- 선택 --</option>`;
 
-    const accessToken = window.localStorage.getItem("accessToken");
+    const accessToken = window.localStorage.getItem('accessToken');
 
     $.ajax({
         url: `/api/mng/code/item/${codeGrp}`,
         type: 'GET',
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Content-type","application/json");
-            xhr.setRequestHeader("Authorization",accessToken);
+            xhr.setRequestHeader('Content-type', 'application/json');
+            xhr.setRequestHeader('Authorization', accessToken);
         },
     }).then(
-        (result) => {
+        result => {
             const dataList = result.data;
 
             for (let i = 0; i < dataList.length; i++) {
@@ -103,24 +106,24 @@ export function setCodeSelBoxCall(id, codeGrp, type, selectedValue, callBack) {
             if (request.status === 500) {
                 console.log(
                     `code:${request.status}\n` +
-                    `message:${request.responseText}\n` +
-                    `error:${error}`
+                        `message:${request.responseText}\n` +
+                        `error:${error}`
                 );
             } else if (request.status === 400) {
-                const { errorList } = request.responseJSON;
+                const {errorList} = request.responseJSON;
                 if (errorList !== undefined) {
                     if (errorList.lengh !== 0) {
-                        const { message } = errorList[0];
+                        const {message} = errorList[0];
                         $('#msg').html(message);
                     }
                 } else {
                     const data = request.responseJSON.header;
                     $('#msg').html(data.message);
                 }
-            } else if(request.status === 401){
+            } else if (request.status === 401) {
                 setAccessToken(request.responseJSON);
                 setCodeSelBoxCall(id, codeGrp, type, selectedValue, callBack);
-            } else if(request.status === 403){
+            } else if (request.status === 403) {
                 mainViewTokenInvalidate();
             }
         }
@@ -131,7 +134,15 @@ export function setCodeSelBoxCall(id, codeGrp, type, selectedValue, callBack) {
  * setCommSelBox : 공통코드를 사용하지 않는 경우 셀렉트 박스 생성
  * 생성할 아이디, url, url_type(url 전송 타입) ,타입(전체, 선택, ''), 선택된 값(''), 파라미터(''), option(옵션안에 넣을 텍스트와 value의 값을 추출)
  */
-export function setCommSelBox(id, url, url_type, type, selected_value, params, option) {
+export function setCommSelBox(
+    id,
+    url,
+    url_type,
+    type,
+    selected_value,
+    params,
+    option
+) {
     let str = '';
 
     if (type === 'ALL') str += `<option value="">-- 전체 --</option>`;
@@ -140,7 +151,7 @@ export function setCommSelBox(id, url, url_type, type, selected_value, params, o
     if (params === '') {
         params = {};
     }
-    const accessToken = window.localStorage.getItem("accessToken");
+    // const accessToken = window.localStorage.getItem("accessToken");
 
     if (url === '') {
         str += '</select>';
@@ -150,10 +161,10 @@ export function setCommSelBox(id, url, url_type, type, selected_value, params, o
             url,
             type: url_type,
             data: JSON.stringify(params),
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("Content-type","application/json");
-                xhr.setRequestHeader("Authorization",accessToken);
-            },
+            // beforeSend: function (xhr) {
+            //     xhr.setRequestHeader("Content-type","application/json");
+            //     xhr.setRequestHeader("Authorization",accessToken);
+            // },
             success(result) {
                 const list = result.data;
 
@@ -163,8 +174,8 @@ export function setCommSelBox(id, url, url_type, type, selected_value, params, o
 
                 for (let i = 0; i < list.length; i++) {
                     if (option !== '') {
-                        const { oTxt } = option;
-                        const { oVal } = option;
+                        const {oTxt} = option;
+                        const {oVal} = option;
 
                         if (selected_value !== '') {
                             if (
@@ -184,26 +195,45 @@ export function setCommSelBox(id, url, url_type, type, selected_value, params, o
                 $(`#${id}`).html(str);
             },
             error(request, status, error) {
-                console.log(`code:${request.status}\n` + `message:${request.responseText}\n` + `error:${error}`);
+                console.log(
+                    `code:${request.status}\n` +
+                        `message:${request.responseText}\n` +
+                        `error:${error}`
+                );
 
-                if(request.status === 401){
-                    setAccessToken(request.responseJSON);
-                    setCommSelBox(id, url, url_type, type, selected_value, params, option);
-                }
-                else if(request.status === 403){
-                    mainViewTokenInvalidate();
-                }
+                // if (request.status === 401) {
+                //     setAccessToken(request.responseJSON);
+                //     setCommSelBox(
+                //         id,
+                //         url,
+                //         url_type,
+                //         type,
+                //         selected_value,
+                //         params,
+                //         option
+                //     );
+                // } else if (request.status === 403) {
+                //     mainViewTokenInvalidate();
+                // }
             },
         });
     }
 }
 
-
 /**
  * setCommSelBox : 공통코드를 사용하지 않는 경우 셀렉트 박스 생성
  * 생성할 아이디, url, url_type(url 전송 타입) ,타입(전체, 선택, ''), 선택된 값(''), 파라미터(''), option(옵션안에 넣을 텍스트와 value의 값을 추출)
  */
-export function setCommSelBoxCall(id, url, url_type, type, selected_value, params, option, callback) {
+export function setCommSelBoxCall(
+    id,
+    url,
+    url_type,
+    type,
+    selected_value,
+    params,
+    option,
+    callback
+) {
     let str = '';
 
     if (type === 'ALL') str += `<option value="">-- 전체 --</option>`;
@@ -212,7 +242,7 @@ export function setCommSelBoxCall(id, url, url_type, type, selected_value, param
     if (params === '') {
         params = {};
     }
-    const accessToken = window.localStorage.getItem("accessToken");
+    const accessToken = window.localStorage.getItem('accessToken');
 
     if (url === '') {
         str += '</select>';
@@ -223,8 +253,8 @@ export function setCommSelBoxCall(id, url, url_type, type, selected_value, param
             type: url_type,
             data: JSON.stringify(params),
             beforeSend: function (xhr) {
-                xhr.setRequestHeader("Content-type","application/json");
-                xhr.setRequestHeader("Authorization",accessToken);
+                xhr.setRequestHeader('Content-type', 'application/json');
+                xhr.setRequestHeader('Authorization', accessToken);
             },
             success(result) {
                 const list = result.data;
@@ -235,8 +265,8 @@ export function setCommSelBoxCall(id, url, url_type, type, selected_value, param
 
                 for (let i = 0; i < list.length; i++) {
                     if (option !== '') {
-                        const { oTxt } = option;
-                        const { oVal } = option;
+                        const {oTxt} = option;
+                        const {oVal} = option;
 
                         if (selected_value !== '') {
                             if (
@@ -257,13 +287,25 @@ export function setCommSelBoxCall(id, url, url_type, type, selected_value, param
                 callback();
             },
             error(request, status, error) {
-                console.log(`code:${request.status}\n` + `message:${request.responseText}\n` + `error:${error}`);
+                console.log(
+                    `code:${request.status}\n` +
+                        `message:${request.responseText}\n` +
+                        `error:${error}`
+                );
 
-                if(request.status === 401){
+                if (request.status === 401) {
                     setAccessToken(request.responseJSON);
-                    setCommSelBoxCall(id, url, url_type, type, selected_value, params, option, callback)
-                }
-                else if(request.status === 403){
+                    setCommSelBoxCall(
+                        id,
+                        url,
+                        url_type,
+                        type,
+                        selected_value,
+                        params,
+                        option,
+                        callback
+                    );
+                } else if (request.status === 403) {
                     mainViewTokenInvalidate();
                 }
             },

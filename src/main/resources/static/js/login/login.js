@@ -97,8 +97,6 @@ const login = () => {
             }
         },
         error(request, status, error) {
-            console.log('55555', request);
-
             console.log(
                 `code:${request.status}\nmessage:${request.responseText}\nerror:${error}`
             );

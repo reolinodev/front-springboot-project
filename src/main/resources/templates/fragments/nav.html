@@ -3,19 +3,19 @@
 
 <nav th:fragment="navFragment">
     <form id="navFrm">
-        <input type="hidden" id="menuIdntfKey"/>
+        <input type="hidden" id="menuId"/>
         <input type="hidden" id="menuNm"/>
-        <input type="hidden" id="prnIdntfKey"/>
-        <input type="hidden" id="prnNm"/>
+        <input type="hidden" id="prnMenuId"/>
+        <input type="hidden" id="prnMenuNm"/>
         <input type="hidden" id="url"/>
     </form>
 
     <aside class="main-sidebar sidebar-dark-primary elevation-4" style="background-color: #101829">
 
-            <a href="#" class="brand-link" style="text-align: center;" id="menuUrl">
+            <a href="javascript:" class="brand-link" style="text-align: center;" id="menuUrl">
                 <div style="display: flex;">
-                <div id="niceLogo" style="background-size: 50px 50px; background-repeat: no-repeat;width: 50px;height: 50px;"></div>
-                <span style="padding: 10px;">매장 마스터</span>
+                    <div id="logo"></div>
+                    <span style="padding: 10px;">관리자 템플릿</span>
                 </div>
             </a>
 
