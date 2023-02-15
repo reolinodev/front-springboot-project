@@ -54,7 +54,7 @@ const searchSuccess = result => {
     page.totalCount = result.total;
     grid.resetData(gridData);
 
-    setGridClickEvent(grid, 'login_id', 'user_id', userEdit);
+    setGridClickEvent(grid, 'login_id', 'user_id', getUserData);
 
     if (page.pageInit === false) {
         pagination.reset(result.total);
@@ -188,28 +188,28 @@ const saveError = response => {
 };
 
 /**
- * userEdit : 사용자 수정 화면 호출
+ * getUserData : 사용자 수정 화면 호출
  */
-const userEdit = userId => {
+const getUserData = userId => {
     spinnerShow();
 
     const url = `/api/user/${userId}`;
-    callGetApi(url, userEditSuccess, userEditError);
+    callGetApi(url, getUserDataSuccess, getUserDataError);
 };
 
 /**
- *  userEditSuccess : userEdit successCallback
+ *  getUserDataSuccess : getUserData successCallback
  */
-const userEditSuccess = result => {
+const getUserDataSuccess = result => {
     spinnerHide();
 
     setEditData(result.data);
 };
 
 /**
- *  userEditError : userEdit errorCallback
+ *  getUserDataError : getUserData errorCallback
  */
-const userEditError = response => {
+const getUserDataError = response => {
     spinnerHide();
 
     console.log(response);
