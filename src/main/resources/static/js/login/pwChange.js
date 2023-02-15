@@ -1,12 +1,9 @@
 import {pageRouter} from '../module/router';
-import {getApi} from '../module/api';
 import {callApi} from '../module/async';
 
 // 변수설정
 const $userPw = $('#userPw'); //비밀번호
 const $userPwRe = $('#userPwRe'); //비밀번호확인
-
-const apiDomain = getApi();
 
 /**
  *  update : 비밀번호 변경실행

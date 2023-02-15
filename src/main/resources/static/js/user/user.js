@@ -3,11 +3,25 @@ import Page, {setPagination} from '../module/pagination';
 import {serializeFormJson} from '../module/json';
 import {setBasicGrid, setGridClickEvent} from '../module/grid';
 import {checkKr} from '../module/validation';
-import {mainViewTokenInvalidate, setAccessToken} from '../module/router';
 import {spinnerHide, spinnerShow} from '../module/spinner';
-import {getApi} from '../module/api';
+import {callApi, callGetApi} from '../module/async';
 
-const apiDomain = getApi();
+//변수설정
+const $writeLoginId = $('#writeLoginId'); //사용자등록 - 로그인아이디
+const $writeUserNm = $('#writeUserNm'); //사용자등록 - 이름
+const $writeTelNo = $('#writeTelNo'); //사용자등록 - 휴대폰번호
+const $writeMsg = $('#writeMsg'); //사용자등록 - 메시지
+
+const $editLoginId = $('#editLoginId'); //사용자수정 - 로그인아이디
+const $editUserId = $('#editUserId'); //사용자수정 - 아이디
+const $editTelno = $('#editTelno'); //사용자수정 - 휴대폰번호
+const $editPwInitYn = $('#editPwInitYn'); //사용자수정 - 초기화여부
+const $editUserNm = $('#editUserNm'); //사용자수정 - 이름
+const $editPwFailCnt = $('#editPwFailCnt'); //사용자수정 - 패스워드실패횟수
+const $editLastLoginAt = $('#editLastLoginAt'); //사용자수정 - 최근로그인일시
+const $editUseYn = $('#editUseYn'); //사용자수정 - 사용여부
+const $editMsg = $('#editMsg'); //사용자수정 - 메시지
+
 let page = new Page(1, false, 10, 0);
 let grid;
 let pagination;
@@ -16,60 +30,46 @@ const pageInit = () => {
     page = new Page(1, false, Number($('#pagePer').val()), 0);
 };
 
-let writeCompArr = [];
-let editCompArr = [];
-
 /**
  * search : 조회
  */
 const search = () => {
     spinnerShow();
 
+    const url = '/api/user';
+    const type = 'POST';
     const params = serializeFormJson('userViewFrm');
     params.current_page = page.currentPage;
     params.page_per = page.pagePer;
 
-    const accessToken = localStorage.getItem('accessToken');
+    callApi(url, type, params, searchSuccess, searchError);
+};
 
-    $.ajax({
-        url: `${apiDomain}/api/user/`,
-        type: 'POST',
-        data: JSON.stringify(params),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-        success(result) {
-            const gridData = result.data;
-            page.totalCount = result.total;
-            grid.resetData(gridData);
+/**
+ *  searchSuccess : search successCallback
+ *  :
+ */
+const searchSuccess = result => {
+    const gridData = result.data;
+    page.totalCount = result.total;
+    grid.resetData(gridData);
 
-            setGridClickEvent(grid, 'login_id', 'user_id', userEdit);
+    setGridClickEvent(grid, 'login_id', 'user_id', userEdit);
 
-            if (page.pageInit === false) {
-                pagination.reset(result.total);
-                page.pageInit = true;
-            }
+    if (page.pageInit === false) {
+        pagination.reset(result.total);
+        page.pageInit = true;
+    }
 
-            spinnerHide();
-        },
-        error(request, status, error) {
-            console.log(
-                `code:${request.status}\n` +
-                    `message:${request.responseText}\n` +
-                    `error:${error}`
-            );
+    spinnerHide();
+};
 
-            if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                search();
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        },
-    });
+/**
+ *  searchError : search errorCallback
+ */
+const searchError = response => {
+    spinnerHide();
+    console.log(response);
 };
 
 /**
@@ -118,13 +118,13 @@ const pagingCallback = returnPage => {
 };
 
 /**
- * initUserWrite : 등록화면의 값 초기화
+ * initWrite : 등록화면의 값 초기화
  */
-const initUserWrite = () => {
-    $('#writeLoginId').val('');
-    $('#writeUserNm').val('');
-    $('#writeTelNo').val('');
-    $('#writeMsg').html('');
+const initWrite = () => {
+    $writeLoginId.val('');
+    $writeUserNm.val('');
+    $writeTelNo.val('');
+    $writeMsg.val('');
 };
 
 /**
@@ -133,20 +133,20 @@ const initUserWrite = () => {
 const save = () => {
     let msg = '';
 
-    if ($('#writeLoginId').val() === '') {
+    if ($writeLoginId.val() === '') {
         msg = '아이디를 입력하세요.';
         $('#writeMsg').html(msg);
         $('#writeLoginId').focus();
         return;
     }
 
-    if (checkKr($('#writeLoginId').val())) {
+    if (checkKr($writeLoginId.val())) {
         msg = '아이디는 한글을 사용할수 없습니다.';
         $('#writeMsg').html(msg);
         $('#writeLoginId').focus();
         return;
     }
-    if ($('#writeUserNm').val() === '') {
+    if ($writeUserNm.val() === '') {
         msg = '이름을 입력하세요.';
         $('#writeMsg').html(msg);
         $('#writeUserNm').focus();
@@ -155,122 +155,77 @@ const save = () => {
 
     spinnerShow();
 
-    const param = {
-        login_id: $('#writeLoginId').val(),
-        user_nm: $('#writeUserNm').val(),
-        user_pw: $('#writeLoginId').val(),
-        tel_no: $('#writeTelNo').val(),
+    const url = '/api/user';
+    const type = 'PUT';
+    const params = {
+        login_id: $writeLoginId.val(),
+        user_nm: $writeUserNm.val(),
+        tel_no: $writeTelNo.val(),
     };
 
-    const accessToken = localStorage.getItem('accessToken');
-
-    $.ajax({
-        url: `${apiDomain}/api/user`,
-        type: 'PUT',
-        data: JSON.stringify(param),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-    }).then(
-        data => {
-            if (data.header.result_code === 'ok') {
-                alert(data.header.message);
-                search();
-                closeModal();
-            } else {
-                $('#writeMsg').html(data.header.message);
-            }
-
-            spinnerHide();
-        },
-        (request, status, error) => {
-            if (request.status === 500) {
-                console.log(
-                    `code:${request.status}\n` +
-                        `message:${request.responseText}\n` +
-                        `error:${error}`
-                );
-            } else if (request.status === 400) {
-                const errorList = request.responseJSON.error_list;
-
-                if (errorList !== undefined) {
-                    if (errorList.length !== 0) {
-                        const message = errorList[0].message;
-                        $('#writeMsg').html(message);
-                    }
-                } else {
-                    const data = request.responseJSON.header;
-                    $('#writeMsg').html(data.message);
-                }
-            } else if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                save();
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        }
-    );
+    callApi(url, type, params, saveSuccess, saveError);
 };
 
-const $editLoginId = $('#editLoginId');
-const $editUserId = $('#editUserId');
-const $editUserNm = $('#editUserNm');
-const $editCompGrCd = $('#editCompGrCd');
-const $editUseYn = $('#editUseYn');
+/**
+ *  saveSuccess : save successCallback
+ */
+const saveSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        alert(result.header.message);
+        search();
+        closeModal();
+    }
+
+    spinnerHide();
+};
+
+/**
+ *  saveError : save errorCallback
+ */
+const saveError = response => {
+    $writeMsg.html(response.message);
+    spinnerHide();
+};
 
 /**
  * userEdit : 사용자 수정 화면 호출
  */
 const userEdit = userId => {
-    const accessToken = localStorage.getItem('accessToken');
-
     spinnerShow();
 
-    $.ajax({
-        url: `${apiDomain}/api/user/${userId}`,
+    const url = `/api/user/${userId}`;
+    callGetApi(url, userEditSuccess, userEditError);
+};
 
-        type: 'GET',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-        success(result) {
-            setEditData(result.data);
-            spinnerHide();
-        },
-        error(request, status, error) {
-            console.log(
-                `code:${request.status}\n` +
-                    `message:${request.responseText}\n` +
-                    `error:${error}`
-            );
+/**
+ *  userEditSuccess : userEdit successCallback
+ */
+const userEditSuccess = result => {
+    spinnerHide();
 
-            if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                userEdit(userId);
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
+    setEditData(result.data);
+};
 
-            spinnerHide();
-        },
-    });
+/**
+ *  userEditError : userEdit errorCallback
+ */
+const userEditError = response => {
+    spinnerHide();
+
+    console.log(response);
 };
 
 /**
  * setEditData : 에디트 데이터 셋
  */
 const setEditData = data => {
-    $('#editLoginId').val(data.login_id);
-    $('#editUserId').val(data.user_id);
-    $('#editTelno').val(data.tel_no);
-    $('#editPwInitYn').val(data.pw_init_yn);
-    $('#editUserNm').val(data.user_nm);
-    $('#editPwFailCnt').val(data.pw_fail_cnt);
-    $('#editLastLoginAt').val(data.last_login_at);
+    $editLoginId.val(data.login_id);
+    $editUserId.val(data.user_id);
+    $editTelno.val(data.tel_no);
+    $editPwInitYn.val(data.pw_init_yn);
+    $editUserNm.val(data.user_nm);
+    $editPwFailCnt.val(data.pw_fail_cnt);
+    $editLastLoginAt.val(data.last_login_at);
 
     setCodeSelBox('editUseYn', 'USE_YN', '', data.use_yn);
 
@@ -283,63 +238,37 @@ const setEditData = data => {
 const update = () => {
     spinnerShow();
 
-    const accessToken = localStorage.getItem('accessToken');
-
-    const param = {
-        user_nm: $('#editUserNm').val(),
-        tel_no: $('#editTelno').val(),
-        use_yn: $('#editUseYn').val(),
+    const url = `/api/user/${$editUserId.val()}`;
+    const type = 'PUT';
+    const params = {
+        user_nm: $editUserNm.val(),
+        tel_no: $editTelno.val(),
+        use_yn: $editUseYn.val(),
     };
 
-    $.ajax({
-        url: `${apiDomain}/api/user/${$('#editUserId').val()}`,
-        type: 'PUT',
-        data: JSON.stringify(param),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-    }).then(
-        data => {
-            if (data.header.result_code === 'ok') {
-                alert(data.header.message);
-                search();
-                closeModal();
-            } else {
-                $('#editMsg').html(data.header.message);
-            }
+    callApi(url, type, params, updateSuccess, updateError);
+};
 
-            spinnerHide();
-        },
-        (request, status, error) => {
-            if (request.status === 500) {
-                console.log(
-                    `code:${request.status}\n` +
-                        `message:${request.responseText}\n` +
-                        `error:${error}`
-                );
-            } else if (request.status === 400) {
-                const errorList = request.responseJSON.error_list;
+/**
+ *  updateSuccess : update successCallback
+ */
+const updateSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        alert(result.header.message);
+        search();
+        closeModal();
+    } else {
+        alert(result.header.message);
+    }
+    spinnerHide();
+};
 
-                if (errorList !== undefined) {
-                    if (errorList.length !== 0) {
-                        const message = errorList[0].message;
-                        $('#editMsg').html(message);
-                    }
-                } else {
-                    const data = request.responseJSON.header;
-                    $('#editMsg').html(data.message);
-                }
-            } else if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                save();
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        }
-    );
+/**
+ *  updateError : update errorCallback
+ */
+const updateError = response => {
+    $editMsg.html(response.message);
+    spinnerHide();
 };
 
 /**
@@ -348,123 +277,68 @@ const update = () => {
 const lockClear = () => {
     spinnerShow();
 
-    const accessToken = localStorage.getItem('accessToken');
+    const url = `/api/user/pw-fail-cnt/${$editUserId.val()}`;
+    callGetApi(url, lockClearSuccess, lockClearError);
+};
 
-    const param = {
-        login_id: $('#editLoginId').val(),
-        user_id: $('#editUserId').val(),
-    };
+/**
+ *  lockClearSuccess : lockClear successCallback
+ */
+const lockClearSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        alert(result.header.message);
+        search();
+        closeModal();
+    } else {
+        alert(result.header.message);
+    }
+    spinnerHide();
+};
 
-    $.ajax({
-        url: `${apiDomain}/api/user/pw-fail-cnt/${$('#editUserId').val()}`,
-        type: 'PUT',
-        data: JSON.stringify(param),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-    }).then(
-        data => {
-            if (data.header.result_code === 'ok') {
-                alert(data.header.message);
-            } else {
-                $('#editMsg').html(data.header.message);
-            }
-
-            spinnerHide();
-        },
-        (request, status, error) => {
-            if (request.status === 500) {
-                console.log(
-                    `code:${request.status}\n` +
-                        `message:${request.responseText}\n` +
-                        `error:${error}`
-                );
-            } else if (request.status === 400) {
-                const errorList = request.responseJSON.error_list;
-
-                if (errorList !== undefined) {
-                    if (errorList.length !== 0) {
-                        const message = errorList[0].message;
-                        $('#editMsg').html(message);
-                    }
-                } else {
-                    const data = request.responseJSON.header;
-                    $('#editMsg').html(data.message);
-                }
-            } else if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                save();
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        }
-    );
+/**
+ *  lockClearError : lockClear errorCallback
+ */
+const lockClearError = response => {
+    console.log(response);
+    spinnerHide();
 };
 
 /**
  *  pwInit : 비밀번호 초기화
  */
 const pwInit = () => {
-    const accessToken = localStorage.getItem('accessToken');
-
-    const param = {
-        login_id: $('#editLoginId').val(),
-        user_id: $('#editUserId').val(),
-        pw_init_yn: 'N',
-    };
-
     spinnerShow();
 
-    $.ajax({
-        url: `${apiDomain}/api/user/user-pw`,
-        type: 'PUT',
-        data: JSON.stringify(param),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-    }).then(
-        data => {
-            if (data.header.result_code === 'ok') {
-                alert(data.header.message);
-            } else {
-                $('#editMsg').html(data.header.message);
-            }
+    const url = `/api/user/user-pw`;
+    const type = 'PUT';
+    const params = {
+        login_id: $editLoginId.val(),
+        user_id: $editUserId.val(),
+    };
 
-            spinnerHide();
-        },
-        (request, status, error) => {
-            if (request.status === 500) {
-                console.log(
-                    `code:${request.status}\n` +
-                        `message:${request.responseText}\n` +
-                        `error:${error}`
-                );
-            } else if (request.status === 400) {
-                const errorList = request.responseJSON.error_list;
+    callApi(url, type, params, pwInitSuccess, pwInitError);
+};
 
-                if (errorList !== undefined) {
-                    if (errorList.length !== 0) {
-                        const message = errorList[0].message;
-                        $('#editMsg').html(message);
-                    }
-                } else {
-                    const data = request.responseJSON.header;
-                    $('#editMsg').html(data.message);
-                }
-            } else if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                save();
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
+/**
+ *  pwInitSuccess : pwInit successCallback
+ */
+const pwInitSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        alert(result.header.message);
+        search();
+        closeModal();
+    } else {
+        alert(result.header.message);
+    }
+    spinnerHide();
+};
 
-            spinnerHide();
-        }
-    );
+/**
+ *  pwInitError : pwInit errorCallback
+ */
+const pwInitError = response => {
+    console.log(response);
+    spinnerHide();
 };
 
 /**
@@ -492,7 +366,7 @@ $(document).ready(() => {
 
     // 등록버튼 클릭시 모달을 초기화한다.
     $('#writeBtn').click(() => {
-        initUserWrite();
+        initWrite();
     });
 
     // 사용자를 등록한다.
