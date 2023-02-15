@@ -1,4 +1,3 @@
-import {mainViewTokenInvalidate, setAccessToken} from './router';
 import {getApi} from './api';
 
 /**
@@ -32,25 +31,11 @@ export function setCodeSelBox(id, codeGrp, type, selectedValue) {
 
             $(`#${id}`).html(str);
         },
-        (request, status, error) => {
-            if (request.status === 500) {
-                console.log(
-                    `code:${request.status}\n` +
-                        `message:${request.responseText}\n` +
-                        `error:${error}`
-                );
-            } else if (request.status === 400) {
-                const {errorList} = request.responseJSON;
-                if (errorList !== undefined) {
-                    if (errorList.lengh !== 0) {
-                        const {message} = errorList[0];
-                        $('#msg').html(message);
-                    }
-                } else {
-                    const data = request.responseJSON.header;
-                    $('#msg').html(data.message);
-                }
-            }
+        response => {
+            const httpStatus = response.status;
+            const resJson = response.responseJSON.header;
+            resJson.httpStatus = httpStatus;
+            console.log(resJson);
         }
     );
 }
