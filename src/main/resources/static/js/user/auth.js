@@ -3,68 +3,33 @@ import Page, {setPagination} from '../module/pagination';
 import {serializeFormJson} from '../module/json';
 import {setBasicGrid, setGridClickEvent} from '../module/grid';
 import {checkKr} from '../module/validation';
-import {mainViewTokenInvalidate, setAccessToken} from '../module/router';
 import {spinnerHide, spinnerShow} from '../module/spinner';
+import {callApi, callGetApi} from '../module/async';
 
 let page = new Page(1, false, 10, 0);
 let grid;
 let pagination;
 
+const $writeAuthRole = $('#writeAuthRole'); //권한등록 - 권한구분
+const $writeAuthNm = $('#writeAuthNm'); //권한등록 - 권한명
+const $writeAuthVal = $('#writeAuthVal'); //권한등록 - 권한코드
+const $writeOrd = $('#writeOrd'); //권한등록 - 순서
+const $writeMemo = $('#writeMemo'); //권한등록 - 비고
+const $writeMainUrl = $('#writeMainUrl'); //권한등록 - 메인URL
+const $writeMsg = $('#writeMsg'); //권한등록 - 메시지
+
+const $editAuthRoleNm = $('#editAuthRoleNm'); //권한수정 - 권한구분
+const $editAuthNm = $('#editAuthNm'); //권한수정 - 권한명
+const $editAuthId = $('#editAuthId'); //권한수정 - 권한식별키
+const $editAuthVal = $('#editAuthVal'); //권한수정 - 권한코드
+const $editOrd = $('#editOrd'); //권한수정 - 순서
+const $editUseYn = $('#editUseYn'); //권한수정 - 사용여부
+const $editMemo = $('#editMemo'); //권한수정 - 비고
+const $editMainUrl = $('#editMainUrl'); //권한수정 - 메인URL
+const $editMsg = $('#editMsg'); //권한수정 - 메시지
+
 const pageInit = () => {
     page = new Page(1, false, Number($('#pagePer').val()), 0);
-};
-
-/**
- * search : 조회
- */
-const search = () => {
-    spinnerShow();
-
-    const params = serializeFormJson('authViewFrm');
-    params.current_page = page.currentPage;
-    params.page_per = page.pagePer;
-
-    const accessToken = window.localStorage.getItem('accessToken');
-
-    $.ajax({
-        url: '/api/auth/',
-        type: 'POST',
-        data: JSON.stringify(params),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-        success(result) {
-            const gridData = result.data;
-            page.totalCount = result.total;
-            grid.resetData(gridData);
-
-            setGridClickEvent(grid, 'auth_cd', 'auth_idntf_key', authEdit);
-
-            if (page.pageInit === false) {
-                pagination.reset(result.total);
-                page.pageInit = true;
-            }
-
-            spinnerHide();
-        },
-        error(request, status, error) {
-            console.log(
-                `code:${request.status}\n` +
-                    `message:${request.responseText}\n` +
-                    `error:${error}`
-            );
-
-            if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                search();
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        },
-    });
 };
 
 /**
@@ -76,14 +41,15 @@ const setGridLayout = () => {
         {header: 'No', name: 'rnum', width: 50, align: 'center'},
         {
             header: 'SEQ',
-            name: 'auth_idntf_key',
+            name: 'auth_id',
             width: 100,
             align: 'center',
             hidden: true,
         },
+        {header: '권한구분', name: 'auth_role_nm', align: 'center'},
         {
             header: '권한코드',
-            name: 'auth_cd',
+            name: 'auth_val',
             align: 'center',
             renderer: {
                 styles: {
@@ -94,13 +60,54 @@ const setGridLayout = () => {
             },
         },
         {header: '권한명', name: 'auth_nm', align: 'center'},
-        {header: '순서', name: 'ord', align: 'center'},
         {header: '사용여부', name: 'use_yn_nm', width: 150, align: 'center'},
     ];
     // 데이터
     const gridData = [];
 
     return setBasicGrid(columns, gridData);
+};
+
+/**
+ * search : 조회
+ */
+const search = () => {
+    spinnerShow();
+
+    const url = '/api/auth';
+    const type = 'POST';
+    const params = serializeFormJson('authViewFrm');
+    params.current_page = page.currentPage;
+    params.page_per = page.pagePer;
+
+    callApi(url, type, params, searchSuccess, searchError);
+};
+
+/**
+ *  searchSuccess : search successCallback
+ *  :
+ */
+const searchSuccess = result => {
+    spinnerHide();
+
+    const gridData = result.data;
+    page.totalCount = result.total;
+    grid.resetData(gridData);
+
+    setGridClickEvent(grid, 'auth_val', 'auth_id', getAuthData);
+
+    if (page.pageInit === false) {
+        pagination.reset(result.total);
+        page.pageInit = true;
+    }
+};
+
+/**
+ *  searchError : search errorCallback
+ */
+const searchError = response => {
+    spinnerHide();
+    console.log(response);
 };
 
 /**
@@ -111,151 +118,106 @@ const pagingCallback = returnPage => {
     search();
 };
 
-const $writeAuthNm = $('#writeAuthNm');
-const $writeAuthCd = $('#writeAuthCd');
-const $writeOrd = $('#writeOrd');
-const $writeMemo = $('#writeMemo');
-
 /**
- * initAuthMngWrite : 등록화면의 값 초기화
+ * initWrite : 등록화면의 값 초기화
  */
-const initAuthMngWrite = () => {
+const initWrite = () => {
+    setCodeSelBox('writeAuthRole', 'AUTH_ROLE', '', '');
     $writeAuthNm.val('');
-    $writeAuthCd.val('');
+    $writeAuthVal.val('');
     $writeOrd.val('');
     $writeMemo.val('');
+    $writeMainUrl.val('');
     $('#writeMsg').html('');
 };
 
 /**
- *  insertProc : 권한 등록
+ *  save : 권한 등록
  */
-const insertProc = () => {
+const save = () => {
     let msg = '';
 
-    if (checkKr($writeAuthCd.val())) {
+    if (checkKr($writeAuthVal.val())) {
         msg = '값을 한글로 입력할 수 없습니다.';
         $('#writeMsg').html(msg);
-        $writeAuthCd.focus();
+        $writeAuthVal.focus();
         return;
     }
 
     spinnerShow();
 
-    const param = {
+    const url = '/api/auth';
+    const type = 'PUT';
+    const params = {
+        auth_role: $writeAuthRole.val(),
         auth_nm: $writeAuthNm.val(),
-        auth_cd: $writeAuthCd.val(),
+        auth_val: $writeAuthVal.val(),
         ord: $writeOrd.val(),
         memo: $writeMemo.val(),
+        main_url: $writeMainUrl.val(),
     };
 
-    const accessToken = window.localStorage.getItem('accessToken');
-
-    $.ajax({
-        url: '/api/auth/',
-        type: 'PUT',
-        data: JSON.stringify(param),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-    }).then(
-        data => {
-            if (data.header.result_code === 'ok') {
-                alert(data.header.message);
-                search();
-                closeModal();
-            } else {
-                $('#writeMsg').html(data.header.message);
-            }
-
-            spinnerHide();
-        },
-        (request, status, error) => {
-            if (request.status === 500) {
-                console.log(
-                    `code:${request.status}\n` +
-                        `message:${request.responseText}\n` +
-                        `error:${error}`
-                );
-            } else if (request.status === 400) {
-                const {errorList} = request.responseJSON;
-                if (errorList !== undefined) {
-                    if (errorList.lengh !== 0) {
-                        const {message} = errorList[0];
-                        $('#writeMsg').html(message);
-                    }
-                } else {
-                    const data = request.responseJSON.header;
-                    $('#writeMsg').html(data.message);
-                }
-            } else if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                insertProc();
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        }
-    );
+    callApi(url, type, params, saveSuccess, saveError);
 };
 
-const $editAuthIdntfKey = $('#editAuthIdntfKey');
-const $editAuthNm = $('#editAuthNm');
-const $editAuthCd = $('#editAuthCd');
-const $editOrd = $('#editOrd');
-const $editMemo = $('#editMemo');
-const $editUseYn = $('#editUseYn');
+/**
+ *  saveSuccess : save successCallback
+ */
+const saveSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        alert(result.header.message);
+        search();
+        closeModal();
+    }
+
+    spinnerHide();
+};
+
+/**
+ *  saveError : save errorCallback
+ */
+const saveError = response => {
+    $writeMsg.html(response.message);
+    spinnerHide();
+};
 
 /**
  * authEdit : 권한 수정 화면 호출
  */
-const authEdit = authIdntfKey => {
+const getAuthData = authId => {
     spinnerShow();
 
-    const accessToken = window.localStorage.getItem('accessToken');
+    const url = `/api/auth/${authId}`;
+    callGetApi(url, getAuthDataSuccess, getAuthDataError);
+};
 
-    $.ajax({
-        url: `/api/auth/${authIdntfKey}`,
-        type: 'GET',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-        success(result) {
-            setEditData(result.data);
+/**
+ *  getAuthDataSuccess : getAuthData successCallback
+ */
+const getAuthDataSuccess = result => {
+    setEditData(result.data);
+    spinnerHide();
+};
 
-            spinnerHide();
-        },
-        error(request, status, error) {
-            console.log(
-                `code:${request.status}\n` +
-                    `message:${request.responseText}\n` +
-                    `error:${error}`
-            );
-
-            if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                authEdit(authIdntfKey);
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        },
-    });
+/**
+ *  getAuthDataError : getAuthData errorCallback
+ */
+const getAuthDataError = response => {
+    console.log(response);
+    spinnerHide();
 };
 
 /**
  * setEditData : 에디트 데이터 셋
  */
 const setEditData = data => {
-    $editAuthIdntfKey.val(data.auth_idntf_key);
+    $editAuthRoleNm.val(data.auth_role_nm);
+    $editAuthId.val(data.auth_id);
     $editAuthNm.val(data.auth_nm);
-    $editAuthCd.val(data.auth_cd);
+    $editAuthVal.val(data.auth_val);
     $editOrd.val(data.ord);
     $editMemo.val(data.memo);
+    $editMainUrl.val(data.main_url);
 
     setCodeSelBox('editUseYn', 'USE_YN', '', data.use_yn);
 
@@ -263,70 +225,44 @@ const setEditData = data => {
 };
 
 /**
- *  editProc : 권한 수정
+ *  update : 권한 수정
  */
-const editProc = () => {
+const update = () => {
     spinnerShow();
 
-    const param = {
-        auth_idntf_key: $editAuthIdntfKey.val(),
+    const url = `/api/auth/${$editAuthId.val()}`;
+    const type = 'PUT';
+    const params = {
         auth_nm: $editAuthNm.val(),
         ord: $editOrd.val(),
         memo: $editMemo.val(),
         use_yn: $editUseYn.val(),
+        main_url: $editMainUrl.val(),
     };
 
-    const accessToken = window.localStorage.getItem('accessToken');
+    callApi(url, type, params, updateSuccess, updateError);
+};
 
-    $.ajax({
-        url: `/api/auth/${$editAuthIdntfKey.val()}`,
-        type: 'PUT',
-        data: JSON.stringify(param),
+/**
+ *  updateSuccess : update successCallback
+ */
+const updateSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        alert(result.header.message);
+        search();
+        closeModal();
+    } else {
+        $('#editMsg').html(result.header.message);
+    }
+    spinnerHide();
+};
 
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-    }).then(
-        data => {
-            if (data.header.result_code === 'ok') {
-                alert(data.header.message);
-                search();
-                closeModal();
-            } else {
-                $('#editMsg').html(data.header.message);
-            }
-
-            spinnerHide();
-        },
-        (request, status, error) => {
-            if (request.status === 500) {
-                console.log(
-                    `code:${request.status}\n` +
-                        `message:${request.responseText}\n` +
-                        `error:${error}`
-                );
-            } else if (request.status === 400) {
-                const {errorList} = request.responseJSON;
-                if (errorList !== undefined) {
-                    if (errorList.lengh !== 0) {
-                        const {message} = errorList[0];
-                        $('#editMsg').html(message);
-                    }
-                } else {
-                    const data = request.responseJSON.header;
-                    $('#editMsg').html(data.message);
-                }
-            } else if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                editProc();
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        }
-    );
+/**
+ *  updateError : update errorCallback
+ */
+const updateError = response => {
+    $editMsg.html(response.message);
+    spinnerHide();
 };
 
 /**
@@ -338,6 +274,9 @@ const closeModal = () => {
 };
 
 $(document).ready(() => {
+    // 셀렉트 박스(공통코드) : 권한구분 => AUTH_ROLE
+    setCodeSelBox('viewAuthRole', 'AUTH_ROLE', 'ALL', '');
+
     // 셀렉트 박스(공통코드) : 사용구분 => USE_YN
     setCodeSelBox('viewUseYn', 'USE_YN', 'ALL', '');
 
@@ -355,24 +294,31 @@ $(document).ready(() => {
 
     // 등록버튼 클릭시 모달을 초기화한다.
     $('#writeBtn').click(() => {
-        initAuthMngWrite();
-
+        initWrite();
         window.$('#authWrite').modal('show');
     });
 
     // 권한을 등록한다.
-    $('#insertBtn').click(() => {
-        insertProc();
+    $('#saveBtn').click(() => {
+        save();
     });
 
     // 권한을 수정한다.
-    $('#editBtn').click(() => {
-        editProc();
+    $('#updateBtn').click(() => {
+        update();
     });
 
-    const searchStrInput = document.getElementById('searchStr');
+    const viewAuthNm = document.getElementById('viewAuthNm');
+    const viewAuthVal = document.getElementById('viewAuthVal');
 
-    searchStrInput.addEventListener('keyup', function (event) {
+    viewAuthNm.addEventListener('keyup', function (event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            document.getElementById('searchBtn').click();
+        }
+    });
+
+    viewAuthVal.addEventListener('keyup', function (event) {
         if (event.keyCode === 13) {
             event.preventDefault();
             document.getElementById('searchBtn').click();
