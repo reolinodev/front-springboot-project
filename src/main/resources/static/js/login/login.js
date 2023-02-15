@@ -1,14 +1,18 @@
 import {pageRouter} from '../module/router';
-import {getCookie, setCookie, deleteCookie} from '../module/cookie';
 import {getDeviceInfo} from '../module/device';
 import {getApi, setApi} from '../module/api';
+import {callApi, callApiWithoutToken} from '../module/async';
 
-const $loginId = $('#loginId');
-const $userPw = $('#userPw');
-let apiDomain = '/';
+// 변수설정
+const $loginId = $('#loginId'); //사용자아이디
+const $userPw = $('#userPw'); //사용자비밀번호
+const $loginDevice = $('#loginDevice'); //사용자디바이스
+const $deviceBrowser = $('#deviceBrowser'); //사용자접속브라우저
+const $idSaveCheck = $('#idSaveCheck'); //아이디 기억하기
+let apiDomain = '/'; //api호출 도메인
 
 /**
- *  login : 로그인 실행
+ *  certification : 인증키발급
  */
 const certification = () => {
     if ($loginId.val() === '') {
@@ -23,97 +27,135 @@ const certification = () => {
         return;
     }
 
+    const url = '/api/certification';
+    const type = 'POST';
     const params = {
         login_id: $loginId.val(),
         user_pw: $userPw.val(),
     };
 
-    $.ajax({
-        url: `${apiDomain}/api/certification`,
-        type: 'POST',
-        data: JSON.stringify(params),
-        headers: {'Content-Type': 'application/json'},
-        success(result) {
-            console.log('result', result);
-            const resultCode = result.header.result_code;
-            const accessToken = result.header.access_token;
+    callApiWithoutToken(
+        url,
+        type,
+        params,
+        certificationSuccess,
+        certificationError
+    );
 
-            if (resultCode === 'ok') {
-                $('#msg').html('');
-                localStorage.setItem('accessToken', accessToken);
-                login();
-            }
-        },
-        error(request, status, error) {
-            console.log(
-                `code:${request.status}\nmessage:${request.responseText}\nerror:${error}`
-            );
+    setRememberLoginId();
+};
 
-            $('#msg').html(request.responseJSON.header.message);
-        },
-    });
+/**
+ *  certificationSuccess : certification successCallback
+ *  : accessToken을 localStorage에 저장하고 로그인
+ */
+const certificationSuccess = result => {
+    const resultCode = result.header.result_code;
+    const accessToken = result.header.access_token;
 
-    const idSaveCheck = document.getElementById('idSaveCheck').checked;
-    if (idSaveCheck) {
-        setCookie('loginId', $loginId.val(), 30);
-        setCookie('idSaveCheck', 'Y', 30);
-    } else {
-        deleteCookie('loginId');
-        setCookie('idSaveCheck', 'N', 30);
+    if (resultCode === 'ok') {
+        $('#msg').html('');
+        localStorage.setItem('accessToken', accessToken);
+        login();
     }
 };
 
+/**
+ *  certificationError : certification errorCallback
+ */
+const certificationError = response => {
+    $('#msg').html(response.message);
+};
+
+/**
+ *  setRememberLoginId
+ *  : 아이디 기억하기 :로컬스토리지에 저장
+ */
+const setRememberLoginId = () => {
+    const idSaveCheck = document.getElementById('idSaveCheck').checked;
+    if (idSaveCheck) {
+        localStorage.setItem('rememberLoginId', $loginId.val());
+        localStorage.setItem('idSaveCheck', 'Y');
+    } else {
+        localStorage.removeItem('rememberLoginId');
+        localStorage.setItem('idSaveCheck', 'N');
+    }
+};
+
+/**
+ *  getRememberLoginId
+ *  : 아이디 기억하기 :로컬스토리지에 가져오기
+ */
+const getRememberLoginId = () => {
+    if (localStorage.getItem('idSaveCheck') === 'Y') {
+        const rememberLoginId = localStorage.getItem('rememberLoginId');
+        $idSaveCheck.prop('checked', true);
+        $loginId.val(rememberLoginId);
+    } else {
+        $idSaveCheck.prop('checked', false);
+    }
+};
+
+/**
+ *  login : 로그인
+ */
 const login = () => {
-    const accessToken = localStorage.getItem('accessToken');
+    const url = '/api/login';
+    const type = 'POST';
 
     const params = {
         login_id: $loginId.val(),
         user_pw: $userPw.val(),
-        login_device: $('#loginDevice').val(),
-        device_browser: $('#deviceBrowser').val(),
+        login_device: $loginDevice.val(),
+        device_browser: $deviceBrowser.val(),
     };
 
-    $.ajax({
-        url: `${apiDomain}/api/login`,
-        type: 'POST',
-        data: JSON.stringify(params),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-        success(result) {
-            const resultCode = result.header.result_code;
-            const message = result.header.message;
-
-            if (resultCode === 'ok') {
-                pageRouter('/page/main');
-            } else if (resultCode === 'pwchange') {
-                alert(
-                    '비밀번호 초기화가 필요합니다. 비밀번호 변경화면으로 이동합니다'
-                );
-                pageRouter('/page/pwChange');
-            } else if (resultCode === 'fail') {
-                $('#msg').html(message);
-            }
-        },
-        error(request, status, error) {
-            console.log(
-                `code:${request.status}\nmessage:${request.responseText}\nerror:${error}`
-            );
-        },
-    });
+    callApi(url, type, params, loginSuccess, loginError);
 };
 
+/**
+ *  loginSuccess : login successCallback
+ *  : 비밀번호 초기화가 필요한 경우 비밀번호변경 페이지 이동, 로그인 성공시 메인페이지 이동
+ */
+const loginSuccess = result => {
+    const resultCode = result.header.result_code;
+    const message = result.header.message;
+
+    if (resultCode === 'ok') {
+        pageRouter('/page/main');
+    } else if (resultCode === 'pwchange') {
+        alert('비밀번호 초기화가 필요합니다. 비밀번호 변경화면으로 이동합니다');
+        pageRouter('/page/pwChange');
+    } else if (resultCode === 'fail') {
+        $('#msg').html(message);
+    }
+};
+
+/**
+ *  loginError : login errorCallback
+ */
+const loginError = response => {
+    console.log(response);
+};
+
+/**
+ *  storageInit
+ *  : 세션스토리지 초기화, 로컬스토리지 초기화
+ */
 const storageInit = () => {
     sessionStorage.clear();
     localStorage.removeItem('accessToken');
     localStorage.removeItem('apiUrl');
 };
 
+/**
+ *  setDeviceInfo
+ *  : 디바이스정보 세팅
+ */
 const setDeviceInfo = () => {
     let deviceInfo = getDeviceInfo();
-    $('#loginDevice').val(deviceInfo.device);
-    $('#deviceBrowser').val(deviceInfo.browser);
+    $loginDevice.val(deviceInfo.device);
+    $deviceBrowser.val(deviceInfo.browser);
 };
 
 $(document).ready(() => {
@@ -139,13 +181,6 @@ $(document).ready(() => {
     setApi($('#apiUrl').val());
     apiDomain = getApi();
 
-    // // 아이디 기억하기(쿠키 불러오기)
-    const idSaveCheck = document.getElementById('idSaveCheck');
-
-    if (getCookie('idSaveCheck') === 'Y') {
-        idSaveCheck.checked = true;
-        $loginId.val(getCookie('loginId'));
-    } else {
-        idSaveCheck.checked = false;
-    }
+    //아이디 기억하기
+    getRememberLoginId();
 });

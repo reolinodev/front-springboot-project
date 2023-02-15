@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Admin</title>
+    <title>Admin Template</title>
     <script type="module" th:src="@{/dist/config.js}"></script>
     <script type="module" th:src="@{/dist/pwChange.js}"></script>
     <link rel="stylesheet" th:href="@{/lib/tmpl/dist/css/adminlte.min.css}"/>
@@ -17,16 +17,8 @@
         <div class="card-body">
             <p class="login-box-msg">비밀번호 변경</p>
             <form name="frm" id="frm" method="POST">
+                <!-- 페이지 이동을 위해 url 필드 넣음 -->
                 <input type="hidden" name="url" id="url"/>
-                <div class="input-group mb-3">
-                    <label for="loginId"></label>
-                    <input type="text" name="login_id" id="loginId" class="form-control" placeholder="아이디"/>
-                    <div class="input-group-append">
-                        <div class="input-group-text">
-                            <span class="fas fa-user"></span>
-                        </div>
-                    </div>
-                </div>
                 <div class="input-group mb-3">
                     <label for="userPw"></label>
                     <input type="password" name="user_pw" id="userPw" class="form-control" placeholder="비밀번호"/>
@@ -52,12 +44,12 @@
 
                 <div class="row">
                     <div class="col-6">
-                        <button type="button" class="btn btn-secondary btn-block" id="returnBtn">
+                        <button type="button" class="btn btn-secondary btn-block" id="backBtn">
                             돌아가기
                         </button>
                     </div>
                     <div class="col-6">
-                        <button type="button" class="btn btn-primary btn-block" id="pwChangeBtn">
+                        <button type="button" class="btn btn-primary btn-block" id="updateBtn">
                             등록
                         </button>
                     </div>

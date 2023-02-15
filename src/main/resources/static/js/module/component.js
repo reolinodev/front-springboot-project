@@ -94,30 +94,11 @@ export function setCodeSelBoxCall(id, codeGrp, type, selectedValue, callBack) {
 
             callBack();
         },
-        (request, status, error) => {
-            if (request.status === 500) {
-                console.log(
-                    `code:${request.status}\n` +
-                        `message:${request.responseText}\n` +
-                        `error:${error}`
-                );
-            } else if (request.status === 400) {
-                const {errorList} = request.responseJSON;
-                if (errorList !== undefined) {
-                    if (errorList.lengh !== 0) {
-                        const {message} = errorList[0];
-                        $('#msg').html(message);
-                    }
-                } else {
-                    const data = request.responseJSON.header;
-                    $('#msg').html(data.message);
-                }
-            } else if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                setCodeSelBoxCall(id, codeGrp, type, selectedValue, callBack);
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
+        response => {
+            const httpStatus = response.status;
+            const resJson = response.responseJSON.header;
+            resJson.httpStatus = httpStatus;
+            console.log(resJson);
         }
     );
 }
@@ -136,6 +117,7 @@ export function setCommSelBox(
     option
 ) {
     let str = '';
+    const apiDomain = getApi();
 
     if (type === 'ALL') str += `<option value="">-- 전체 --</option>`;
     else if (type === 'SEL') str += `<option value="">-- 선택 --</option>`;
@@ -143,20 +125,15 @@ export function setCommSelBox(
     if (params === '') {
         params = {};
     }
-    // const accessToken = window.localStorage.getItem("accessToken");
 
     if (url === '') {
         str += '</select>';
         $(`#${id}`).html(str);
     } else {
         $.ajax({
-            url,
+            url: `${apiDomain}${url}`,
             type: url_type,
             data: JSON.stringify(params),
-            // beforeSend: function (xhr) {
-            //     xhr.setRequestHeader("Content-type","application/json");
-            //     xhr.setRequestHeader("Authorization",accessToken);
-            // },
             success(result) {
                 const list = result.data;
 
@@ -186,35 +163,19 @@ export function setCommSelBox(
 
                 $(`#${id}`).html(str);
             },
-            error(request, status, error) {
-                console.log(
-                    `code:${request.status}\n` +
-                        `message:${request.responseText}\n` +
-                        `error:${error}`
-                );
-
-                // if (request.status === 401) {
-                //     setAccessToken(request.responseJSON);
-                //     setCommSelBox(
-                //         id,
-                //         url,
-                //         url_type,
-                //         type,
-                //         selected_value,
-                //         params,
-                //         option
-                //     );
-                // } else if (request.status === 403) {
-                //     mainViewTokenInvalidate();
-                // }
+            error(response) {
+                const httpStatus = response.status;
+                const resJson = response.responseJSON.header;
+                resJson.httpStatus = httpStatus;
+                console.log(resJson);
             },
         });
     }
 }
 
 /**
- * setCommSelBox : 공통코드를 사용하지 않는 경우 셀렉트 박스 생성
- * 생성할 아이디, url, url_type(url 전송 타입) ,타입(전체, 선택, ''), 선택된 값(''), 파라미터(''), option(옵션안에 넣을 텍스트와 value의 값을 추출)
+ * setCommSelBoxCall : 공통코드를 사용하지 않는 경우 셀렉트 박스 생성, 콜백함수가 필요한 경우
+ * 생성할 아이디, url, url_type(url 전송 타입) ,타입(전체, 선택, ''), 선택된 값(''), 파라미터(''), option(옵션안에 넣을 텍스트와 value의 값을 추출), callback
  */
 export function setCommSelBoxCall(
     id,
@@ -234,7 +195,6 @@ export function setCommSelBoxCall(
     if (params === '') {
         params = {};
     }
-    const accessToken = window.localStorage.getItem('accessToken');
 
     if (url === '') {
         str += '</select>';
@@ -244,10 +204,6 @@ export function setCommSelBoxCall(
             url,
             type: url_type,
             data: JSON.stringify(params),
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader('Content-type', 'application/json');
-                xhr.setRequestHeader('Authorization', accessToken);
-            },
             success(result) {
                 const list = result.data;
 
@@ -278,28 +234,11 @@ export function setCommSelBoxCall(
                 $(`#${id}`).html(str);
                 callback();
             },
-            error(request, status, error) {
-                console.log(
-                    `code:${request.status}\n` +
-                        `message:${request.responseText}\n` +
-                        `error:${error}`
-                );
-
-                if (request.status === 401) {
-                    setAccessToken(request.responseJSON);
-                    setCommSelBoxCall(
-                        id,
-                        url,
-                        url_type,
-                        type,
-                        selected_value,
-                        params,
-                        option,
-                        callback
-                    );
-                } else if (request.status === 403) {
-                    mainViewTokenInvalidate();
-                }
+            error(response) {
+                const httpStatus = response.status;
+                const resJson = response.responseJSON.header;
+                resJson.httpStatus = httpStatus;
+                console.log(resJson);
             },
         });
     }

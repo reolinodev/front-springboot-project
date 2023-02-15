@@ -5,6 +5,7 @@ import {
     setAccessToken,
 } from '../module/router';
 import {getApi} from '../module/api';
+import {callApi, callGetApi} from '../module/async';
 
 let mainUrl;
 const apiDomain = getApi();
@@ -21,45 +22,36 @@ const logout = () => {
  * getUserData : 사용자 정보조회(토큰 내용 가져오기)
  */
 const getUserData = () => {
-    const accessToken = localStorage.getItem('accessToken');
-
-    $.ajax({
-        url: `${apiDomain}/api/main/user`,
-        type: 'GET',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-        success(result) {
-            const data = result.data;
-
-            $('#userNm').html(data.user_nm);
-            $('#userId').val(data.user_id);
-
-            sessionStorage.setItem('userId', data.user_id);
-            sessionStorage.setItem('authId', data.auth_id);
-            setMyAuthItem();
-            getNavList(data.auth_id);
-        },
-        error(request, status, error) {
-            console.log(
-                `code:${request.status}\n` +
-                    `message:${request.responseText}\n` +
-                    `error:${error}`
-            );
-
-            if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                getUserData();
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
-        },
-    });
+    const url = '/api/main/user';
+    callGetApi(url, getUserDataSuccess, getUserDataError);
 };
 
 /**
- * setMyAuthItem : 내 권한조회
+ *  getUserDataSuccess : getUserData successCallback
+ *  :
+ */
+const getUserDataSuccess = result => {
+    const data = result.data;
+
+    $('#userNm').html(data.user_nm);
+    $('#userId').val(data.user_id);
+
+    sessionStorage.setItem('userId', data.user_id);
+    sessionStorage.setItem('authId', data.auth_id);
+
+    setMyAuthItem();
+    getNavList(data.auth_id);
+};
+
+/**
+ *  getUserDataError : getUserData errorCallback
+ */
+const getUserDataError = response => {
+    console.log(response);
+};
+
+/**
+ * setMyAuthItem : 내가 가진 권한을 셀렉트박스에 표현
  */
 const setMyAuthItem = () => {
     const userId = $('#userId').val();
@@ -72,53 +64,41 @@ const setMyAuthItem = () => {
 
     setCommSelBox(
         'authId',
-        apiDomain + '/api/item/auth/mine/' + userId,
+        `/api/item/auth/mine/${userId}`,
         'POST',
         '',
         '',
         params,
         option
     );
-
-    // if ($('#dataType').val() === 'json') {
-    //     $('#authId').prop('disabled', true);
-    // }
 };
 
+/**
+ * getNavList : 네비게이션 리스트 조회
+ */
 const getNavList = authId => {
-    const accessToken = window.localStorage.getItem('accessToken');
-
+    const url = '/api/main/nav';
+    const type = 'POST';
     const params = {
         auth_id: authId,
     };
 
-    $.ajax({
-        url: `${apiDomain}/api/main/nav`,
-        type: 'POST',
-        data: JSON.stringify(params),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-        success(result) {
-            const data = result.data;
-            setNaviList(data);
-        },
-        error(request, status, error) {
-            console.log(
-                `code:${request.status}\n` +
-                    `message:${request.responseText}\n` +
-                    `error:${error}`
-            );
+    callApi(url, type, params, getNavListSuccess, getNavListError);
+};
 
-            if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                getNavList();
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
-        },
-    });
+/**
+ *  getNavListSuccess : getNavList successCallback
+ *  :
+ */
+const getNavListSuccess = result => {
+    setNaviList(result.data);
+};
+
+/**
+ *  getNavListError : getNavList errorCallback
+ */
+const getNavListError = response => {
+    console.log(response);
 };
 
 /**
@@ -135,10 +115,6 @@ const setNaviList = data => {
     $('#navFrm #prnMenuId').val(menuUrl.prn_menu_id);
     $('#navFrm #prnMenuNm').val(menuUrl.prn_menu_nm);
     $('#navFrm #url').val(menuUrl.url);
-
-    // $('#mainFrm #mainUrl').val(firstUrl.url);
-    // $('#mainFrm #mainMenuNm').val(firstUrl.menu_nm);
-    // $('#mainFrm #mainParentNm').val(firstUrl.prn_menu_nm);
 
     $('#navUl').html('');
 

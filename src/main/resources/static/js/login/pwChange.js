@@ -1,29 +1,26 @@
 import {pageRouter} from '../module/router';
 import {getApi} from '../module/api';
+import {callApi} from '../module/async';
+
+// 변수설정
+const $userPw = $('#userPw'); //비밀번호
+const $userPwRe = $('#userPwRe'); //비밀번호확인
 
 const apiDomain = getApi();
-const $loginId = $('#loginId');
-const $userPw = $('#userPw');
-const $userPwRe = $('#userPwRe');
 
 /**
- *  pwChangeProc : 회원가입 실행
+ *  update : 비밀번호 변경실행
  */
-const pwChangeProc = () => {
+const update = () => {
     let msg = '';
 
-    if ($loginId.val() === '') {
-        msg = '아이디를 입력하세요.';
-        $('#msg').html(msg);
-        $('#loginId').focus();
-        return;
-    } else if ($userPw.val() === '') {
+    if ($userPw.val() === '') {
         msg = '비밀번호를 입력하세요.';
         $('#msg').html(msg);
         $('#userPw').focus();
         return;
     } else if ($userPwRe.val() === '') {
-        msg = '비밀번호를 한번 더 입력하세요..';
+        msg = '비밀번호를 한번 더 입력하세요.';
         $('#msg').html(msg);
         $('#userPwRe').focus();
         return;
@@ -34,68 +31,51 @@ const pwChangeProc = () => {
         return;
     }
 
-    const param = {
-        login_id: $loginId.val(),
+    const url = '/api/user/user-page/user-pw';
+    const type = 'PUT';
+    const params = {
         user_pw: $userPw.val(),
     };
 
-    const accessToken = localStorage.getItem('accessToken');
-
-    $.ajax({
-        url: `${apiDomain}/api/user/user-pw`,
-        type: 'PUT',
-        data: JSON.stringify(param),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-    }).then(
-        data => {
-            if (data.header.result_code === 'ok') {
-                alert(data.header.message);
-                login();
-            } else {
-                $('#msg').html(data.header.message);
-            }
-        },
-        (request, status, error) => {
-            if (request.status === 500) {
-                console.log(
-                    `code:${request.status}\n` +
-                        `message:${request.responseText}\n` +
-                        `error:${error}`
-                );
-            } else if (request.status === 400) {
-                const {errorList} = request.responseJSON;
-                if (errorList !== undefined) {
-                    if (errorList.lengh !== 0) {
-                        const {message} = errorList[0];
-                        $('#msg').html(message);
-                    }
-                } else {
-                    const data = request.responseJSON.header;
-                    $('#msg').html(data.message);
-                }
-            }
-        }
-    );
+    callApi(url, type, params, updateSuccess, updateError);
 };
 
 /**
- *  login : 로그인 화면 이동
+ *  updateSuccess : update successCallback
+ *  :
  */
-const login = () => {
+const updateSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        alert(result.header.message);
+        back();
+    } else {
+        $('#msg').html(result.header.message);
+    }
+};
+
+/**
+ *  updateError : update errorCallback
+ */
+const updateError = response => {
+    $('#msg').html(response.message);
+};
+
+/**
+ *  back
+ *  : 로그인화면으로 이동
+ */
+const back = () => {
     pageRouter('/login');
 };
 
 $(document).ready(() => {
     // 패스워드 변경 이벤트
-    $('#pwChangeBtn').click(() => {
-        pwChangeProc();
+    $('#updateBtn').click(() => {
+        update();
     });
 
     // 돌아가기 이벤트
-    $('#returnBtn').click(() => {
-        login();
+    $('#backBtn').click(() => {
+        back();
     });
 });
