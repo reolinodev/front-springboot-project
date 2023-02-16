@@ -51,15 +51,9 @@ export function setCodeSelBoxCall(id, codeGrp, type, selectedValue, callBack) {
     if (type === 'ALL') str += `<option value="">-- 전체 --</option>`;
     else if (type === 'SEL') str += `<option value="">-- 선택 --</option>`;
 
-    const accessToken = window.localStorage.getItem('accessToken');
-
     $.ajax({
         url: `${apiDomain}/api/item/code/${codeGrp}`,
         type: 'GET',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
     }).then(
         result => {
             const dataList = result.data;
@@ -67,11 +61,11 @@ export function setCodeSelBoxCall(id, codeGrp, type, selectedValue, callBack) {
             for (let i = 0; i < dataList.length; i++) {
                 if (
                     selectedValue !== '' &&
-                    selectedValue === dataList[i].cd_val
+                    selectedValue === dataList[i].code_val
                 ) {
-                    str += `<option value="${dataList[i].cd_val}" selected> ${dataList[i].cd_nm}</option>`;
+                    str += `<option value="${dataList[i].code_val}" selected> ${dataList[i].code_nm}</option>`;
                 } else {
-                    str += `<option value="${dataList[i].cd_val}"> ${dataList[i].cd_nm}</option>`;
+                    str += `<option value="${dataList[i].code_val}"> ${dataList[i].code_nm}</option>`;
                 }
             }
 
@@ -173,6 +167,7 @@ export function setCommSelBoxCall(
     callback
 ) {
     let str = '';
+    const apiDomain = getApi();
 
     if (type === 'ALL') str += `<option value="">-- 전체 --</option>`;
     else if (type === 'SEL') str += `<option value="">-- 선택 --</option>`;
@@ -186,7 +181,7 @@ export function setCommSelBoxCall(
         $(`#${id}`).html(str);
     } else {
         $.ajax({
-            url,
+            url: `${apiDomain}${url}`,
             type: url_type,
             data: JSON.stringify(params),
             success(result) {

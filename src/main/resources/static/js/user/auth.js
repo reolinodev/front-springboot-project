@@ -85,7 +85,6 @@ const search = () => {
 
 /**
  *  searchSuccess : search successCallback
- *  :
  */
 const searchSuccess = result => {
     spinnerHide();
