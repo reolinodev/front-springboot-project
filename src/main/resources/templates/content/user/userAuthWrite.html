@@ -5,12 +5,12 @@
     layout:decorate="~{layouts/defaultLayout}"
 >
 <head>
-    <title>사용자 권한 관리 등록</title>
+    <title>사용자권한정보</title>
     <script type="module" th:src="@{/dist/userAuthWrite.js}"></script>
 </head>
 
 <div layout:fragment="content" id="container">
-    <form name="authUserWriteFrm">
+    <form name="userAuthWriteFrm">
         <div class="row justify-content-end" style="margin-bottom: 10px;">
             <div class="col-2 ">
                 <button type="button" class="btn btn-block btn-primary btn-sm" id="backBtn">뒤로가기</button>
@@ -26,10 +26,10 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col-6">
-                                <select class="custom-select rounded-0" id="authIdntfKey" name="auth_idntf_key"></select>
+                                <select class="custom-select rounded-0" id="authRole" name="auth_role"></select>
                             </div>
                             <div class="col-6">
-                                <select class="custom-select rounded-0" id="corpCd" name="corp_cd"></select>
+                                <select class="custom-select rounded-0" id="authId" name="auth_id"></select>
                             </div>
                         </div>
                     </div>
@@ -37,7 +37,7 @@
                         <div class="row justify-content-end">
                             <div class="col-8">
                                 <div class="input-group input-group-sm">
-                                    <input type="text" class="form-control" id="searchStr" name="search_str" placeholder="아이디/이름">
+                                    <label for="searchStr"></label><input type="text" class="form-control" id="searchStr" name="search_str" placeholder="아이디/이름">
                                     <input type="text" class="form-control" style="display: none">
                                 </div>
                             </div>

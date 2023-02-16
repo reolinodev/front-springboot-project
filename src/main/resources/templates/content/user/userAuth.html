@@ -14,18 +14,21 @@
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-4">
+                    <div class="col-3">
+                        <label for="viewAuthId">권한구분</label>
+                        <select class="custom-select rounded-0" id="viewAuthRole" name="auth_role"></select>
+                    </div>
+                    <div class="col-3">
                         <label for="viewAuthId">권한명</label>
-                        <select class="custom-select rounded-0" id="viewAuthId" name="auth_idntf_key"></select>
+                        <select class="custom-select rounded-0" id="viewAuthId" name="auth_id"></select>
                     </div>
-                    <div class="col-4">
-                        <label for="searchStr">아이디/이름</label>
-                        <input type="text" class="form-control" id="searchStr" name="search_str">
+                    <div class="col-3">
+                        <label for="viewLoginId">아이디</label>
+                        <input type="text" class="form-control" id="viewLoginId" name="login_id">
                     </div>
-                    <div class="col-4">
-                        <input type="text" class="form-control" style="display: none"> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
-                        <label for="viewCorpCd">계열사</label>
-                        <select class="custom-select rounded-0" id="viewCorpCd" name="corp_cd"></select>
+                    <div class="col-3">
+                        <label for="viewUserNm">이름</label>
+                        <input type="text" class="form-control" id="viewUserNm" name="user_nm">
                     </div>
                 </div>
             </div>

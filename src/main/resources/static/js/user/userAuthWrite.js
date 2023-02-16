@@ -1,4 +1,4 @@
-import {setCodeSelBox, setCommSelBox} from '../module/component';
+import {setCodeSelBoxCall, setCommSelBox} from '../module/component';
 import Page, {setPagination} from '../module/pagination';
 import {serializeFormJson} from '../module/json';
 import {
@@ -6,14 +6,16 @@ import {
     getCheckedRows,
     setCheckBoxGridId,
 } from '../module/grid';
-import {mainViewTokenInvalidate, setAccessToken} from '../module/router';
 import {spinnerHide, spinnerShow} from '../module/spinner';
+import {callApi} from '../module/async';
 
 let page = new Page(1, false, 10, 0);
 let grid;
 let grid2;
 let pagination;
 let selectedData = [];
+
+const $authId = $('#authId'); //권한식별키
 
 // 페이징 초기화
 const pageInit = () => {
@@ -24,56 +26,45 @@ const pageInit = () => {
  * search : 조회
  */
 const search = () => {
-    const params = serializeFormJson('authUserWriteFrm');
+    const params = serializeFormJson('userAuthWriteFrm');
     params.current_page = page.currentPage;
     params.page_per = page.pagePer;
 
-    if (params.auth_idntf_key === '') {
+    if (params.auth_id === '') {
         alert('권한을 선택하세요.');
         return;
     }
 
     spinnerShow();
 
-    const accessToken = window.localStorage.getItem('accessToken');
+    const url = '/api/userAuth/input-user';
+    const type = 'POST';
 
-    $.ajax({
-        url: '/api/userAuth/inputUser',
-        type: 'POST',
-        data: JSON.stringify(params),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-        success(result) {
-            const gridData = result.data;
-            page.totalCount = result.total;
-            grid.resetData(gridData);
+    callApi(url, type, params, searchSuccess, searchError);
+};
 
-            if (page.pageInit === false) {
-                pagination.reset(result.total);
-                page.pageInit = true;
-            }
+/**
+ *  searchSuccess : search successCallback
+ */
+const searchSuccess = result => {
+    const gridData = result.data;
+    page.totalCount = result.total;
+    grid.resetData(gridData);
 
-            spinnerHide();
-        },
-        error(request, status, error) {
-            console.log(
-                `code:${request.status}\n` +
-                    `message:${request.responseText}\n` +
-                    `error:${error}`
-            );
+    if (page.pageInit === false) {
+        pagination.reset(result.total);
+        page.pageInit = true;
+    }
 
-            if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                search();
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
+    spinnerHide();
+};
 
-            spinnerHide();
-        },
-    });
+/**
+ *  searchError : search errorCallback
+ */
+const searchError = response => {
+    spinnerHide();
+    console.log(response);
 };
 
 /**
@@ -81,10 +72,10 @@ const search = () => {
  */
 const setGridLayout = () => {
     const columns = [
-        {header: 'SEQ', name: 'user_idntf_key', align: 'center', hidden: true},
+        {header: 'SEQ', name: 'user_id', align: 'center', hidden: true},
         {header: '아이디', name: 'login_id', align: 'center'},
         {header: '이름', name: 'user_nm', align: 'center'},
-        {header: '계열사', name: 'corp_nm', align: 'center'},
+        {header: '휴대폰번호', name: 'tel_no', align: 'center'},
     ];
     const gridData = [];
 
@@ -96,10 +87,10 @@ const setGridLayout = () => {
  */
 const setGridLayout2 = () => {
     const columns = [
-        {header: 'SEQ', name: 'user_idntf_key', align: 'center', hidden: true},
+        {header: 'SEQ', name: 'user_id', align: 'center', hidden: true},
         {header: '아이디', name: 'login_id', align: 'center'},
         {header: '이름', name: 'user_nm', align: 'center'},
-        {header: '계열사', name: 'corp_nm', align: 'center'},
+        {header: '휴대폰번호', name: 'tel_no', align: 'center'},
     ];
     const gridData = [];
     return setCheckBoxGridId(columns, gridData, 'grid2');
@@ -114,10 +105,10 @@ const pagingCallback = returnPage => {
 };
 
 /**
- * setAuthUser : 사용자 선택
+ * setUserAuth : 사용자 선택
  */
-const setAuthUser = () => {
-    if ($('#authIdntfKey').val() === '') {
+const setUserAuth = () => {
+    if ($authId.val() === '') {
         alert('권한을 선택하세요.');
         return;
     }
@@ -150,27 +141,25 @@ const removeDuplicateItem = data => {
     let uniqueData;
     uniqueData = data.filter(
         (character, idx, arr) =>
-            arr.findIndex(
-                item => item.user_idntf_key === character.user_idntf_key
-            ) === idx
+            arr.findIndex(item => item.user_id === character.user_id) === idx
     );
 
     return uniqueData;
 };
 
 /**
- * deleteAuthUser : 사용자 삭제
+ * deleteUserAuth : 사용자 삭제
  */
-const deleteAuthUser = () => {
+const deleteUserAuth = () => {
     grid2.removeCheckedRows();
     selectedData = grid2.getData();
 };
 
 /**
- *  insertProc : 권한 등록
+ *  save : 권한 등록
  */
-const insertProc = () => {
-    if ($('#authIdntfKey').val() === '') {
+const save = () => {
+    if ($authId.val() === '') {
         alert('권한을 선택하세요.');
         return;
     }
@@ -185,67 +174,43 @@ const insertProc = () => {
     const userArr = [];
 
     for (const obj of selectedData) {
-        userArr.push(obj.user_idntf_key);
+        userArr.push(obj.user_id);
     }
 
     const params = {
-        auth_idntf_key: $('#authIdntfKey').val(),
+        auth_id: $('#authId').val(),
         user_arr: userArr,
     };
 
-    const accessToken = window.localStorage.getItem('accessToken');
+    const url = '/api/userAuth';
+    const type = 'PUT';
 
-    $.ajax({
-        url: '/api/userAuth/',
-        type: 'PUT',
-        data: JSON.stringify(params),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-    }).then(
-        data => {
-            if (data.header.result_code === 'ok') {
-                alert(data.header.message);
-                refreshSearch();
-            }
+    callApi(url, type, params, saveSuccess, saveError);
+};
 
-            spinnerHide();
-        },
-        (request, status, error) => {
-            if (request.status === 500) {
-                console.log(
-                    `code:${request.status}\n` +
-                        `message:${request.responseText}\n` +
-                        `error:${error}`
-                );
-            } else if (request.status === 400) {
-                const {errorList} = request.responseJSON;
-                if (errorList !== undefined) {
-                    if (errorList.lengh !== 0) {
-                        const {message} = errorList[0];
-                        alert(message);
-                    }
-                } else {
-                    const data = request.responseJSON.header;
-                    alert(data.message);
-                }
-            } else if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                insertProc();
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
+/**
+ *  saveSuccess : save successCallback
+ */
+const saveSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        alert(result.header.message);
+        refreshSearch();
+    }
 
-            spinnerHide();
-        }
-    );
+    spinnerHide();
+};
+
+/**
+ *  saveError : save errorCallback
+ */
+const saveError = response => {
+    spinnerHide();
+    console.log(response);
 };
 
 /**
  *  refreshSearch :  재검색하기
  */
-
 const refreshSearch = () => {
     pageInit();
     $('#searchStr').val('');
@@ -254,23 +219,28 @@ const refreshSearch = () => {
     search();
 };
 
-$(document).ready(() => {
+/**
+ *  setAuthIdSelBox :  권한 셀렉트박스 조회
+ */
+const setAuthIdSelBox = () => {
     const params = {};
     const option = {
         oTxt: 'auth_nm',
-        oVal: 'auth_idntf_key',
+        oVal: 'auth_id',
     };
     setCommSelBox(
-        'authIdntfKey',
-        '/api/auth/useAuth',
+        'authId',
+        `/api/item/auth/auth-role/${$('#authRole').val()}`,
         'POST',
         'SEL',
         '',
         params,
         option
     );
+};
 
-    setCodeSelBox('corpCd', 'CORP_CD', 'ALL', '');
+$(document).ready(() => {
+    setCodeSelBoxCall('authRole', 'AUTH_ROLE', '', '', setAuthIdSelBox);
 
     // 그리드 세팅
     grid = setGridLayout();
@@ -285,19 +255,27 @@ $(document).ready(() => {
         search();
     });
 
+    // 권한변경 이벤트
+    $('#authId').change(() => {
+        if ($authId.val() !== '') {
+            pageInit();
+            search();
+        }
+    });
+
     // 추가 버튼 클릭 이벤트
     $('#addBtn').click(() => {
-        setAuthUser();
+        setUserAuth();
     });
 
     // 삭제 버튼 클릭 이벤트
     $('#delBtn').click(() => {
-        deleteAuthUser();
+        deleteUserAuth();
     });
 
     // 저장 버튼 클릭 이벤트
     $('#saveBtn').click(() => {
-        insertProc();
+        save();
     });
 
     // 뒤로가기 버튼 클릭 이벤트
