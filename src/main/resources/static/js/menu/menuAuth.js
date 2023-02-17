@@ -1,55 +1,47 @@
-import { setBasicTree } from '../module/tree';
-import {
-    focustGridFirstRow,
-    setBasicGrid
-} from '../module/grid';
-import { mainViewTokenInvalidate, setAccessToken } from "../module/router";
-import { spinnerHide, spinnerShow } from "../module/spinner";
+import {setBasicTree} from '../module/tree';
+import {focustGridFirstRow, setBasicGrid} from '../module/grid';
+import {spinnerHide, spinnerShow} from '../module/spinner';
+import {setCodeSelBoxCall} from '../module/component';
+import {callApi, callGetApi} from '../module/async';
 
 let tree;
 let grid;
+
+const $authRole = $('#authRole'); //권한구분
+const $menuId = $('#menuId'); //메뉴식별키
 
 /**
  * search : 메뉴트리 조회
  */
 const search = () => {
-
     spinnerShow();
 
-    const accessToken = window.localStorage.getItem("accessToken");
+    const url = `/api/menu/tree/${$authRole.val()}`;
+    callGetApi(url, searchSuccess, searchError);
+};
 
-    $.ajax({
-        url: `/api/menu/menu/tree`,
-        type: 'GET',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader("Content-type","application/json");
-            xhr.setRequestHeader("Authorization",accessToken);
-        },
-        success(result) {
-            setMenuList(result.data);
+/**
+ *  searchSuccess : search successCallback
+ */
+const searchSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        setMenuTree(result.data);
+    }
+    spinnerHide();
+};
 
-            spinnerHide();
-        },
-        error(request, status, error) {
-            console.log(`code:${request.status}\n` + `message:${request.responseText}\n` + `error:${error}`);
-
-            if(request.status === 401){
-                setAccessToken(request.responseJSON);
-                search();
-            }
-            else if(request.status === 403){
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        },
-    });
+/**
+ *  searchError : search errorCallback
+ */
+const searchError = response => {
+    spinnerHide();
+    console.log(response);
 };
 
 /**
  * setMenuList : 조회된 데이터 트리 데이터로 정제 후 트리컴퍼넌트 호출
  */
-const setMenuList = (list) => {
+const setMenuTree = list => {
     const menu = [];
 
     for (const data of list) {
@@ -58,12 +50,12 @@ const setMenuList = (list) => {
             const children = [];
 
             obj1.text = data.menu_nm;
-            obj1.target = data.menu_idntf_key;
+            obj1.target = data.menu_id;
             for (const data2 of list) {
-                if (data.menu_idntf_key === data2.prn_idntf_key) {
+                if (data.menu_id === data2.prn_menu_id) {
                     const obj2 = {};
                     obj2.text = data2.menu_nm;
-                    obj2.target = data2.menu_idntf_key;
+                    obj2.target = data2.menu_id;
                     children.push(obj2);
                 }
             }
@@ -72,7 +64,7 @@ const setMenuList = (list) => {
         }
     }
 
-    tree = setBasicTree(menu, setMenuId);
+    tree = setBasicTree(menu, setAuthData);
 };
 
 /**
@@ -80,8 +72,8 @@ const setMenuList = (list) => {
  */
 const setGridLayout = () => {
     const columns = [
-        { header: 'Auth Id', name: 'auth_idntf_key', align: 'center', hidden: true },
-        { header: '권한명', name: 'auth_nm', align: 'left' },
+        {header: 'Auth Id', name: 'auth_id', align: 'center', hidden: true},
+        {header: '권한명', name: 'auth_nm', align: 'left'},
         {
             header: '사용여부',
             name: 'use_yn',
@@ -91,116 +83,99 @@ const setGridLayout = () => {
                 type: 'select',
                 options: {
                     listItems: [
-                        { text: '사용', value: 'Y' },
-                        { text: '미사용', value: 'N' },
+                        {text: '사용', value: 'Y'},
+                        {text: '미사용', value: 'N'},
                     ],
                 },
             },
-            renderer: { styles: {color: '#e83e8c', textDecoration : 'underline', cursor: 'pointer'}}
+            renderer: {
+                styles: {
+                    color: '#e83e8c',
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                },
+            },
         },
-        { header: '수정된 날짜', name: 'sys_mdfcn_dt', align: 'left' },
-        { header: '수정자', name: 'sys_mdfcn_nm', align: 'center' },
+        {header: '수정된 날짜', name: 'updated_at', align: 'left'},
+        {header: '수정자', name: 'updated_nm', align: 'center'},
     ];
     const gridData = [];
     return setBasicGrid(columns, gridData);
 };
-const setMenuId = (menuId) => {
-    $('#menuIdntfKey').val(menuId);
-
-    searchAuthMenu();
+const setAuthData = menuId => {
+    $menuId.val(menuId);
+    getAuthData();
 };
 
 /**
- * searchMenuInfo : 메뉴 상세 정보 조회하기
+ * getAuthData : 권한 조회하기
  */
-const searchAuthMenu = () => {
-
+const getAuthData = () => {
     spinnerShow();
 
+    const url = `/api/menuAuth/${$menuId.val()}`;
+    callGetApi(url, getAuthDataSuccess, getAuthDataError);
+};
+
+/**
+ *  getAuthDataSuccess : getAuthData successCallback
+ */
+const getAuthDataSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        const gridData = result.data;
+        grid.resetData(gridData);
+    }
+    spinnerHide();
+};
+
+/**
+ *  getAuthDataError : getAuthData errorCallback
+ */
+const getAuthDataError = response => {
+    spinnerHide();
+    console.log(response);
+};
+
+/**
+ * save : 메뉴 권한 저장
+ */
+const save = updatedRows => {
+    spinnerShow();
+
+    let url = '/api/menuAuth';
+
+    const type = 'PUT';
     const params = {
-        menu_idntf_key: $('#menuIdntfKey').val(),
-    };
-
-    const accessToken = window.localStorage.getItem("accessToken");
-
-    $.ajax({
-        url: '/api/menu/authMenu/',
-        type: 'POST',
-        data: JSON.stringify(params),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader("Content-type","application/json");
-            xhr.setRequestHeader("Authorization",accessToken);
-        },
-        success(result) {
-            const gridData = result.data;
-            grid.resetData(gridData);
-
-            spinnerHide();
-        },
-        error(request, status, error) {
-            console.log(`code:${request.status}\n` + `message:${request.responseText}\n` + `error:${error}`);
-
-            if(request.status === 401){
-                setAccessToken(request.responseJSON);
-                searchAuthMenu();
-            }
-            else if(request.status === 403){
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        },
-    });
-};
-
-/**
- * saveProc : 메뉴 권한 저장
- */
-const saveProc = (updatedRows) => {
-
-    spinnerShow();
-
-    const param = {
-        menu_idntf_key: $('#menuIdntfKey').val(),
+        menu_id: $menuId.val(),
         updated_rows: updatedRows,
     };
 
-    const accessToken = window.localStorage.getItem("accessToken");
+    callApi(url, type, params, saveSuccess, saveError);
+};
 
-    $.ajax({
-        url: '/api/menu/authMenu/',
-        type: 'PUT',
-        data: JSON.stringify(param),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader("Content-type","application/json");
-            xhr.setRequestHeader("Authorization",accessToken);
-        },
-    }).then(
-        (data) => {
-            searchAuthMenu();
-            alert(data.header.message);
+/**
+ *  saveSuccess : save successCallback
+ */
+const saveSuccess = result => {
+    alert(result.header.message);
+    if (result.header.result_code === 'ok') {
+        getAuthData();
+    }
 
-            spinnerHide();
-        },
-        (request, status, error) => {
-            console.log(`code:${request.status}\n` + `message:${request.responseText}\n` + `error:${error}`);
+    spinnerHide();
+};
 
-            if(request.status === 401){
-                setAccessToken(request.responseJSON);
-                saveProc(updatedRows);
-            }
-            else if(request.status === 403){
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        }
-    );
+/**
+ *  saveError : save errorCallback
+ */
+const saveError = response => {
+    console.log(response);
+    spinnerHide();
 };
 
 $(document).ready(() => {
-
-    search();
+    //권한구분 설정 및 트리조회
+    setCodeSelBoxCall('authRole', 'AUTH_ROLE', '', '', search);
 
     grid = setGridLayout();
 
@@ -209,9 +184,9 @@ $(document).ready(() => {
         focustGridFirstRow(grid);
 
         const rows = grid.getModifiedRows();
-        const { updatedRows } = rows;
+        const {updatedRows} = rows;
 
-        if ($('#menuIdntfKey').val() === '') {
+        if ($menuId.val() === '') {
             alert('선택된 메뉴가 없습니다.');
             return;
         }
@@ -221,6 +196,6 @@ $(document).ready(() => {
             return;
         }
 
-        saveProc(updatedRows);
+        save(updatedRows);
     });
 });
