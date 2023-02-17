@@ -5,7 +5,7 @@
     layout:decorate="~{layouts/defaultLayout}"
 >
 <head>
-    <title>메뉴 관리 등록</title>
+    <title>메뉴정보</title>
     <script type="module" th:src="@{/dist/menu.js}"></script>
 </head>
 
@@ -15,6 +15,8 @@
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-body">
+                        <select class="custom-select rounded-0" id="authRole" name="auth_role"></select>
+
                         <div id="tree" class="tui-tree-wrap" style="width: 100%;"></div>
                     </div>
                 </div>
@@ -25,7 +27,7 @@
                     <div class="card-header">
                         <div class="row justify-content-end">
                             <div class="col-3">
-                                <button type="button" class="btn btn-block btn-warning btn-sm" id="addBtn">초기화</button>
+                                <button type="button" class="btn btn-block btn-warning btn-sm" id="addBtn">새메뉴 등록</button>
                             </div>
                             <div class="col-3">
                                 <button type="button" class="btn btn-block btn-danger btn-sm" id="delBtn">삭제</button>
@@ -39,15 +41,12 @@
                         <div class="form-group row">
                             <div class="col-6">
                                 <label for="menuLv">* 레벨</label>
-                                <select class="custom-select rounded-0" id="menuLv" name="menu_lv">
-                                    <option value="1" selected>상위</option>
-                                    <option value="2">하위</option>
-                                </select>
-                                <input type="hidden" id="menuIdntfKey" name="menu_idntf_key" class="form-control">
+                                <select class="custom-select rounded-0" id="menuLv" name="menu_lv"></select>
+                                <input type="hidden" id="menuId" name="menu_id" class="form-control">
                             </div>
                             <div class="col-6">
-                                <label for="prnIdntfKey">* 상위 메뉴</label>
-                                <select class="custom-select rounded-0" id="prnIdntfKey" name="prn_idntf_key">
+                                <label for="prnMenuId">* 대메뉴</label>
+                                <select class="custom-select rounded-0" id="prnMenuId" name="prn_menu_id">
                                     <option value="0">-- 없음 --</option>
                                 </select>
                             </div>
@@ -70,7 +69,7 @@
                                 </div>
                             </div>
                             <div class="col-6">
-                                <select class="custom-select rounded-0" id="boardId" name="board_idntf_key" style="display: none"></select>
+                                <select class="custom-select rounded-0" id="boardId" name="board_id" style="display: none"></select>
                             </div>
                         </div>
                         <div class="form-group">

@@ -1,10 +1,27 @@
-import {setCodeSelBox, setCommSelBox} from '../module/component';
+import {
+    setCodeSelBox,
+    setCodeSelBoxCall,
+    setCommSelBox,
+} from '../module/component';
 import {setBasicTree} from '../module/tree';
 import {checkKr} from '../module/validation';
-import {mainViewTokenInvalidate, setAccessToken} from '../module/router';
 import {spinnerHide, spinnerShow} from '../module/spinner';
+import {callApi, callGetApi} from '../module/async';
 
 let tree;
+
+const $authRole = $('#authRole'); //권한구분
+const $menuId = $('#menuId'); //메뉴식별키
+const $menuLv = $('#menuLv'); //메뉴레벨
+const $menuNm = $('#menuNm'); //메뉴명
+const $url = $('#url'); //url
+const $useYn = $('#useYn'); //사용여부
+const $ord = $('#ord'); //순서
+const $boardId = $('#boardId'); //게시판식별키
+const $mainYn = $('#mainYn'); //메인여부
+const $prnMenuId = $('#prnMenuId'); //상위메뉴
+const $menuType1 = $('#menuType1'); //메뉴타입 - 도메인
+const $menuType2 = $('#menuType2 '); //메뉴타입 - 게시판
 
 /**
  * search : 메뉴트리 조회
@@ -12,43 +29,32 @@ let tree;
 const search = () => {
     spinnerShow();
 
-    const accessToken = window.localStorage.getItem('accessToken');
+    const url = `/api/menu/tree/${$authRole.val()}`;
+    callGetApi(url, searchSuccess, searchError);
+};
 
-    $.ajax({
-        url: `/api/menu/menu/tree`,
-        type: 'GET',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-        success(result) {
-            setMenuList(result.data);
+/**
+ *  searchSuccess : search successCallback
+ */
+const searchSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        setMenuTree(result.data);
+    }
+    spinnerHide();
+};
 
-            spinnerHide();
-        },
-        error(request, status, error) {
-            console.log(
-                `code:${request.status}\n` +
-                    `message:${request.responseText}\n` +
-                    `error:${error}`
-            );
-
-            if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                search();
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        },
-    });
+/**
+ *  searchError : search errorCallback
+ */
+const searchError = response => {
+    spinnerHide();
+    console.log(response);
 };
 
 /**
  * setMenuList : 조회된 데이터 트리 데이터로 정제 후 트리컴퍼넌트 호출
  */
-const setMenuList = list => {
+const setMenuTree = list => {
     const menu = [];
 
     for (const data of list) {
@@ -57,13 +63,13 @@ const setMenuList = list => {
             const children = [];
 
             obj1.text = data.menu_nm;
-            obj1.target = data.menu_idntf_key;
+            obj1.target = data.menu_id;
 
             for (const data2 of list) {
-                if (data.menu_idntf_key === data2.prn_idntf_key) {
+                if (data.menu_id === data2.prn_menu_id) {
                     const obj2 = {};
                     obj2.text = data2.menu_nm;
-                    obj2.target = data2.menu_idntf_key;
+                    obj2.target = data2.menu_id;
                     children.push(obj2);
                 }
             }
@@ -72,207 +78,122 @@ const setMenuList = list => {
         }
     }
 
-    tree = setBasicTree(menu, searchMenuInfo);
+    tree = setBasicTree(menu, getMenuData);
 };
 
 /**
- * searchMenuInfo : 메뉴 상세 정보 조회하기
+ * getMenuData : 메뉴 상세 정보 조회하기
  */
-const searchMenuInfo = menuIdntfKey => {
+const getMenuData = menuId => {
     spinnerShow();
 
-    const accessToken = window.localStorage.getItem('accessToken');
+    const url = `/api/menu/${menuId}`;
+    callGetApi(url, getMenuDataSuccess, getMenuDataError);
+};
 
-    $.ajax({
-        url: `/api/menu/menu/${menuIdntfKey}`,
-        type: 'GET',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-        success(result) {
-            setMenuData(result.data);
-            spinnerHide();
-        },
-        error(request, status, error) {
-            console.log(
-                `code:${request.status}\n` +
-                    `message:${request.responseText}\n` +
-                    `error:${error}`
-            );
+/**
+ *  getMenuDataSuccess : getMenuData successCallback
+ */
+const getMenuDataSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        setMenuData(result.data);
+    }
+    spinnerHide();
+};
 
-            if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                searchMenuInfo(menuIdntfKey);
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        },
-    });
+/**
+ *  getMenuDataError : getMenuData errorCallback
+ */
+const getMenuDataError = response => {
+    spinnerHide();
+    console.log(response);
 };
 
 /**
  * setMenuData : 조회된 메뉴 데이터 화면에 매핑
  */
 const setMenuData = data => {
-    $('#menuIdntfKey').val(data.menu_idntf_key);
-    $('#menuLv').val(data.menu_lv);
-    $('#menuNm').val(data.menu_nm);
-    $('#url').val(data.url);
-    $('#useYn').val(data.use_yn);
-    $('#ord').val(data.ord);
+    $menuId.val(data.menu_id);
+    $menuLv.val(data.menu_lv);
+    $menuNm.val(data.menu_nm);
+    $url.val(data.url);
+    $useYn.val(data.use_yn);
+    $ord.val(data.ord);
 
     if (data.menu_type === 'URL') {
-        $('#menuType1').prop('checked', true);
-        $('#boardId').val('');
-        $('#boardId').hide();
+        $menuType1.prop('checked', true);
+        $boardId.val('');
+        $boardId.hide();
     } else {
-        $('#menuType2').prop('checked', true);
+        $menuType2.prop('checked', true);
         const url = data.url;
-        const boardKey = url.substring(url.lastIndexOf('/') + 1);
-        if (boardKey !== '') {
-            $('#boardId').val(boardKey);
+        const boardId = url.substring(url.lastIndexOf('/') + 1);
+        if (boardId !== '') {
+            $boardId.val(boardId);
         }
-        $('#boardId').show();
+        $boardId.show();
     }
 
     if (data.main_yn === 'Y') {
-        $('#mainYn').prop('checked', true);
+        $mainYn.prop('checked', true);
     } else {
-        $('#mainYn').prop('checked', false);
+        $mainYn.prop('checked', false);
     }
 
     if (data.menu_lv === 1) {
         const str = '<option value="0">-- 없음 --</option>';
-        $('#prnIdntfKey').html(str);
+        $prnMenuId.html(str);
     } else {
-        const params = {
-            prn_idntf_key: data.prn_idntf_key,
-        };
-        const option = {
-            oTxt: 'menu_nm',
-            oVal: 'menu_idntf_key',
-        };
-        setCommSelBox(
-            'prnIdntfKey',
-            '/api/menu/menu/parent',
-            'POST',
-            '',
-            '',
-            params,
-            option
-        );
+        setPrnMenuSelectBox('', data.prn_menu_id);
     }
 
-    $('#menuLv').attr('disabled', true);
-    $('#prnIdntfKey').attr('disabled', true);
+    $menuLv.attr('disabled', true);
+    $prnMenuId.attr('disabled', true);
 };
 
 /**
  * initMenuAdd : 메뉴 등록 초기화 하기
  */
 const initMenuAdd = () => {
-    $('#menuIdntfKey').val('');
-    $('#menuLv').val(1);
+    $menuId.val('');
+    $menuLv.val(1);
 
     const str = '<option value="0">-- 없음 --</option>';
-    $('#prnIdntfKey').html(str);
+    $prnMenuId.html(str);
 
-    $('#menuType1').prop('checked', true);
-    $('#menuNm').val('');
-    $('#url').val('');
-    $('#useYn').val('Y');
-    $('#ord').val('');
-    $('#mainYn').prop('checked', false);
+    $menuType1.prop('checked', true);
+    $menuNm.val('');
+    $url.val('');
+    $useYn.val('Y');
+    $ord.val('');
+    $mainYn.prop('checked', false);
 
-    $('#menuLv').attr('disabled', false);
-    $('#prnIdntfKey').attr('disabled', false);
+    $menuLv.attr('disabled', false);
+    $prnMenuId.attr('disabled', false);
 };
 
 /**
- * delMenuProc : 메뉴 삭제
+ * save : 메뉴 저장
  */
-const delMenuProc = () => {
-    spinnerShow();
-
-    const param = {
-        menu_idntf_key: $('#menuIdntfKey').val(),
-        menu_lv: $('#menuLv').val(),
-    };
-
-    const accessToken = window.localStorage.getItem('accessToken');
-
-    $.ajax({
-        url: '/api/menu/menu/',
-        type: 'DELETE',
-        data: JSON.stringify(param),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-    }).then(
-        data => {
-            alert(data.header.message);
-            if (data.header.result_code === 'ok') {
-                search();
-            }
-
-            spinnerHide();
-        },
-        (request, status, error) => {
-            if (request.status === 500) {
-                console.log(
-                    `code:${request.status}\n` +
-                        `message:${request.responseText}\n` +
-                        `error:${error}`
-                );
-            } else if (request.status === 400) {
-                const {errorList} = request.responseJSON;
-                if (errorList !== undefined) {
-                    if (errorList.lengh !== 0) {
-                        const {message} = errorList[0];
-                        alert(message);
-                    }
-                } else {
-                    const data = request.responseJSON.header;
-                    alert(data.message);
-                }
-            } else if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                delMenuProc();
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        }
-    );
-};
-
-/**
- * saveMenuProc : 메뉴 저장
- */
-const saveMenuProc = () => {
+const save = () => {
     let msg = '';
 
-    if ($('#menuLv').val() === '2' && $('#prnIdntfKey').val() === '') {
+    if ($menuLv.val() === '2' && $prnMenuId.val() === '') {
         msg = '상위 메뉴를 선택하세요.';
         alert(msg);
-        $('#prnIdntfKey').focus();
+        $prnMenuId.focus();
         return;
     }
-    if ($('#menuNm').val() === '') {
+    if ($menuNm.val() === '') {
         msg = '메뉴명을 입력하세요.';
         alert(msg);
-        $('#url').focus();
+        $url.focus();
         return;
     }
-    if (checkKr($('#url').val())) {
+    if (checkKr($url.val())) {
         msg = 'URL은 한글로 입력하실 수 없습니다.';
         alert(msg);
-        $('#url').focus();
+        $url.focus();
         return;
     }
 
@@ -283,120 +204,150 @@ const saveMenuProc = () => {
 
     spinnerShow();
 
-    const param = {
-        menu_lv: $('#menuLv').val(),
-        prn_idntf_key: $('#prnIdntfKey').val(),
-        menu_nm: $('#menuNm').val(),
-        menu_type: $("input[name='menu_type']:checked").val(),
-        url: $('#url').val(),
-        use_yn: $('#useYn').val(),
-        ord: $('#ord').val(),
-        main_yn: mainYn,
-    };
-
-    let url = '/api/menu/menu/';
-
-    if ($('#menuIdntfKey').val() !== '') {
-        url = `/api/menu/menu/${$('#menuIdntfKey').val()}`;
+    let url = '/api/menu';
+    if ($menuId.val() !== '') {
+        url = `/api/menu/${$menuId.val()}`;
     }
 
-    const accessToken = window.localStorage.getItem('accessToken');
+    const type = 'PUT';
+    const params = {
+        menu_lv: $menuLv.val(),
+        prn_menu_id: $prnMenuId.val(),
+        menu_nm: $menuNm.val(),
+        menu_type: $("input[name='menu_type']:checked").val(),
+        url: $url.val(),
+        use_yn: $useYn.val(),
+        ord: $ord.val(),
+        main_yn: mainYn,
+        auth_role: $authRole.val(),
+    };
 
-    $.ajax({
-        url,
-        type: 'PUT',
-        data: JSON.stringify(param),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-    }).then(
-        data => {
-            alert(data.header.message);
-            if (data.header.result_code === 'ok') {
-                search();
-            }
-
-            spinnerHide();
-        },
-        (request, status, error) => {
-            if (request.status === 500) {
-                console.log(
-                    `code:${request.status}\n` +
-                        `message:${request.responseText}\n` +
-                        `error:${error}`
-                );
-            } else if (request.status === 400) {
-                const {errorList} = request.responseJSON;
-                if (errorList !== undefined) {
-                    if (errorList.lengh !== 0) {
-                        const {message} = errorList[0];
-                        alert(message);
-                    }
-                } else {
-                    const data = request.responseJSON.header;
-                    alert(data.message);
-                }
-            } else if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                saveMenuProc();
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        }
-    );
+    callApi(url, type, params, saveSuccess, saveError);
 };
 
-$(document).ready(() => {
+/**
+ *  saveSuccess : save successCallback
+ */
+const saveSuccess = result => {
+    alert(result.header.message);
+    if (result.header.result_code === 'ok') {
+        search();
+    }
+
+    spinnerHide();
+};
+
+/**
+ *  saveError : save errorCallback
+ */
+const saveError = response => {
+    console.log(response);
+    spinnerHide();
+};
+
+/**
+ * menuDelete : 메뉴 삭제
+ */
+const menuDelete = () => {
+    spinnerShow();
+
+    let url = '/api/menu';
+
+    const type = 'DELETE';
+
+    const params = {
+        menu_id: $('#menuId').val(),
+        menu_lv: $('#menuLv').val(),
+    };
+
+    callApi(url, type, params, menuDeleteSuccess, menuDeleteError);
+};
+
+/**
+ *  menuDeleteSuccess : menuDelete successCallback
+ */
+const menuDeleteSuccess = result => {
+    alert(result.header.message);
+    if (result.header.result_code === 'ok') {
+        search();
+    }
+
+    spinnerHide();
+};
+
+/**
+ *  menuDeleteError : menuDelete errorCallback
+ */
+const menuDeleteError = response => {
+    alert(response.message);
+    spinnerHide();
+};
+
+const initSelectBox = () => {
     setCodeSelBox('useYn', 'USE_YN', '', 'Y');
+
+    setCodeSelBox('menuLv', 'MENU_LV', '', 'Y');
 
     const option = {
         oTxt: 'board_title',
-        oVal: 'board_idntf_key',
+        oVal: 'board_id',
     };
 
     const params = {};
 
     setCommSelBox(
         'boardId',
-        '/api/board/select',
+        '/api/item/board/use-yn/Y',
         'POST',
         'SEL',
         '',
         params,
         option
     );
+};
 
-    search();
+const setPrnMenuSelectBox = (type, prnMenuId) => {
+    const params = {};
+    const option = {
+        oTxt: 'menu_nm',
+        oVal: 'menu_id',
+    };
+    setCommSelBox(
+        'prnMenuId',
+        `/api/item/menu/prn-menu/${$authRole.val()}`,
+        'POST',
+        type,
+        prnMenuId,
+        params,
+        option
+    );
+};
+
+$(document).ready(() => {
+    //권한구분 설정 및 트리조회
+    setCodeSelBoxCall('authRole', 'AUTH_ROLE', '', '', search);
+
+    // 권한구분 변경 이벤트
+    $('#authRole').change(() => {
+        search();
+    });
+
+    //입력폼 셀렉트박스 초기화
+    initSelectBox();
 
     // 메뉴 레벨 변경시 상위 메뉴 검색
     $('#menuLv').change(() => {
         if ($('#menuLv').val() === '2') {
-            const params = {};
-            const option = {
-                oTxt: 'menu_nm',
-                oVal: 'menu_idntf_key',
-            };
-            setCommSelBox(
-                'prnIdntfKey',
-                '/api/menu/menu/parent',
-                'POST',
-                'SEL',
-                '',
-                params,
-                option
-            );
+            setPrnMenuSelectBox('SEL', '');
         } else {
             const str = '<option value="0">-- 없음 --</option>';
-            $('#prnIdntfKey').html(str);
+            $('#prnMenuId').html(str);
         }
     });
 
     // 저장 버튼 클릭 이벤트
     $('#saveBtn').click(() => {
-        saveMenuProc();
+        save();
     });
 
     // 추가 버튼 클릭 이벤트
@@ -406,33 +357,35 @@ $(document).ready(() => {
 
     // 삭제 버튼 클릭 이벤트
     $('#delBtn').click(() => {
-        if ($('#menuIdntfKey').val() === '') {
+        if ($('#menuId').val() === '') {
             alert('선택된 메뉴가 없습니다.');
             return;
         }
 
         if (confirm('선택된 메뉴를 삭제하시겠습니까?')) {
-            delMenuProc();
+            menuDelete();
         }
     });
 
     $("input[name='menu_type']").change(() => {
         const menuType = $("input[name='menu_type']:checked").val();
-        $('#url').val('');
-        $('#boardId').val('');
+        $url.val('');
+        $boardId.val('');
         if (menuType === 'URL') {
-            $('#boardId').hide();
+            $boardId.hide();
         } else {
-            $('#boardId').show();
+            $boardId.show();
         }
     });
 
     // 추가 버튼 클릭 이벤트
     $('#boardId').change(() => {
-        const boardId = $('#boardId').val();
+        const boardId = $boardId.val();
 
         if (boardId !== '') {
-            $('#url').val(`/page/board/post/` + boardId);
+            $('#url').val(`/page/board/post/init/` + boardId);
         }
     });
+
+    search();
 });
