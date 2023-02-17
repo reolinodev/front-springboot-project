@@ -5,7 +5,7 @@
     layout:decorate="~{layouts/defaultLayout}"
 >
 <head>
-    <title>코드 관리 등록</title>
+    <title>코드정보</title>
     <script type="module" th:src="@{/dist/code.js}"></script>
 </head>
 
@@ -100,7 +100,7 @@
                         </div>
                         <div class="modal-footer justify-content-end">
                             <button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
-                            <button type="button" class="btn btn-primary" id="writeCodeGrpBtn">저장</button>
+                            <button type="button" class="btn btn-primary" id="saveCodeGrpBtn">저장</button>
                         </div>
                     </div>
                 </div>
@@ -123,7 +123,7 @@
                         <div class="form-group row">
                             <div class="col-4">
                                 <input type="text" class="form-control" id="editCodeGrpNm" name="cd_grp_nm" placeholder="코드 그룹명을 입력하세요.">
-                                <input type="hidden" class="form-control" id="editCodeGrpId" name="cd_grp_idntf_key">
+                                <input type="hidden" class="form-control" id="editCodeGrpId" name="cd_grp_id">
                             </div>
                             <div class="col-4">
                                 <input type="text" class="form-control" id="editCodeGrpVal" name="cd_grp_val" readonly>
@@ -137,7 +137,7 @@
                         </div>
                         <div class="modal-footer justify-content-end">
                             <button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
-                            <button type="button" class="btn btn-primary" id="editCodeGrpBtn">저장</button>
+                            <button type="button" class="btn btn-primary" id="updateCodeGrpBtn">저장</button>
                         </div>
                     </div>
                 </div>
