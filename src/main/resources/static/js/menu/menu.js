@@ -28,7 +28,6 @@ const $menuType2 = $('#menuType2 '); //메뉴타입 - 게시판
  */
 const search = () => {
     spinnerShow();
-
     const url = `/api/menu/tree/${$authRole.val()}`;
     callGetApi(url, searchSuccess, searchError);
 };
@@ -297,7 +296,7 @@ const initSelectBox = () => {
 
     setCommSelBox(
         'boardId',
-        '/api/item/board/use-yn/Y',
+        '/api/item/board/BOARD/Y',
         'POST',
         'SEL',
         '',
@@ -383,9 +382,7 @@ $(document).ready(() => {
         const boardId = $boardId.val();
 
         if (boardId !== '') {
-            $('#url').val(`/page/board/post/init/` + boardId);
+            $('#url').val(`/page/board/post/list/init/` + boardId);
         }
     });
-
-    search();
 });
