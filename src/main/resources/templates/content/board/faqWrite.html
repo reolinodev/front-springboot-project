@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}"
+>
+<head>
+    <title>FAQ 추가</title>
+    <script type="module" th:src="@{/dist/faqWrite.js}"></script>
+</head>
+
+<div layout:fragment="content" id="container">
+    <div class="card card-info">
+        <div class="card-header">
+            <h3 class="card-title">FAQ 추가</h3>
+        </div>
+
+        <form id="faqWriteFrm" name="faqWriteFrm" class="form-horizontal">
+            <div class="card-body">
+                <div class="form-group row">
+                    <label for="boardId" class="col-sm-2 col-form-label">게시판</label>
+                    <div class="col-sm-10">
+                        <select class="custom-select rounded-0" id="boardId" name="board_id"></select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="faqTitle" class="col-sm-2 col-form-label">제목</label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control" id="faqTitle" name="faq_title" rows="3" placeholder="제목을 입력하세요." ></textarea>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="editor" class="col-sm-2 col-form-label">본문</label>
+                    <textarea id="mainText" name="main_text" style="display: none"></textarea>
+                    <div class="col-sm-10">
+                        <div id="editor"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="row justify-content-end">
+                    <div class="col-2">
+                        <button type="button" class="btn btn-block btn-default" id="backBtn">돌아가기</button>
+                    </div>
+                    <div class="col-2 ">
+                        <button type="button" class="btn btn-block btn-success" id="saveBtn">저장</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/gridLayout}"
+>
+<head>
+    <title>QNA 관리</title>
+    <script type="module" th:src="@{/dist/adminQna.js}"></script>
+</head>
+
+<div layout:fragment="content" id="container">
+    <!-- 조회 화면 -->
+    <form id="qnaViewFrm" name="qnaViewFrm">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-4">
+                        <label for="boardId">게시판</label>
+                        <select class="custom-select rounded-0" id="boardId" name="board_id"></select>
+                    </div>
+                    <div class="col-4">
+                        <label for="qnaType">질의유형</label>
+                        <select class="custom-select rounded-0" id="qnaType" name="qna_type"></select>
+                    </div>
+                    <div class="col-4">
+                        <label for="responseYn">응답여부</label>
+                        <select class="custom-select rounded-0" id="responseYn" name="response_yn"></select>
+                    </div>
+                </div>
+                <div class="row"style="padding-top: 10px">
+                    <div class="col-4">
+                        <label for="searchStr">제목 / 작성자</label>
+                        <input type="text" class="form-control" id="searchStr" name="search_str">
+                    </div>
+                    <div class="col-4">
+                        <label>생성일</label>
+                        <div id="dateRange"></div>
+                    </div>
+                    <div class="col-4">
+                        <label for="useYn">사용여부</label>
+                        <select class="custom-select rounded-0" id="useYn" name="use_yn"></select>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer ">
+                <div class="row justify-content-end">
+                    <div class="col-2 ">
+                        <button type="button" class="btn btn-block btn-primary btn-sm" id="searchBtn">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+</html>

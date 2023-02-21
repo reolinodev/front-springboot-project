@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}"
+>
+<head>
+    <title>QNA 수정</title>
+
+    <script type="module" th:src="@{/dist/adminQnaEdit.js}"></script>
+</head>
+
+<div layout:fragment="content" id="container">
+    <div class="card card-info">
+        <div class="card-header">
+            <h3 class="card-title">QNA 수정</h3>
+        </div>
+
+        <form id="qnaEditFrm" name="qnaEditFrm" class="form-horizontal">
+            <div class="card-body">
+                <div class="form-group row">
+                    <label for="boardId" class="col-sm-2 col-form-label">게시판</label>
+                    <div class="col-sm-10">
+                        <input type="hidden" class="form-control" id="boardId" name="board_id" th:value="${data.board_id}">
+                        <input type="hidden" class="form-control" id="qnaId" name="qna_id" th:value="${data.qna_id}">
+                        <input type="text" class="form-control" id="boardTitle" name="board_title" th:value="${data.board_title}" readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="title" class="col-sm-2 col-form-label">제목</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="title" name="title" th:value="${data.title}" placeholder="제목을 입력하세요.">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="responseYnNm" class="col-sm-2 col-form-label">작성자</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="createdNm" th:value="${data.created_nm}" readonly>
+                    </div>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="createdAt" th:value="${data.created_at}" readonly>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="responseYnNm" class="col-sm-2 col-form-label">응답여부</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="responseYnNm" th:value="${data.response_yn_nm}" readonly>
+                    </div>
+                    <label for="updatedNm" class="col-sm-2 col-form-label">응답일</label>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" id="updatedNm" th:value="${data.updated_nm}" readonly>
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" id="updatedAt" th:value="${data.updated_at}" readonly>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="editor" class="col-sm-2 col-form-label">문의</label>
+                    <textarea id="questions" name="questions" style="display: none" th:text="${data.questions}"></textarea>
+                    <div class="col-sm-10">
+                        <div id="editor"></div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="editor2" class="col-sm-2 col-form-label">응답</label>
+                    <textarea id="mainText" name="main_text" style="display: none" th:text="${data.main_text}"></textarea>
+                    <div class="col-sm-10">
+                        <div id="editor2"></div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="useYn" class="col-sm-2 col-form-label">사용여부</label>
+                    <div class="col-sm-4">
+                        <select class="custom-select rounded-0" id="useYn" name="use_yn"></select>
+                        <input type="hidden" class="form-control" id="use" th:value="${data.use_yn}">
+                    </div>
+                    <label for="useYn" class="col-sm-2 col-form-label">비밀글여부</label>
+                    <div class="col-sm-4">
+                        <select class="custom-select rounded-0" id="hiddenYn" name="hidden_yn"></select>
+                        <input type="hidden" class="form-control" id="hidden" th:value="${data.hidden_yn}">
+                    </div>
+                </div>
+                <div class="form-group row" id="qnaPwRow" style="display:none;">
+                    <label for="qnaPw" class="col-sm-2 col-form-label">비밀번호</label>
+                    <div class="col-sm-4">
+                        <input type="password" class="form-control" id="qnaPw" name="qna_pw" th:value="${data.qna_pw}">
+                    </div>
+                </div>
+                <div class="form-group row" style="text-align: right">
+                    <div class="col-12" style="color: red">
+                        * 비밀글에서 공개로 변경시 패스워드는 초기화 됩니다.
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="row justify-content-end">
+                    <div class="col-2">
+                        <button type="button" class="btn btn-block btn-default" id="backBtn">뒤로가기</button>
+                    </div>
+                    <div class="col-2 ">
+                        <button type="button" class="btn btn-block btn-success" id="saveBtn">저장</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</html>

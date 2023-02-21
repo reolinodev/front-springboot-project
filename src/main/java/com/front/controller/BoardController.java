@@ -82,4 +82,58 @@ public class BoardController {
         return mav;
     }
 
+
+    /***
+     * FAQ정보 화면
+     ***/
+    @GetMapping(value = "/page/board/faq/list/{status}")
+    public ModelAndView faqView(@PathVariable String status) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("status", status);
+        mav.setViewName("content/board/faq");
+        return mav;
+    }
+
+    /***
+     * FAQ 등록화면
+     ***/
+    @GetMapping(value = "/page/board/faq/write")
+    public ModelAndView faqWriteView() {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("content/board/faqWrite");
+        return mav;
+    }
+
+    /***
+     * FAQ 수정화면
+     ***/
+    @GetMapping(value = "/page/board/faq/edit/{faq_id}")
+    public ModelAndView faqEditView(@PathVariable String faq_id) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("faq_id", faq_id);
+        mav.setViewName("content/board/faqEdit");
+        return mav;
+    }
+
+    /***
+     * QNA 정보화면
+     ***/
+    @GetMapping(value = "/page/board/qna/list/{status}")
+    public ModelAndView qnaView(@PathVariable String status) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("status", status);
+        mav.setViewName("content/board/qna");
+        return mav;
+    }
+
+    /***
+     * QNA 수정화면
+     ***/
+    @GetMapping(value = "/page/board/qnaEdit")
+    public ModelAndView qnaEditView() {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("content/board/qnaEdit");
+        return mav;
+    }
+
 }

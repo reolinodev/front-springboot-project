@@ -31,6 +31,11 @@ module.exports = {
         postEdit: '/js/board/postEdit.js',
         postView: '/js/board/postView.js',
         postWrite: '/js/board/postWrite.js',
+        faq: '/js/board/faq.js',
+        faqEdit: '/js/board/faqEdit.js',
+        faqWrite: '/js/board/faqWrite.js',
+        qna: '/js/board/qna.js',
+        qnaEdit: '/js/board/qnaEdit.js',
     },
     output: {
         path: path.resolve(`${__dirname}/dist`),
