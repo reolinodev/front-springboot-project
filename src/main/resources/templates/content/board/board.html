@@ -5,7 +5,7 @@
     layout:decorate="~{layouts/defaultLayout}"
 >
 <head>
-    <title>게시판 관리</title>
+    <title>게시판정보</title>
     <script type="module" th:src="@{/dist/board.js}"></script>
 </head>
 
@@ -15,12 +15,22 @@
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-4">
-                        <label for="searchStr">게시판명 / 작성자</label>
-                        <input type="text" class="form-control" id="searchStr" name="search_str">
+                    <div class="col-3">
+                        <label for="viewUseYn">게시판유형</label>
+                        <select class="custom-select rounded-0" id="viewBoardType" name="board_type"></select>
+                    </div>
+                    <div class="col-3">
+                        <label for="viewBoardTitle">게시판명</label>
+                        <input type="text" class="form-control" id="viewBoardTitle" name="board_title">
                         <input type="text" class="form-control" style="display: none"> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
                     </div>
-                    <div class="col-4">
+                    <div class="col-3">
+                        <label for="viewUpdatedNm">작성자명</label>
+                        <input type="text" class="form-control" id="viewUpdatedNm" name="updated_nm">
+                        <input type="text" class="form-control" style="display: none"> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
+                    </div>
+
+                    <div class="col-3">
                         <label for="viewUseYn">사용여부</label>
                         <select class="custom-select rounded-0" id="viewUseYn" name="use_yn"></select>
                     </div>
@@ -66,6 +76,12 @@
                                     <div class="col-12">
                                         <label for="writeBoardTitle">* 게시판명</label>
                                         <input type="text" class="form-control" id="writeBoardTitle" name="board_title" placeholder="게시판명을 입력하세요.">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-12">
+                                        <label for="writeBoardType">* 게시판유형</label>
+                                        <select class="custom-select rounded-0" id="writeBoardType" name="board_type"></select>
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -128,14 +144,30 @@
                         <div class="form-group row">
                             <div class="col-8">
                                 <div class="form-group row">
-                                    <div class="col-8">
+                                    <div class="col-12">
                                         <label for="editBoardTitle">* 게시판명</label>
                                         <input type="text" class="form-control" id="editBoardTitle" name="board_title" placeholder="게시판명을 입력하세요.">
-                                        <input type="hidden" id="editBoardId" name="board_idntf_key">
+                                        <input type="hidden" id="editBoardId" name="board_id">
                                     </div>
-                                    <div class="col-4">
-                                        <label for="editUseYn">* 사용여부</label>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-6">
+                                        <label for="editBoardType">게시판유형</label>
+                                        <select class="custom-select rounded-0" id="editBoardType" name="board_type"></select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="editUseYn">사용여부</label>
                                         <select class="custom-select rounded-0" id="editUseYn" name="use_yn"></select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-6">
+                                        <label for="editUpdatedNm">작성자</label>
+                                        <input type="text" class="form-control" id="editUpdatedNm" name="updated_nm" placeholder="작성자를 입력하세요." readonly>
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="editUpdatedAt">수정일자</label>
+                                        <input type="text" class="form-control" id="editUpdatedAt" name="updated_at" placeholder="수정일자를 입력하세요." readonly>
                                     </div>
                                 </div>
                                 <div class="form-group row">

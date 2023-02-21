@@ -1,106 +1,136 @@
 import {setBasicEditor} from '../module/editor';
-import {setCodeSelBox} from '../module/component';
+import {setCodeSelBox, setCommSelBox} from '../module/component';
 import {serializeFormJson} from '../module/json';
-import {mainViewTokenInvalidate, setAccessToken} from '../module/router';
 import {spinnerHide, spinnerShow} from '../module/spinner';
+import {callApi, callGetApi} from '../module/async';
 
 let editor;
-let content = '';
+const $postId = $('#postId'); //게시글식별키
+const $postTitle = $('#postTitle'); //게시글제목
+const postType = $('#postType').val();
 
 /**
- *  saveProc : 게시글 수정
+ * search : 게시판 수정 화면 호출
  */
-const saveProc = () => {
+const search = () => {
+    spinnerShow();
+    const url = `/api/post/${$postId.val()}`;
+    callGetApi(url, searchSuccess, searchError);
+};
+
+/**
+ *  searchSuccess : search successCallback
+ */
+const searchSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        setPostData(result.data);
+    }
+    spinnerHide();
+};
+
+/**
+ *  searchError : search errorCallback
+ */
+const searchError = response => {
+    spinnerHide();
+    console.log(response.message);
+};
+
+/**
+ *  setPostData : 게시판 화면세팅
+ */
+const setPostData = data => {
+    setBoardBoxCall(data.board_id);
+    $postTitle.val(data.post_title);
+
+    editor = setBasicEditor('editor', data.main_text, 500);
+
+    setCodeSelBox('useYn', 'USE_YN', '', data.use_yn);
+
+    $('#boardId').prop('disabled', true);
+};
+
+/**
+ *  save : 게시글 수정
+ */
+const save = () => {
     let msg = '';
 
-    if ($('#postTitle').val() === '') {
+    if ($postTitle.val() === '') {
         msg = '제목을 입력하세요.';
         alert(msg);
-        $('#postTitle').focus();
+        $postTitle.focus();
         return;
     }
 
-    content = editor.getMarkdown();
-
-    $('#postText').val(content);
+    $('#mainText').val(editor.getMarkdown());
 
     spinnerShow();
 
+    let url = `/api/post/${$postId.val()}`;
+    const type = 'PUT';
     const params = serializeFormJson('postEditFrm');
+    callApi(url, type, params, saveSuccess, saveError);
+};
 
-    const accessToken = window.localStorage.getItem('accessToken');
+/**
+ *  saveSuccess : save successCallback
+ */
+const saveSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        alert(result.header.message);
+        pageMove();
+    } else {
+        alert(result.header.message);
+    }
 
-    $.ajax({
-        url: `/api/post/${$('#postId').val()}`,
-        type: 'PUT',
-        data: JSON.stringify(params),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-    }).then(
-        data => {
-            if (data.header.result_code === 'ok') {
-                alert(data.header.message);
-                pageMove();
-            } else {
-                alert(data.header.message);
-            }
+    spinnerHide();
+};
 
-            spinnerHide();
-        },
-        (request, status, error) => {
-            if (request.status === 500) {
-                console.log(
-                    `code:${request.status}\n` +
-                        `message:${request.responseText}\n` +
-                        `error:${error}`
-                );
-            } else if (request.status === 400) {
-                const {errorList} = request.responseJSON;
-                if (errorList !== undefined) {
-                    if (errorList.lengh !== 0) {
-                        const {message} = errorList[0];
-                        alert(message);
-                    }
-                } else {
-                    const data = request.responseJSON.header;
-                    alert(data.message);
-                }
-            } else if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                saveProc();
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        }
-    );
+/**
+ *  saveError : save errorCallback
+ */
+const saveError = response => {
+    spinnerHide();
+    alert(response.message);
 };
 
 const pageMove = () => {
-    const boardKey = $('#boardKey').val();
-
-    let url = `/page/board/post/back`;
-    if (boardKey !== '') {
-        url = `/page/board/post/back/` + boardKey;
+    let url = `/page/board/post/list/back`;
+    if (postType !== 'manage') {
+        url = `/page/board/post/list/back/${$('#boardId').val()}`;
     }
 
     location.href = url;
 };
 
-$(document).ready(() => {
-    content = $('#postText').val();
-    editor = setBasicEditor('editor', content, 500);
+const setBoardBoxCall = boardId => {
+    const option = {
+        oTxt: 'board_title',
+        oVal: 'board_id',
+    };
 
-    setCodeSelBox('useYn', 'USE_YN', '', $('#use').val());
+    const params = {};
+
+    setCommSelBox(
+        'boardId',
+        '/api/item/board/BOARD/Y',
+        'POST',
+        'SEL',
+        boardId,
+        params,
+        option
+    );
+};
+
+$(document).ready(() => {
+    search();
 
     $('#backBtn').click(() => {
         pageMove();
     });
 
     $('#saveBtn').click(() => {
-        saveProc();
+        save();
     });
 });

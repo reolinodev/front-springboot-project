@@ -27,6 +27,7 @@ module.exports = {
         menuAuth: '/js/menu/menuAuth.js',
         board: '/js/board/board.js',
         post: '/js/board/post.js',
+        postPage: '/js/board/postPage.js',
         postEdit: '/js/board/postEdit.js',
         postView: '/js/board/postView.js',
         postWrite: '/js/board/postWrite.js',

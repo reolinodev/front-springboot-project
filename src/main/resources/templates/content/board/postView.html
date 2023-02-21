@@ -5,7 +5,7 @@
     layout:decorate="~{layouts/defaultLayout}"
 >
 <head>
-    <title>게시글 보기</title>
+    <title>게시글보기</title>
     <script type="module" th:src="@{/dist/postView.js}"></script>
 </head>
 
@@ -17,45 +17,47 @@
 
         <form id="postEditViewFrm" name="postEditViewFrm" class="form-horizontal">
             <div class="card-body">
+                <input type="hidden" class="form-control" id="postId" name="post_id" th:value="${post_id}">
+                <input type="hidden" class="form-control" id="postType" th:value="${post_type}">
+
                 <div class="form-group row">
                     <label for="boardId" class="col-sm-2 col-form-label">게시판</label>
-                    <div class="col-sm-10">
-                        <input type="hidden" class="form-control" id="boardKey" th:value="${boardKey}">
-                        <input type="hidden" class="form-control" id="boardId" name="board_idntf_key" th:value="${data.board_idntf_key}" value="">
-                        <input type="hidden" class="form-control" id="postId" name="post_idntf_key" th:value="${data.post_idntf_key}">
-                        <input type="hidden" class="form-control" id="sysRegId" th:value="${data.sys_reg_id}">
-                        <input type="text" class="form-control" id="boardTitle" name="board_title" th:value="${data.board_title}" readonly>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="title" class="col-sm-2 col-form-label">제목</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="title" name="title" th:value="${data.post_title}" readonly>
+                    <div class="col-sm-6">
+                        <select class="custom-select rounded-0" id="boardId" name="board_id"></select>
                     </div>
                 </div>
 
                 <div class="form-group row">
-                    <label for="sys_mdfcn_nm" class="col-sm-2 col-form-label">작성자 / 수정날짜</label>
+                    <label for="postTitle" class="col-sm-2 col-form-label">* 제목</label>
+
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="postTitle" name="post_title" readonly>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="createdNm" class="col-sm-2 col-form-label">작성자 / 수정날짜</label>
                     <div class="col-sm-5">
-                        <input type="text" class="form-control" id="sys_mdfcn_nm" th:value="${data.sys_mdfcn_nm}" readonly>
+                        <input type="text" class="form-control" id="createdNm" readonly>
+                        <input type="hidden" class="form-control" id="createdId">
                     </div>
                     <div class="col-sm-5">
-                        <input type="text" class="form-control" id="sysMdfcnDtVal" th:value="${data.sys_mdfcn_dt_val}" readonly>
+                        <input type="text" class="form-control" id="createdAt"  readonly>
                     </div>
                 </div>
 
                 <div class="form-group row">
                     <label for="viewer" class="col-sm-2 col-form-label">본문</label>
-                    <textarea id="postText" name="post_text" style="display: none" th:text="${data.post_text}"></textarea>
+                    <textarea id="mainText" name="main_text" style="display: none"></textarea>
                     <div class="col-sm-10" style="border: 1px solid #cccccc;min-height: 200px;">
                         <div id="viewer"></div>
                     </div>
                 </div>
+
                 <div class="form-group row">
                     <label for="useYn" class="col-sm-2 col-form-label">사용여부</label>
-                    <div class="col-sm-2">
-                        <select class="custom-select rounded-0" id="useYn" name="use_yn" disabled></select>
-                        <input type="hidden" class="form-control" id="use" th:value="${data.use_yn}" readonly>
+                    <div class="col-sm-4">
+                        <select class="custom-select rounded-0" id="useYn" name="use_yn"></select>
                     </div>
                 </div>
             </div>
@@ -64,8 +66,8 @@
                     <div class="col-2">
                         <button type="button" class="btn btn-block btn-default" id="backBtn">돌아가기</button>
                     </div>
-                    <div class="col-2" id="editBtnArea">
-                        <button type="button" class="btn btn-block btn-success" id="editBtn">수정하기</button>
+                    <div class="col-2" id="updateBtnArea">
+                        <button type="button" class="btn btn-block btn-success" id="updateBtn">수정하기</button>
                     </div>
                 </div>
             </div>

@@ -382,7 +382,7 @@ $(document).ready(() => {
         const boardId = $boardId.val();
 
         if (boardId !== '') {
-            $('#url').val(`/page/board/post/list/init/` + boardId);
+            $('#url').val(`/page/board/post/list/init/normal/` + boardId);
         }
     });
 });

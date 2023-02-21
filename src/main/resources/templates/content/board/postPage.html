@@ -6,7 +6,7 @@
 >
 <head>
     <title>게시글정보</title>
-    <script type="module" th:src="@{/dist/post.js}"></script>
+    <script type="module" th:src="@{/dist/postPage.js}"></script>
 </head>
 
 <div layout:fragment="content" id="container">
@@ -15,21 +15,16 @@
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-3">
-                        <label for="boardId">게시판</label>
-                        <select class="custom-select rounded-0" id="boardId" name="board_id"></select>
-                    </div>
                     <div class="col-4">
+                        <label for="searchStr">게시글제목 / 작성자</label>
+                        <input type="hidden" class="form-control" id="boardId" name="board_id" th:value="${board_id}">
+                        <input type="text" class="form-control" id="searchStr" name="search_str">
+                    </div>
+                    <div class="col-5">
                         <label>작성일</label>
                         <div id="dateRange"></div>
                     </div>
                     <div class="col-3">
-                        <label for="searchStr">게시글제목 / 작성자</label>
-                        <input type="text" class="form-control" id="searchStr" name="search_str">
-                        <input type="text" class="form-control" style="display: none"> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
-                    </div>
-
-                    <div class="col-2">
                         <label for="useYn">사용여부</label>
                         <select class="custom-select rounded-0" id="useYn" name="use_yn"></select>
                     </div>

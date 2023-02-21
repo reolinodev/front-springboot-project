@@ -2,12 +2,30 @@ import {setCodeSelBox} from '../module/component';
 import Page, {setPagination} from '../module/pagination';
 import {setBasicGrid, setGridClickEvent} from '../module/grid';
 import {serializeFormJson} from '../module/json';
-import {mainViewTokenInvalidate, setAccessToken} from '../module/router';
 import {spinnerHide, spinnerShow} from '../module/spinner';
+import {callApi, callGetApi} from '../module/async';
 
 let page = new Page(1, false, 10, 0);
 let grid;
 let pagination;
+
+const $writeBoardTitle = $('#writeBoardTitle');
+const $writeBoardType = $('#writeBoardType');
+const $writeMemo = $('#writeMemo');
+const $writeMsg = $('#writeMsg');
+const $writeAuthArea = $('#writeAuthArea');
+
+const $editBoardTitle = $('#editBoardTitle');
+const $editUseYn = $('#editUseYn');
+const $editBoardId = $('#editBoardId');
+const $editMemo = $('#editMemo');
+const $editMsg = $('#editMsg');
+const $editUpdatedNm = $('#editUpdatedNm');
+const $editUpdatedAt = $('#editUpdatedAt');
+const $editAuthArea = $('#editAuthArea');
+
+let selectedType;
+let selectedAuthList;
 
 const pageInit = () => {
     page = new Page(1, false, Number($('#pagePer').val()), 0);
@@ -22,56 +40,40 @@ let editAuthArr = [];
 const search = () => {
     spinnerShow();
 
+    let url = `/api/board`;
+    const type = 'POST';
     const params = serializeFormJson('boardViewFrm');
     params.current_page = page.currentPage;
     params.page_per = page.pagePer;
 
-    const accessToken = window.localStorage.getItem('accessToken');
+    callApi(url, type, params, searchSuccess, searchError);
+};
 
-    $.ajax({
-        url: '/api/board/',
-        type: 'POST',
-        data: JSON.stringify(params),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-        success(result) {
-            const gridData = result.data;
-            page.totalCount = result.total;
-            grid.resetData(gridData);
+/**
+ *  searchSuccess : search successCallback
+ */
+const searchSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        const gridData = result.data;
+        page.totalCount = result.total;
+        grid.resetData(gridData);
 
-            setGridClickEvent(
-                grid,
-                'board_title',
-                'board_idntf_key',
-                boardEdit
-            );
+        setGridClickEvent(grid, 'board_title', 'board_id', getBoardData);
 
-            if (page.pageInit === false) {
-                pagination.reset(result.total);
-                page.pageInit = true;
-            }
+        if (page.pageInit === false) {
+            pagination.reset(result.total);
+            page.pageInit = true;
+        }
+    }
+    spinnerHide();
+};
 
-            spinnerHide();
-        },
-        error(request, status, error) {
-            console.log(
-                `code:${request.status}\n` +
-                    `message:${request.responseText}\n` +
-                    `error:${error}`
-            );
-
-            if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                search();
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        },
-    });
+/**
+ *  searchError : search errorCallback
+ */
+const searchError = response => {
+    spinnerHide();
+    console.log(response.message);
 };
 
 /**
@@ -83,10 +85,16 @@ const setGridLayout = () => {
         {header: 'No', name: 'rnum', width: 50, align: 'center'},
         {
             header: 'SEQ',
-            name: 'board_idntf_key',
+            name: 'board_id',
             width: 100,
             align: 'center',
             hidden: true,
+        },
+        {
+            header: '게시판유형',
+            name: 'board_type_nm',
+            width: 150,
+            align: 'center',
         },
         {
             header: '게시판명',
@@ -100,7 +108,7 @@ const setGridLayout = () => {
                 },
             },
         },
-        {header: '작성자', name: 'sys_mdfcn_nm', width: 150, align: 'center'},
+        {header: '작성자명', name: 'updated_nm', width: 150, align: 'center'},
         {header: '비고', name: 'memo', align: 'center'},
         {header: '사용여부', name: 'use_yn_nm', width: 150, align: 'center'},
     ];
@@ -111,53 +119,49 @@ const setGridLayout = () => {
 };
 
 /**
- * boardEdit : 게시판 수정 화면 호출
+ * getBoardData : 게시판 수정 화면 호출
  */
-const boardEdit = boardId => {
+const getBoardData = boardId => {
     spinnerShow();
 
-    const accessToken = window.localStorage.getItem('accessToken');
+    const url = `/api/board/${boardId}`;
+    callGetApi(url, getBoardDataSuccess, getBoardDataError);
+};
 
-    $.ajax({
-        url: `/api/board/${boardId}`,
-        type: 'GET',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-        success(result) {
-            setBoardEditData(result.data, result.authData);
+/**
+ *  getBoardDataSuccess : getBoardData successCallback
+ */
+const getBoardDataSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        setBoardData(result.data, result.boardAuthList);
+    }
+    spinnerHide();
+};
 
-            spinnerHide();
-        },
-        error(request, status, error) {
-            console.log(
-                `code:${request.status}\n` +
-                    `message:${request.responseText}\n` +
-                    `error:${error}`
-            );
-
-            if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                boardEdit(boardId);
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        },
-    });
+/**
+ *  getBoardDataError : getBoardData errorCallback
+ */
+const getBoardDataError = response => {
+    spinnerHide();
+    console.log(response.message);
 };
 
 /**
  * setBoardEditData : 수정화면
  */
-const setBoardEditData = (data, authData) => {
+const setBoardData = (data, authList) => {
     setCodeSelBox('editUseYn', 'USE_YN', '', data.use_yn);
-    $('#editBoardTitle').val(data.board_title);
-    $('#editMemo').val(data.memo);
-    $('#editBoardId').val(data.board_idntf_key);
-    setAuth('edit', authData);
+    setCodeSelBox('editBoardType', 'BOARD_TYPE', '', data.board_type);
+
+    $editBoardTitle.val(data.board_title);
+    $editMemo.val(data.memo);
+    $editBoardId.val(data.board_id);
+    $editUpdatedNm.val(data.updated_nm);
+    $editUpdatedAt.val(data.updated_at);
+
+    setAuth('edit', authList);
+
+    $('#editBoardType').prop('disabled', true);
 
     window.$('#boardEdit').modal('show');
 };
@@ -165,7 +169,7 @@ const setBoardEditData = (data, authData) => {
 /**
  * initUserMngWrite : 등록화면의 값 초기화
  */
-const initBoardWrite = () => {
+const initWrite = () => {
     $('#writeBoardTitle').val('');
     $('#writeMemo').val('');
     writeAuthArr = [];
@@ -173,168 +177,113 @@ const initBoardWrite = () => {
 };
 
 /**
- *  saveProc : 게시판 등록
+ *  save : 게시판 등록
  */
-const saveProc = () => {
+const save = () => {
     let msg = '';
     writeAuthArr = [];
 
-    $('#boardWriteFrm input:checkbox[name=auth_idntf_key]').each(function (
-        index
-    ) {
+    $('#boardWriteFrm input:checkbox[name=auth_id]').each(function (index) {
         if ($(this).is(':checked') === true) {
             writeAuthArr.push($(this).val());
         }
     });
 
-    if ($('#writeBoardTitle').val() === '') {
+    if ($writeBoardTitle.val() === '') {
         msg = '게시판명을 입력하세요.';
-        $('#writeMsg').html(msg);
-        $('#writeBoardTitle').focus();
+        $writeMsg.html(msg);
+        $writeBoardTitle.focus();
         return;
     }
 
     spinnerShow();
 
-    const param = {
-        board_title: $('#writeBoardTitle').val(),
-        memo: $('#writeMemo').val(),
+    let url = `/api/board`;
+    const type = 'PUT';
+    const params = {
+        board_title: $writeBoardTitle.val(),
+        board_type: $writeBoardType.val(),
+        memo: $writeMemo.val(),
         auth_id_arr: writeAuthArr,
     };
 
-    const accessToken = window.localStorage.getItem('accessToken');
-
-    $.ajax({
-        url: '/api/board/',
-        type: 'PUT',
-        data: JSON.stringify(param),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-    }).then(
-        data => {
-            if (data.header.result_code === 'ok') {
-                alert(data.header.message);
-                search();
-                closeModal();
-            } else {
-                $('#writeMsg').html(data.header.message);
-            }
-
-            spinnerHide();
-        },
-        (request, status, error) => {
-            if (request.status === 500) {
-                console.log(
-                    `code:${request.status}\n` +
-                        `message:${request.responseText}\n` +
-                        `error:${error}`
-                );
-            } else if (request.status === 400) {
-                const {errorList} = request.responseJSON;
-                if (errorList !== undefined) {
-                    if (errorList.lengh !== 0) {
-                        const {message} = errorList[0];
-                        $('#writeMsg').html(message);
-                    }
-                } else {
-                    const data = request.responseJSON.header;
-                    $('#writeMsg').html(data.message);
-                }
-            } else if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                saveProc();
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        }
-    );
+    callApi(url, type, params, saveSuccess, saveError);
 };
 
 /**
- *  editProc : 사용자 수정
+ *  saveSuccess : save successCallback
  */
-const editProc = () => {
+const saveSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        alert(result.header.message);
+        search();
+        closeModal();
+    }
+    spinnerHide();
+};
+
+/**
+ *  saveError : save errorCallback
+ */
+const saveError = response => {
+    spinnerHide();
+    $writeMsg.html(response.message);
+};
+
+/**
+ *  update : 게시판 수정
+ */
+const update = () => {
     let msg = '';
     editAuthArr = [];
 
-    $('#boardEditFrm input:checkbox[name=auth_idntf_key]').each(function (
-        index
-    ) {
+    $('#boardEditFrm input:checkbox[name=auth_id]').each(function (index) {
         if ($(this).is(':checked') === true) {
             editAuthArr.push($(this).val());
         }
     });
 
-    if ($('#editBoardTitle').val() === '') {
+    if ($editBoardTitle.val() === '') {
         msg = '게시판명을 입력하세요.';
-        $('#editMsg').html(msg);
-        $('#editBoardTitle').focus();
+        $editMsg.html(msg);
+        $editBoardTitle.focus();
         return;
     }
 
     spinnerShow();
 
-    const param = {
-        board_title: $('#editBoardTitle').val(),
-        memo: $('#editMemo').val(),
-        use_yn: $('#editUseYn').val(),
+    let url = `/api/board/${$editBoardId.val()}`;
+    const type = 'PUT';
+    const params = {
+        board_title: $editBoardTitle.val(),
+        memo: $editMemo.val(),
+        use_yn: $editUseYn.val(),
         auth_id_arr: editAuthArr,
     };
 
-    const accessToken = window.localStorage.getItem('accessToken');
+    callApi(url, type, params, updateSuccess, updateError);
+};
 
-    $.ajax({
-        url: `/api/board/${$('#editBoardId').val()}`,
-        type: 'PUT',
-        data: JSON.stringify(param),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-    }).then(
-        data => {
-            if (data.header.result_code === 'ok') {
-                alert(data.header.message);
-                search();
-                closeModal();
-            } else {
-                $('#editMsg').html(data.header.message);
-            }
+/**
+ *  updateSuccess : update successCallback
+ */
+const updateSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        alert(result.header.message);
+        search();
+        closeModal();
+    } else {
+        $editMsg.html(result.header.message);
+    }
+    spinnerHide();
+};
 
-            spinnerHide();
-        },
-        (request, status, error) => {
-            if (request.status === 500) {
-                console.log(
-                    `code:${request.status}\n` +
-                        `message:${request.responseText}\n` +
-                        `error:${error}`
-                );
-            } else if (request.status === 400) {
-                const {errorList} = request.responseJSON;
-                if (errorList !== undefined) {
-                    if (errorList.lengh !== 0) {
-                        const {message} = errorList[0];
-                        $('#editMsg').html(message);
-                    }
-                } else {
-                    const data = request.responseJSON.header;
-                    $('#editMsg').html(data.message);
-                }
-            } else if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                editProc();
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        }
-    );
+/**
+ *  updateError : update errorCallback
+ */
+const updateError = response => {
+    spinnerHide();
+    $editMsg.html(response.message);
 };
 
 /**
@@ -354,153 +303,145 @@ const closeModal = () => {
 };
 
 /**
- *  setCompCd : 계열사 서비스 코드 세팅
+ *  setAuth : 권한 세팅
  */
 const setAuth = (type, authList) => {
     spinnerShow();
 
-    const param = {};
-    const accessToken = window.localStorage.getItem('accessToken');
+    selectedType = type;
+    selectedAuthList = authList;
 
-    $.ajax({
-        url: `/api/auth/useAuth`,
-        type: 'POST',
-        data: JSON.stringify(param),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-    }).then(
-        result => {
-            const dataList = result.data;
-            let str = '';
+    const url = `/api/item/auth/use-yn/Y`;
+    callGetApi(url, setAuthSuccess, setAuthError);
+};
 
-            if (type === 'edit') {
-                $('#editAuthArea').html('');
+/**
+ *  setAuthSuccess : setAuth successCallback
+ */
+const setAuthSuccess = result => {
+    console.log('sadfasdf', selectedAuthList);
 
-                for (let i = 0; i < dataList.length; i++) {
-                    const data = dataList[i];
-                    let equalFlg = false;
+    if (result.header.result_code === 'ok') {
+        const dataList = result.data;
+        let str = '';
 
-                    for (let j = 0; j < authList.length; j++) {
-                        const authData = authList[j];
-                        if (data.auth_idntf_key === authData.auth_idntf_key) {
-                            equalFlg = true;
-                        }
+        if (selectedType === 'edit') {
+            $editAuthArea.html('');
+
+            for (let i = 0; i < dataList.length; i++) {
+                const data = dataList[i];
+                let equalFlg = false;
+
+                for (let j = 0; j < selectedAuthList.length; j++) {
+                    const authData = selectedAuthList[j];
+                    if (data.auth_id === authData.auth_id) {
+                        equalFlg = true;
                     }
-
-                    if (equalFlg) {
-                        str = `<div className="custom-control custom-checkbox">
-                                    <input className="custom-control-input" type="checkbox" name="auth_idntf_key" value="${data.auth_idntf_key}" checked>
-                                    <label className="custom-control-label">${data.auth_nm}</label>
-                               </div>`;
-                    } else {
-                        str = `<div className="custom-control custom-checkbox">
-                                    <input className="custom-control-input" type="checkbox" name="auth_idntf_key" value="${data.auth_idntf_key}">
-                                    <label className="custom-control-label">${data.auth_nm}</label>
-                                </div>`;
-                    }
-
-                    $('#editAuthArea').append(str);
                 }
-            } else {
-                $('#writeAuthArea').html('');
 
-                for (let i = 0; i < dataList.length; i++) {
-                    const data = dataList[i];
+                if (equalFlg) {
                     str = `<div className="custom-control custom-checkbox">
-                                <input className="custom-control-input" type="checkbox" name="auth_idntf_key" value="${data.auth_idntf_key}">
+                                <input className="custom-control-input" type="checkbox" name="auth_id" value="${data.auth_id}" checked>
+                                <label className="custom-control-label">${data.auth_nm}</label>
+                           </div>`;
+                } else {
+                    str = `<div className="custom-control custom-checkbox">
+                                <input className="custom-control-input" type="checkbox" name="auth_id" value="${data.auth_id}">
                                 <label className="custom-control-label">${data.auth_nm}</label>
                             </div>`;
-                    $('#writeAuthArea').append(str);
                 }
-            }
 
-            spinnerHide();
-        },
-        (request, status, error) => {
-            if (request.status === 500) {
-                console.log(
-                    `code:${request.status}\n` +
-                        `message:${request.responseText}\n` +
-                        `error:${error}`
-                );
-            } else if (request.status === 400) {
-                const {errorList} = request.responseJSON;
-                if (errorList !== undefined) {
-                    if (errorList.lengh !== 0) {
-                        const {message} = errorList[0];
-                        console.log(message);
-                    }
-                } else {
-                    const data = request.responseJSON.header;
-                    $('#msg').html(data.message);
-                    console.log(data.message);
-                }
-            } else if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                setAuth(type, authList);
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
+                $editAuthArea.append(str);
             }
+        } else {
+            $writeAuthArea.html('');
 
-            spinnerHide();
+            for (let i = 0; i < dataList.length; i++) {
+                const data = dataList[i];
+                str = `<div className="custom-control custom-checkbox">
+                            <input className="custom-control-input" type="checkbox" name="auth_id" value="${data.auth_id}">
+                            <label className="custom-control-label">${data.auth_nm}</label>
+                        </div>`;
+                $writeAuthArea.append(str);
+            }
         }
-    );
+    }
+    spinnerHide();
+};
+
+/**
+ *  setAuthSuccess : setAuth errorCallback
+ */
+const setAuthError = response => {
+    spinnerHide();
+    console.log(response.message);
 };
 
 $(document).ready(() => {
+    setCodeSelBox('viewBoardType', 'BOARD_TYPE', 'ALL', '');
+
     setCodeSelBox('viewUseYn', 'USE_YN', 'ALL', '');
+
+    setCodeSelBox('writeBoardType', 'BOARD_TYPE', '', '');
 
     grid = setGridLayout();
 
     pagination = setPagination(page, pagingCallback);
-
-    setAuth('write', '');
 
     $('#searchBtn').click(() => {
         pageInit();
         search();
     });
 
+    $('#viewBoardType').change(() => {
+        pageInit();
+        search();
+    });
+
+    $('#viewUseYn').change(() => {
+        pageInit();
+        search();
+    });
+
     $('#writeBtn').click(() => {
-        initBoardWrite();
+        initWrite();
     });
 
     $('#writeSaveBtn').click(() => {
-        saveProc();
+        save();
     });
 
     $('#editSaveBtn').click(() => {
-        editProc();
+        update();
     });
 
     $('#writeAuthAll').click(function () {
-        if ($('#writeAuthAll').is(':checked'))
-            $('#boardWriteFrm input[name=auth_idntf_key]').prop(
-                'checked',
-                true
-            );
-        else
-            $('#boardWriteFrm input[name=auth_idntf_key]').prop(
-                'checked',
-                false
-            );
+        if ($('#writeAuthAll').is(':checked')) {
+            $('#boardWriteFrm input[name=auth_id]').prop('checked', true);
+        } else {
+            $('#boardWriteFrm input[name=auth_id]').prop('checked', false);
+        }
     });
 
     $('#editAuthAll').click(function () {
-        if ($('#editAuthAll').is(':checked'))
-            $('#boardEditFrm input[name=auth_idntf_key]').prop('checked', true);
-        else
-            $('#boardEditFrm input[name=auth_idntf_key]').prop(
-                'checked',
-                false
-            );
+        if ($('#editAuthAll').is(':checked')) {
+            $('#boardEditFrm input[name=auth_id]').prop('checked', true);
+        } else {
+            $('#boardEditFrm input[name=auth_id]').prop('checked', false);
+        }
     });
 
-    const searchStrInput = document.getElementById('searchStr');
+    const viewBoardTitle = document.getElementById('viewBoardTitle');
+    const viewUpdatedNm = document.getElementById('viewUpdatedNm');
 
-    searchStrInput.addEventListener('keyup', function (event) {
+    viewBoardTitle.addEventListener('keyup', function (event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            document.getElementById('searchBtn').click();
+        }
+    });
+
+    viewUpdatedNm.addEventListener('keyup', function (event) {
         if (event.keyCode === 13) {
             event.preventDefault();
             document.getElementById('searchBtn').click();

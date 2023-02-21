@@ -1,135 +1,119 @@
 import {setBasicEditor} from '../module/editor';
 import {setCommSelBox} from '../module/component';
 import {serializeFormJson} from '../module/json';
-import {mainViewTokenInvalidate, setAccessToken} from '../module/router';
 import {spinnerHide, spinnerShow} from '../module/spinner';
+import {callApi} from '../module/async';
 
 let editor;
 let content = '';
 
+const $boardId = $('#boardId');
+const $postTitle = $('#postTitle');
+const boardKey = $('#boardKey').val();
+const postType = $('#postType').val();
+
 /**
- *  saveProc : 게시글 등록
+ *  save : 게시글 등록
  */
-const saveProc = () => {
+const save = () => {
     let msg = '';
 
-    if ($('#boardId').val() === '') {
+    if ($boardId.val() === '') {
         msg = '게시판을 선택하세요';
         alert(msg);
-        $('#boardId').focus();
+        $boardId.focus();
         return;
     }
-    if ($('#postTitle').val() === '') {
+    if ($postTitle.val() === '') {
         msg = '제목을 입력하세요..';
         alert(msg);
-        $('#title').focus();
+        $postTitle.focus();
         return;
     }
 
     content = editor.getMarkdown();
 
-    $('#postText').val(content);
+    $('#boardId').prop('disabled', false);
+    $('#mainText').val(content);
 
     spinnerShow();
 
+    let url = `/api/post`;
+    const type = 'PUT';
     const params = serializeFormJson('postWriteFrm');
-
-    const accessToken = window.localStorage.getItem('accessToken');
-
-    $.ajax({
-        url: '/api/post/',
-        type: 'PUT',
-        data: JSON.stringify(params),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.setRequestHeader('Authorization', accessToken);
-        },
-    }).then(
-        data => {
-            if (data.header.result_code === 'ok') {
-                alert(data.header.message);
-
-                const boardKey = $('#boardKey').val();
-                let url = '/page/board/post/init';
-                if (boardKey !== '') {
-                    url = `/page/board/post/init/` + boardKey;
-                }
-
-                spinnerHide();
-
-                location.href = url;
-            } else {
-                alert(data.header.message);
-            }
-
-            spinnerHide();
-        },
-        (request, status, error) => {
-            if (request.status === 500) {
-                console.log(
-                    `code:${request.status}\n` +
-                        `message:${request.responseText}\n` +
-                        `error:${error}`
-                );
-            } else if (request.status === 400) {
-                const {errorList} = request.responseJSON;
-                if (errorList !== undefined) {
-                    if (errorList.lengh !== 0) {
-                        const {message} = errorList[0];
-                        alert(message);
-                    }
-                } else {
-                    const data = request.responseJSON.header;
-                    alert(data.message);
-                }
-            } else if (request.status === 401) {
-                setAccessToken(request.responseJSON);
-                saveProc();
-            } else if (request.status === 403) {
-                mainViewTokenInvalidate();
-            }
-
-            spinnerHide();
-        }
-    );
+    callApi(url, type, params, saveSuccess, saveError);
 };
 
-$(document).ready(() => {
-    const boardKey = $('#boardKey').val();
+/**
+ *  saveSuccess : save successCallback
+ */
+const saveSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        alert(result.header.message);
+        spinnerHide();
+        location.href = returnPage();
+    } else {
+        alert(result.header.message);
+    }
 
-    if (boardKey !== '') {
-        $('#boardKeyDiv').hide();
+    spinnerHide();
+};
+
+/**
+ *  saveError : save errorCallback
+ */
+const saveError = response => {
+    spinnerHide();
+    alert(response.message);
+};
+
+const setBoardBox = () => {
+    let boardId = '';
+
+    if (postType !== 'manage') {
+        boardId = boardKey;
     }
 
     const option = {
         oTxt: 'board_title',
-        oVal: 'board_idntf_key',
+        oVal: 'board_id',
     };
 
     const params = {};
 
     setCommSelBox(
         'boardId',
-        '/api/board/select',
+        '/api/item/board/BOARD/Y',
         'POST',
         'SEL',
-        boardKey,
+        boardId,
         params,
         option
     );
 
+    if (postType !== 'manage') {
+        $('#boardId').prop('disabled', true);
+    }
+};
+
+const returnPage = () => {
+    let url = '/page/board/post/list/back';
+    if (postType !== 'manage') {
+        url = `/page/board/post/list/back/` + boardKey;
+    }
+    return url;
+};
+
+$(document).ready(() => {
+    setBoardBox();
+
     editor = setBasicEditor('editor', content, 500);
 
     $('#backBtn').click(() => {
-        let url = '/page/board/post/back';
-        if (boardKey !== '') {
-            url = `/page/board/post/back/` + boardKey;
-        }
-
-        location.href = url;
+        location.href = returnPage();
     });
 
     $('#saveBtn').click(() => {
-        saveProc();
+        save();
     });
 });
