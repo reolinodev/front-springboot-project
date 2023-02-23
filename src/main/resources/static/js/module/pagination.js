@@ -14,21 +14,15 @@ export default class Page {
  * setPagination : 페이징 세팅
  */
 export function setPagination(page, callBackFunc) {
-
     const pagination = new Pagination('pagination', {
         totalItems: page.totalCount,
         itemsPerPage: page.pagePer,
-        visiblePages: 10
+        visiblePages: 10,
     });
 
-    pagination.on('beforeMove', (eventData) => {
-        callBackFunc(eventData.page);
-    });
-
-    pagination.on('afterMove', (eventData) => {
+    pagination.on('afterMove', eventData => {
         callBackFunc(eventData.page);
     });
 
     return pagination;
 }
-

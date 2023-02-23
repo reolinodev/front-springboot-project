@@ -63,8 +63,9 @@
     background: #101829;
 }
 
-#niceLogo {
-    background-image: url("../images/niceSymbol.jpg");
-    width: 71px;
-    height: 71px;
+#viewer, #viewer2{
+    border: 1px solid #cccccc;
+    padding: 5px;
+    min-height: 200px;
 }
+

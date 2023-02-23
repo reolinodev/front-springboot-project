@@ -4,17 +4,16 @@ import Grid from 'tui-grid';
  * setBasicGrid : 기본 그리드 생성
  * columns: 컬럼, gridData : 데이터
  */
-export function setBasicGrid (columns, gridData) {
-
+export function setBasicGrid(columns, gridData) {
     const grid = new Grid({
         el: document.getElementById('grid'),
         data: gridData,
         scrollX: false,
         scrollY: false,
         columns,
-        columnOptions : {
-            resizable : true
-        }
+        columnOptions: {
+            resizable: true,
+        },
     });
 
     Grid.applyTheme('striped');
@@ -28,17 +27,16 @@ export function setBasicGrid (columns, gridData) {
  * setBasicGridId : 기본 그리드 생성
  * columns: 컬럼, gridData : 데이터, gridId : 그리드 아이디
  */
-export function setBasicGridId (columns, gridData, gridId) {
-
+export function setBasicGridId(columns, gridData, gridId) {
     const grid = new Grid({
         el: document.getElementById(`${gridId}`),
         data: gridData,
         scrollX: false,
         scrollY: false,
         columns,
-        columnOptions : {
-            resizable : true
-        }
+        columnOptions: {
+            resizable: true,
+        },
     });
 
     Grid.applyTheme('striped');
@@ -48,13 +46,11 @@ export function setBasicGridId (columns, gridData, gridId) {
     return grid;
 }
 
-
 /**
  * setCheckBoxGrid : 체크박스가 있는 그리드 생성(해당 아이디에 생성)
  * columns: 컬럼, gridData : 데이터
  */
-export function setCheckBoxGridId (columns, gridData, gridId) {
-
+export function setCheckBoxGridId(columns, gridData, gridId) {
     const grid = new Grid({
         el: document.getElementById(`${gridId}`),
         rowHeaders: ['checkbox'],
@@ -62,9 +58,9 @@ export function setCheckBoxGridId (columns, gridData, gridId) {
         scrollX: false,
         scrollY: false,
         columns,
-        columnOptions : {
-            resizable : true
-        }
+        columnOptions: {
+            resizable: true,
+        },
     });
 
     Grid.applyTheme('striped');
@@ -74,13 +70,11 @@ export function setCheckBoxGridId (columns, gridData, gridId) {
     return grid;
 }
 
-
 /**
  * setCheckBoxGrid : 체크박스가 있는 그리드 생성
  * columns: 컬럼, gridData : 데이터
  */
-export function setCheckBoxGrid (columns, gridData) {
-
+export function setCheckBoxGrid(columns, gridData) {
     const grid = new Grid({
         el: document.getElementById('grid'),
         rowHeaders: ['checkbox'],
@@ -88,9 +82,9 @@ export function setCheckBoxGrid (columns, gridData) {
         scrollX: false,
         scrollY: false,
         columns,
-        columnOptions : {
-            resizable : true
-        }
+        columnOptions: {
+            resizable: true,
+        },
     });
 
     Grid.applyTheme('striped');
@@ -104,19 +98,18 @@ export function setCheckBoxGrid (columns, gridData) {
  * setGridClickEvent : 그리드 클릭 이벤트
  * grid: 그리드, select_column : 선택할 컬럼, return_column: 반환할 컬럼, callbackFunc: 콜백
  */
-export function setGridClickEvent(grid, selectColumn, returnColumn, callbackFunc) {
-
-    grid.getData().forEach(row => {
-        grid.addCellClassName(row.rowKey, selectColumn, 'cell-click');
-    });
-
+export function setGridClickEvent(
+    grid,
+    selectColumn,
+    returnColumn,
+    callbackFunc
+) {
     grid.on('focusChange', ev => {
-        if(ev.columnName === selectColumn){
+        if (ev.columnName === selectColumn) {
             callbackFunc(grid.getValue(ev.rowKey, returnColumn));
         }
     });
 }
-
 
 /**
  * getCheckedRows : 그리드 클릭 이벤트
@@ -126,30 +119,22 @@ export function getCheckedRows(grid) {
     return grid.getCheckedRows();
 }
 
-
 /**
- * setGridClickEvent : 그리드 클릭 이벤트
- * grid: 그리드, select_column : 선택할 컬럼, return_column: 반환할 컬럼, callbackFunc: 콜백
+ * setGridClickRowEvent : 그리드 클릭 이벤트
+ * grid: 그리드, select_column : 선택할 컬럼,  callbackFunc: 콜백
  */
-export function setGridClickRowEvent(grid, selectColumn, returnColumn, callbackFunc) {
-
-    grid.getData().forEach(row => {
-        grid.addCellClassName(row.rowKey, selectColumn, 'cell-click');
-    });
-
+export function setGridClickRowEvent(grid, selectColumn, callbackFunc) {
     grid.on('focusChange', ev => {
-        if(ev.columnName === selectColumn){
+        if (ev.columnName === selectColumn) {
             callbackFunc(grid.getRow(ev.rowKey));
         }
     });
 }
-
 
 /**
  * focustGridFirstRow : 그리드 클릭 이벤트
  * grid: 그리드
  */
 export function focustGridFirstRow(grid) {
-    grid.focusAt(0,0);
+    grid.focusAt(0, 0);
 }
-
