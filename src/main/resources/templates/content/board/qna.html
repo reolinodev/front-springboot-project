@@ -2,16 +2,16 @@
 <html
     xmlns:th="http://www.thymeleaf.org"
     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-    layout:decorate="~{layouts/gridLayout}"
+    layout:decorate="~{layouts/defaultLayout}"
 >
 <head>
-    <title>QNA 관리</title>
-    <script type="module" th:src="@{/dist/adminQna.js}"></script>
+    <title>QNA정보</title>
+    <script type="module" th:src="@{/dist/qna.js}"></script>
 </head>
 
 <div layout:fragment="content" id="container">
     <!-- 조회 화면 -->
-    <form id="qnaViewFrm" name="qnaViewFrm">
+    <form id="qnaFrm" name="qnaFrm">
         <div class="card">
             <div class="card-body">
                 <div class="row">
@@ -20,22 +20,22 @@
                         <select class="custom-select rounded-0" id="boardId" name="board_id"></select>
                     </div>
                     <div class="col-4">
-                        <label for="qnaType">질의유형</label>
-                        <select class="custom-select rounded-0" id="qnaType" name="qna_type"></select>
-                    </div>
-                    <div class="col-4">
-                        <label for="responseYn">응답여부</label>
-                        <select class="custom-select rounded-0" id="responseYn" name="response_yn"></select>
-                    </div>
-                </div>
-                <div class="row"style="padding-top: 10px">
-                    <div class="col-4">
-                        <label for="searchStr">제목 / 작성자</label>
-                        <input type="text" class="form-control" id="searchStr" name="search_str">
-                    </div>
-                    <div class="col-4">
-                        <label>생성일</label>
+                        <label>작성일</label>
                         <div id="dateRange"></div>
+                    </div>
+                    <div class="col-4">
+                        <label for="qnaTitle">게시글명</label>
+                        <input type="text" class="form-control" id="qnaTitle" name="qna_title">
+                        <input type="text" class="form-control" style="display: none"> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
+                    </div>
+                    <div class="col-4">
+                        <label for="createdNm">작성자</label>
+                        <input type="text" class="form-control" id="createdNm" name="created_nm">
+                        <input type="text" class="form-control" style="display: none"> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
+                    </div>
+                    <div class="col-4">
+                        <label for="responseYn">답변여부</label>
+                        <select class="custom-select rounded-0" id="responseYn" name="response_yn"></select>
                     </div>
                     <div class="col-4">
                         <label for="useYn">사용여부</label>
@@ -46,11 +46,20 @@
             <div class="card-footer ">
                 <div class="row justify-content-end">
                     <div class="col-2 ">
-                        <button type="button" class="btn btn-block btn-primary btn-sm" id="searchBtn">Search</button>
+                        <button type="button" class="btn btn-block btn-primary btn-sm" id="searchBtn">조회</button>
                     </div>
                 </div>
             </div>
         </div>
     </form>
+
+    <input type="hidden" id="status" th:value="${status}">
+    <input type="hidden" id="pagePer" name="page_per" th:value="10"/>
+
+    <!-- 그리드 영역-->
+    <div id="grid"></div>
+
+    <!-- 페이징 영역 -->
+    <div id="pagination" class="tui-pagination"></div>
 </div>
 </html>

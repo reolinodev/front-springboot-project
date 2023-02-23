@@ -27,7 +27,7 @@ const search = () => {
  */
 const searchSuccess = result => {
     if (result.header.result_code === 'ok') {
-        setQnaData(result.data);
+        setFaqData(result.data);
     }
     spinnerHide();
 };
@@ -40,7 +40,7 @@ const searchError = response => {
     console.log(response.message);
 };
 
-const setQnaData = data => {
+const setFaqData = data => {
     setBoardBox(data.board_id);
 
     $faqTitle.val(data.faq_title);

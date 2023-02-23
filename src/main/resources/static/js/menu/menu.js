@@ -289,14 +289,14 @@ const initSelectBox = () => {
 
     const option = {
         oTxt: 'board_title',
-        oVal: 'board_id',
+        oVal: 'board_val',
     };
 
     const params = {};
 
     setCommSelBox(
         'boardId',
-        '/api/item/board/BOARD/Y',
+        '/api/item/board/ALL/Y',
         'POST',
         'SEL',
         '',
@@ -377,12 +377,18 @@ $(document).ready(() => {
         }
     });
 
-    // 추가 버튼 클릭 이벤트
+    // 게시판식별키 변경 이벤트
     $('#boardId').change(() => {
         const boardId = $boardId.val();
 
         if (boardId !== '') {
-            $('#url').val(`/page/board/post/list/init/normal/` + boardId);
+            const arr = boardId.split('/');
+            const boardIdStr = arr[0];
+            const boardTypeStr = arr[1].toLowerCase();
+
+            $('#url').val(
+                `/page/board/${boardTypeStr}/list/init/` + boardIdStr
+            );
         }
     });
 });

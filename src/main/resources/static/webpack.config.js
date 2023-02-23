@@ -35,7 +35,11 @@ module.exports = {
         faqEdit: '/js/board/faqEdit.js',
         faqWrite: '/js/board/faqWrite.js',
         qna: '/js/board/qna.js',
+        qnaPage: '/js/board/qnaPage.js',
+        qnaWrite: '/js/board/qnaWrite.js',
         qnaEdit: '/js/board/qnaEdit.js',
+        qnaDetail: '/js/board/qnaDetail.js',
+        qnaAnswer: '/js/board/qnaAnswer.js',
     },
     output: {
         path: path.resolve(`${__dirname}/dist`),

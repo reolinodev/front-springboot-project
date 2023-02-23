@@ -5,34 +5,37 @@
     layout:decorate="~{layouts/defaultLayout}"
 >
 <head>
-    <title>게시글정보</title>
-    <script type="module" th:src="@{/dist/postPage.js}"></script>
+    <title>QNA정보</title>
+    <script type="module" th:src="@{/dist/qnaPage.js}"></script>
 </head>
 
 <div layout:fragment="content" id="container">
     <!-- 조회 화면 -->
-    <form id="postViewFrm" name="postViewFrm">
+    <form id="qnaFrm" name="qnaFrm">
         <div class="card">
             <div class="card-body">
                 <div class="row">
                     <div class="col-4">
-                        <label for="searchStr">게시글제목 / 작성자</label>
-                        <input type="text" class="form-control" id="searchStr" name="search_str">
+                        <label for="qnaTitle">게시글제목</label>
+                        <input type="text" class="form-control" id="qnaTitle" name="qna_title">
+                        <input type="text" class="form-control" style="display: none"> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
+                        <input type="hidden" id="useYn" name="use_yn" th:value="Y">
                     </div>
-                    <div class="col-5">
+                    <div class="col-4">
                         <label>작성일</label>
                         <div id="dateRange"></div>
                     </div>
-                    <div class="col-3">
-                        <label for="useYn">사용여부</label>
-                        <select class="custom-select rounded-0" id="useYn" name="use_yn"></select>
+                    <div class="col-4">
+                        <label for="createdNm">작성자</label>
+                        <input type="text" class="form-control" id="createdNm" name="created_nm">
+                        <input type="text" class="form-control" style="display: none"> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
                     </div>
                 </div>
             </div>
             <div class="card-footer ">
                 <div class="row justify-content-end">
                     <div class="col-2">
-                        <button type="button" class="btn btn-block btn-success btn-sm" id="writeBtn">게시글 작성</button>
+                        <button type="button" class="btn btn-block btn-success btn-sm" id="writeBtn">QNA작성</button>
                     </div>
                     <div class="col-2 ">
                         <button type="button" class="btn btn-block btn-primary btn-sm" id="searchBtn">조회</button>

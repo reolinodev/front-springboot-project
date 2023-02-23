@@ -84,7 +84,6 @@ const search = () => {
  */
 const searchSuccess = result => {
     if (result.header.result_code === 'ok') {
-        console.log('result', result);
         const gridData = result.data;
         page.totalCount = result.total;
         grid.resetData(gridData);

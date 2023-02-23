@@ -58,9 +58,8 @@ const searchSuccess = result => {
         page.totalCount = result.total;
         grid.resetData(gridData);
 
-        setGridClickEvent(grid, 'board_title', 'board_id', getBoardData);
-
         if (page.pageInit === false) {
+            setGridClickEvent(grid, 'board_title', 'board_id', getBoardData);
             pagination.reset(result.total);
             page.pageInit = true;
         }

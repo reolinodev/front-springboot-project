@@ -33,8 +33,9 @@ public class BoardController {
         return mav;
     }
 
+
     /***
-     * 게시글정보 화면
+     * 게시글정보 화면(개별)
      ***/
     @GetMapping(value = "/page/board/post/list/{status}/{board_id}")
     public ModelAndView postPageView(@PathVariable String status, @PathVariable String board_id) {
@@ -127,12 +128,61 @@ public class BoardController {
     }
 
     /***
-     * QNA 수정화면
+     * QNA 정보화면(개별)
      ***/
-    @GetMapping(value = "/page/board/qnaEdit")
-    public ModelAndView qnaEditView() {
+    @GetMapping(value = "/page/board/qna/list/{status}/{board_id}")
+    public ModelAndView qnaPageView(@PathVariable String status, @PathVariable String board_id) {
         ModelAndView mav = new ModelAndView();
+        mav.addObject("status", status);
+        mav.addObject("board_id", board_id);
+        mav.setViewName("content/board/qnaPage");
+        return mav;
+    }
+
+
+    /***
+     * QNA 등록 화면
+     ***/
+    @GetMapping(value = "/page/board/qna/write/{board_id}")
+    public ModelAndView postWriteView(@PathVariable String board_id) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("board_id", board_id);
+        mav.setViewName("content/board/qnaWrite");
+        return mav;
+    }
+
+
+    /***
+     * QNA 수정 화면
+     ***/
+    @GetMapping(value = "/page/board/qna/edit/{qna_id}")
+    public ModelAndView qnaEditView(@PathVariable String qna_id) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("qna_id", qna_id);
         mav.setViewName("content/board/qnaEdit");
+        return mav;
+    }
+
+    /***
+     * QNA 상세 화면
+     ***/
+    @GetMapping(value = "/page/board/qna/detail/{qna_id}")
+    public ModelAndView qnaDetailView(@PathVariable String qna_id) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("qna_id", qna_id);
+        mav.setViewName("content/board/qnaDetail");
+        return mav;
+    }
+
+
+    /***
+     * QNA 답변화면
+     ***/
+    @GetMapping(value = "/page/board/qna/answer/{qna_id}")
+    public ModelAndView qnaAnswerView(@PathVariable String qna_id) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("qna_id", qna_id);
+        mav.setViewName("content/board/qnaAnswer");
         return mav;
     }
 

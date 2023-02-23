@@ -1,12 +1,20 @@
-import { setCommSelBox, setCodeSelBox } from '../module/component';
-import Page, { setPagination } from '../module/pagination';
-import { setBasicGrid, setGridClickEvent } from '../module/grid';
-import { serializeFormJson } from '../module/json';
-import { setBasicDataRange } from '../module/datePicker';
+import {
+    setCodeSelBox,
+    setCommSelBoxCall,
+    setCodeSelBoxCall,
+} from '../module/component';
+import Page, {setPagination} from '../module/pagination';
+import {setBasicGrid, setGridClickEvent} from '../module/grid';
+import {serializeFormJson} from '../module/json';
+import {setBasicDataRange} from '../module/datePicker';
+import {spinnerHide, spinnerShow} from '../module/spinner';
+import {callApi} from '../module/async';
 
 let page = new Page(1, false, 10, 0);
 let grid;
 let pagination;
+let sessionParam;
+const status = $('#status').val();
 
 const pageInit = () => {
     page = new Page(1, false, Number($('#pagePer').val()), 0);
@@ -18,7 +26,7 @@ const pageInit = () => {
 const setGridLayout = () => {
     // 헤더 생성
     const columns = [
-        { header: 'No', name: 'rnum', width: 100, align: 'center' },
+        {header: 'No', name: 'rnum', width: 100, align: 'center'},
         {
             header: 'SEQ',
             name: 'qna_id',
@@ -26,23 +34,29 @@ const setGridLayout = () => {
             align: 'center',
             hidden: true,
         },
-        { header: '게시판', name: 'board_title', width: 150, align: 'center' },
+        {header: '게시판', name: 'board_title', width: 150, align: 'center'},
         {
-            header: '질의 유형',
-            name: 'qna_type_nm',
-            width: 150,
+            header: '게시글명',
+            name: 'qna_title',
             align: 'center',
+            renderer: {
+                styles: {
+                    color: '#0863c8',
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                },
+            },
         },
-        { header: '제목', name: 'title', align: 'left' },
-        { header: '이름', name: 'created_nm', width: 100, align: 'center' },
-        { header: '생성일', name: 'created_at', width: 150, align: 'center' },
+        {header: '작성자', name: 'created_nm', width: 100, align: 'center'},
+        {header: '답변자', name: 'response_nm', width: 100, align: 'center'},
+        {header: '작성일', name: 'created_at', width: 150, align: 'center'},
         {
-            header: '응답여부',
+            header: '답변여부',
             name: 'response_yn_nm',
             width: 100,
             align: 'center',
         },
-        { header: '사용여부', name: 'use_yn_nm', width: 100, align: 'center' },
+        {header: '사용여부', name: 'use_yn_nm', width: 100, align: 'center'},
     ];
     // 데이터
     const gridData = [];
@@ -51,81 +65,109 @@ const setGridLayout = () => {
 };
 
 /**
- * qnaEditView : qna 수정
+ * qnaAnswer : qna 수정
  */
-const qnaEditView = (qnaId) => {
-    location.href = `/admin/board/qna/edit/${qnaId}`;
+const qnaAnswer = qnaId => {
+    location.href = `/page/board/qna/answer/${qnaId}`;
 };
 
 /**
  * search : 조회
  */
 const search = () => {
-    const params = serializeFormJson('qnaViewFrm');
+    spinnerShow();
+
+    let url = `/api/qna`;
+    const type = 'POST';
+
+    const params = serializeFormJson('qnaFrm');
     params.current_page = page.currentPage;
     params.page_per = page.pagePer;
+    window.sessionStorage.setItem('params', JSON.stringify(params));
 
-    $.ajax({
-        url: '/api/admin/qna/',
-        type: 'POST',
-        data: JSON.stringify(params),
-        headers: { 'Content-Type': 'application/json' },
-        success(result) {
-            const gridData = result.data;
-            page.totalCount = result.total;
-            grid.resetData(gridData);
+    callApi(url, type, params, searchSuccess, searchError);
+};
 
-            // eslint-disable-next-line no-use-before-define
-            setGridClickEvent(grid, 'title', 'qna_id', qnaEditView);
+/**
+ *  searchSuccess : search successCallback
+ */
+const searchSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        const gridData = result.data;
+        page.totalCount = result.total;
+        grid.resetData(gridData);
 
-            if (page.pageInit === false) {
-                pagination.reset(result.total);
-                page.pageInit = true;
-            }
-        },
-        error(request, status, error) {
-            // eslint-disable-next-line no-useless-concat
-            console.log(
-                `code:${request.status}\n` +
-                    `message:${request.responseText}\n` +
-                    `error:${error}`
-            );
-        },
-    });
+        if (page.pageInit === false) {
+            page.pageInit = true;
+            setGridClickEvent(grid, 'qna_title', 'qna_id', qnaAnswer);
+            pagination.reset(result.total);
+        }
+    }
+
+    spinnerHide();
+};
+
+/**
+ *  searchError : search errorCallback
+ */
+const searchError = response => {
+    spinnerHide();
+    console.log(response.message);
 };
 
 /**
  * pagingCallback : 페이징 콜백
  */
-const pagingCallback = (returnPage) => {
+const pagingCallback = returnPage => {
     page.currentPage = returnPage;
     search();
 };
 
-$(document).ready(() => {
+const setBoardBoxCall = (selected, callback) => {
+    const params = {};
+
     const option = {
-        oTxt: 'title',
+        oTxt: 'board_title',
         oVal: 'board_id',
     };
 
-    const params = {};
-
-    setCommSelBox(
+    setCommSelBoxCall(
         'boardId',
-        '/api/admin/board/qna',
+        '/api/item/board/QNA/Y',
         'POST',
         'ALL',
-        '',
+        selected,
         params,
-        option
+        option,
+        callback
     );
+};
 
-    setCodeSelBox('qnaType', 'QNA_TYPE', 'ALL', '');
+const setUseYnCall = () => {
+    setCodeSelBoxCall(
+        'useYn',
+        'USE_YN',
+        'ALL',
+        sessionParam.use_yn,
+        setResponseYnCall
+    );
+};
 
-    setCodeSelBox('responseYn', 'RESPONSE_YN', 'ALL', '');
+const setResponseYnCall = () => {
+    setCodeSelBoxCall(
+        'responseYn',
+        'RESPONSE_YN',
+        'ALL',
+        sessionParam.response_yn,
+        setMoveToPagination
+    );
+};
 
-    setCodeSelBox('useYn', 'USE_YN', 'ALL', '');
+const setMoveToPagination = () => {
+    pagination.movePageTo(sessionParam.current_page);
+};
 
+$(document).ready(() => {
     setBasicDataRange('start_date', 'end_date', '1years');
 
     grid = setGridLayout();
@@ -137,18 +179,7 @@ $(document).ready(() => {
         search();
     });
 
-    $('#pagePer').change(() => {
-        pageInit();
-        pagination = setPagination(page, pagingCallback);
-        search();
-    });
-
     $('#boardId').change(() => {
-        pageInit();
-        search();
-    });
-
-    $('#qnaType').change(() => {
         pageInit();
         search();
     });
@@ -163,5 +194,41 @@ $(document).ready(() => {
         search();
     });
 
-    search();
+    const qnaTitleInput = document.getElementById('qnaTitle');
+
+    qnaTitleInput.addEventListener('keyup', function (event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            document.getElementById('searchBtn').click();
+        }
+    });
+
+    const createdNmInput = document.getElementById('createdNm');
+
+    createdNmInput.addEventListener('keyup', function (event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            document.getElementById('searchBtn').click();
+        }
+    });
+
+    //첫진입과 뒤로가기로 진입했을 경우 파라미터 세팅
+    if (status === 'init') {
+        window.sessionStorage.removeItem('params');
+        setCodeSelBox('responseYn', 'RESPONSE_YN', 'ALL', '');
+        setCodeSelBox('useYn', 'USE_YN', 'ALL', '');
+        setBoardBoxCall('', search);
+    } else {
+        sessionParam = JSON.parse(window.sessionStorage.getItem('params'));
+
+        $('input[name=qna_title]').val(sessionParam.qna_title);
+        $('input[name=created_nm]').val(sessionParam.created_nm);
+        $('input[name=start_date]').val(sessionParam.start_date);
+        $('input[name=end_date]').val(sessionParam.end_date);
+
+        page.currentPage = sessionParam.current_page;
+        page.page_per = sessionParam.page_per;
+
+        setBoardBoxCall(sessionParam.board_id, setUseYnCall);
+    }
 });
