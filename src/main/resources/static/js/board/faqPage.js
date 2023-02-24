@@ -1,19 +1,15 @@
-import {
-    setCommSelBoxCall,
-    setCodeSelBoxCall,
-    setCodeSelBox,
-} from '../module/component';
 import Page, {setPagination} from '../module/pagination';
-import {setBasicGrid, setGridClickEvent} from '../module/grid';
+import {setBasicGrid, setGridClickRowEvent} from '../module/grid';
 import {serializeFormJson} from '../module/json';
 import {spinnerHide, spinnerShow} from '../module/spinner';
-import {callApi} from '../module/async';
+import {callApi, callGetApi} from '../module/async';
+import {setBasicViewer} from '../module/editor';
 
 let page = new Page(1, false, 10, 0);
 let grid;
 let pagination;
-let sessionParam;
-const status = $('#status').val();
+
+const $viewFaqTitle = $('#viewFaqTitle');
 
 const pageInit = () => {
     page = new Page(1, false, Number($('#pagePer').val()), 0);
@@ -25,7 +21,7 @@ const pageInit = () => {
 const setGridLayout = () => {
     // 헤더 생성
     const columns = [
-        {header: 'No', name: 'rnum', width: 50, align: 'center'},
+        {header: 'No', name: 'rnum', width: 100, align: 'center'},
         {
             header: 'SEQ',
             name: 'faq_id',
@@ -33,9 +29,8 @@ const setGridLayout = () => {
             align: 'center',
             hidden: true,
         },
-        {header: '게시판', name: 'board_title', width: 200, align: 'center'},
         {
-            header: '게시글명',
+            header: '제목',
             name: 'faq_title',
             align: 'center',
             renderer: {
@@ -46,20 +41,11 @@ const setGridLayout = () => {
                 },
             },
         },
-        {header: '작성자', name: 'created_nm', width: 200, align: 'center'},
-        {header: '사용여부', name: 'use_yn_nm', width: 150, align: 'center'},
     ];
     // 데이터
     const gridData = [];
 
     return setBasicGrid(columns, gridData);
-};
-
-/**
- * postView : 게시글 보기
- */
-const faqView = faqId => {
-    location.href = `/page/board/faq/edit/${faqId}`;
 };
 
 /**
@@ -89,9 +75,9 @@ const searchSuccess = result => {
         grid.resetData(gridData);
 
         if (page.pageInit === false) {
-            pagination.reset(result.total);
             page.pageInit = true;
-            setGridClickEvent(grid, 'faq_title', 'faq_id', faqView);
+            setGridClickRowEvent(grid, 'faq_title', faqView);
+            pagination.reset(result.total);
         }
     }
 
@@ -114,59 +100,53 @@ const pagingCallback = returnPage => {
     search();
 };
 
-const setBoardBoxCall = (selected, callback) => {
-    const params = {};
-
-    const option = {
-        oTxt: 'board_title',
-        oVal: 'board_id',
-    };
-
-    setCommSelBoxCall(
-        'boardId',
-        '/api/item/board/faq/Y',
-        'POST',
-        'ALL',
-        selected,
-        params,
-        option,
-        callback
-    );
+/**
+ * faqView : 상세화면 및 수정화면 이동
+ */
+const faqView = rowData => {
+    getFaqData(rowData.faq_id);
 };
 
-const setUseYnCall = () => {
-    setCodeSelBoxCall(
-        'useYn',
-        'USE_YN',
-        'ALL',
-        sessionParam.use_yn,
-        setMoveToPagination
-    );
+/**
+ * getFaqData : FAQ 상세데이터 조회
+ */
+const getFaqData = faqId => {
+    spinnerShow();
+    const url = `/api/faq/${faqId}`;
+    callGetApi(url, getFaqDataSuccess, getFaqDataError);
 };
 
-const setMoveToPagination = () => {
-    pagination.movePageTo(sessionParam.current_page);
+/**
+ *  getFaqDataSuccess : getFaqData successCallback
+ */
+const getFaqDataSuccess = result => {
+    if (result.header.result_code === 'ok') {
+        setFaqData(result.data);
+    }
+    spinnerHide();
+};
+
+/**
+ *  getFaqDataError : getFaqData errorCallback
+ */
+const getFaqDataError = response => {
+    spinnerHide();
+    console.log(response.message);
+};
+
+const setFaqData = data => {
+    $viewFaqTitle.val(data.faq_title);
+    setBasicViewer('viewer', data.main_text);
+
+    window.$('#faqView').modal('show');
 };
 
 $(document).ready(() => {
     grid = setGridLayout();
+
     pagination = setPagination(page, pagingCallback);
 
     $('#searchBtn').click(() => {
-        pageInit();
-        search();
-    });
-
-    $('#writeBtn').click(() => {
-        location.href = '/page/board/faq/write';
-    });
-
-    $('#boardId').change(() => {
-        pageInit();
-        search();
-    });
-
-    $('#useYn').change(() => {
         pageInit();
         search();
     });
@@ -180,19 +160,5 @@ $(document).ready(() => {
         }
     });
 
-    //첫진입과 뒤로가기로 진입했을 경우 파라미터 세팅
-    if (status === 'init') {
-        window.sessionStorage.removeItem('params');
-        setCodeSelBox('useYn', 'USE_YN', 'ALL', '');
-        setBoardBoxCall('', search);
-    } else {
-        sessionParam = JSON.parse(window.sessionStorage.getItem('params'));
-
-        $('input[name=faq_title]').val(sessionParam.faq_title);
-
-        page.currentPage = sessionParam.current_page;
-        page.page_per = sessionParam.page_per;
-
-        setBoardBoxCall(sessionParam.board_id, setUseYnCall);
-    }
+    search();
 });

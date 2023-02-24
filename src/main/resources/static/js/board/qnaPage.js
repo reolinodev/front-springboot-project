@@ -143,7 +143,7 @@ const setBoardBoxCall = (selected, callback) => {
 
     setCommSelBoxCall(
         'boardId',
-        '/api/item/board/QNA/Y',
+        '/api/item/board/qna/Y',
         'POST',
         'ALL',
         selected,

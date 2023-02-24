@@ -32,6 +32,7 @@ module.exports = {
         postView: '/js/board/postView.js',
         postWrite: '/js/board/postWrite.js',
         faq: '/js/board/faq.js',
+        faqPage: '/js/board/faqPage.js',
         faqEdit: '/js/board/faqEdit.js',
         faqWrite: '/js/board/faqWrite.js',
         qna: '/js/board/qna.js',

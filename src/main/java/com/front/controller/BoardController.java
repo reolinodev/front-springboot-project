@@ -96,6 +96,19 @@ public class BoardController {
     }
 
     /***
+     * FAQ 정보화면(개별)
+     ***/
+    @GetMapping(value = "/page/board/faq/list/{status}/{board_id}")
+    public ModelAndView faqPageView(@PathVariable String status, @PathVariable String board_id) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("status", status);
+        mav.addObject("board_id", board_id);
+        mav.setViewName("content/board/faqPage");
+        return mav;
+    }
+
+
+    /***
      * FAQ 등록화면
      ***/
     @GetMapping(value = "/page/board/faq/write")

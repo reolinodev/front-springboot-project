@@ -79,7 +79,7 @@ const setBoardBox = boardId => {
 
     setCommSelBox(
         'boardId',
-        '/api/item/board/QNA/Y',
+        '/api/item/board/qna/Y',
         'POST',
         '',
         boardId,

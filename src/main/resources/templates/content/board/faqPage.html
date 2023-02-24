@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}"
+>
+<head>
+    <title>FAQ정보</title>
+    <script type="module" th:src="@{/dist/faqPage.js}"></script>
+</head>
+
+<div layout:fragment="content" id="container">
+    <!-- 조회 화면 -->
+    <form id="faqFrm" name="faqFrm">
+        <input type="hidden" id="boardId" name="board_id" th:value="${board_id}">
+        <input type="hidden" id="status" th:value="${status}">
+        <input type="hidden" id="pagePer" name="page_per" th:value="10"/>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <label for="faqTitle">제목</label>
+                        <input type="text" class="form-control" id="faqTitle" name="faq_title">
+                        <input type="text" class="form-control" style="display: none"> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
+                        <input type="hidden" id="useYn" name="use_yn" th:value="Y">
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer ">
+                <div class="row justify-content-end">
+                    <div class="col-2 ">
+                        <button type="button" class="btn btn-block btn-primary btn-sm" id="searchBtn">조회</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- 그리드 영역-->
+    <div id="grid"></div>
+
+    <!-- 페이징 영역 -->
+    <div id="pagination" class="tui-pagination"></div>
+
+    <!-- 상세화면 (modal) -->
+    <div class="modal fade" id="faqView">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">FAQ 상세</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <div class="form-group row">
+                                <div class="col-12">
+                                    <label for="viewFaqTitle">제목</label>
+                                    <input type="text" class="form-control" id="viewFaqTitle" placeholder="아이디">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-12">
+                                    <label for="viewer">본문</label>
+                                    <div id="viewer"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer justify-content-end">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

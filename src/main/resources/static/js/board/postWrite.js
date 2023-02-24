@@ -83,7 +83,7 @@ const setBoardBox = () => {
 
     setCommSelBox(
         'boardId',
-        '/api/item/board/BOARD/Y',
+        '/api/item/board/post/Y',
         'POST',
         'SEL',
         boardId,

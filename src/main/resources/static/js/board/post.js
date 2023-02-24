@@ -126,7 +126,7 @@ const setBoardBoxCall = (selected, callback) => {
 
     setCommSelBoxCall(
         'boardId',
-        '/api/item/board/BOARD/Y',
+        '/api/item/board/post/Y',
         'POST',
         'ALL',
         selected,

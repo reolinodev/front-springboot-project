@@ -65,7 +65,7 @@ const setBoardBox = boardId => {
 
     setCommSelBox(
         'boardId',
-        '/api/item/board/FAQ/Y',
+        '/api/item/board/faq/Y',
         'POST',
         '',
         boardId,

@@ -1,8 +1,7 @@
-import {setBasicEditor, setBasicViewer} from '../module/editor';
-import {setCodeSelBox, setCommSelBox} from '../module/component';
-import {serializeFormJson} from '../module/json';
+import {setBasicViewer} from '../module/editor';
+import {setCommSelBox} from '../module/component';
 import {spinnerHide, spinnerShow} from '../module/spinner';
-import {callApi, callDelApi, callGetApi} from '../module/async';
+import {callGetApi} from '../module/async';
 
 const qnaId = $('#qnaId').val(); //게시글식별키
 const $qnaTitle = $('#qnaTitle');
@@ -83,7 +82,7 @@ const setBoardBox = boardId => {
 
     setCommSelBox(
         'boardId',
-        '/api/item/board/QNA/Y',
+        '/api/item/board/qna/Y',
         'POST',
         '',
         boardId,
