@@ -9,7 +9,7 @@ import {
 } from '../module/grid';
 import {checkDuplicateList, checkNullList} from '../module/validation';
 import {spinnerHide, spinnerShow} from '../module/spinner';
-import {callApi, callGetApi} from '../module/async';
+import {callApi, callApiWithoutBody} from '../module/async';
 
 let page = new Page(1, false, 10, 0);
 let grid;
@@ -258,8 +258,12 @@ const saveGrpError = response => {
 const getCodeGrpData = codeGrpId => {
     spinnerShow();
 
-    const url = `/api/codeGrp/${codeGrpId}`;
-    callGetApi(url, getCodeGrpDataSuccess, getCodeGrpDataError);
+    callApiWithoutBody(
+        `/api/codeGrp/${codeGrpId}`,
+        'GET',
+        getCodeGrpDataSuccess,
+        getCodeGrpDataError
+    );
 };
 
 /**
@@ -348,8 +352,12 @@ const search = codeGrpId => {
 
     spinnerShow();
 
-    const url = `/api/code/${codeGrpId}`;
-    callGetApi(url, searchSuccess, searchError);
+    callApiWithoutBody(
+        `/api/code/${codeGrpId}`,
+        'GET',
+        searchSuccess,
+        searchError
+    );
 };
 
 /**

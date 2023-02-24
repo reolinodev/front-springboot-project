@@ -3,7 +3,7 @@ import Page, {setPagination} from '../module/pagination';
 import {setBasicGrid, setGridClickEvent} from '../module/grid';
 import {serializeFormJson} from '../module/json';
 import {spinnerHide, spinnerShow} from '../module/spinner';
-import {callApi, callGetApi} from '../module/async';
+import {callApi, callApiWithoutBody} from '../module/async';
 
 let page = new Page(1, false, 10, 0);
 let grid;
@@ -123,8 +123,12 @@ const setGridLayout = () => {
 const getBoardData = boardId => {
     spinnerShow();
 
-    const url = `/api/board/${boardId}`;
-    callGetApi(url, getBoardDataSuccess, getBoardDataError);
+    callApiWithoutBody(
+        `/api/board/${boardId}`,
+        'GET',
+        getBoardDataSuccess,
+        getBoardDataError
+    );
 };
 
 /**
@@ -310,8 +314,12 @@ const setAuth = (type, authList) => {
     selectedType = type;
     selectedAuthList = authList;
 
-    const url = `/api/item/auth/use-yn/Y`;
-    callGetApi(url, setAuthSuccess, setAuthError);
+    callApiWithoutBody(
+        `/api/item/auth/use-yn/Y`,
+        'GET',
+        setAuthSuccess,
+        setAuthError
+    );
 };
 
 /**

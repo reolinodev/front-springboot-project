@@ -1,7 +1,7 @@
 import {setBasicViewer} from '../module/editor';
 import {setCommSelBox} from '../module/component';
 import {spinnerHide, spinnerShow} from '../module/spinner';
-import {callGetApi} from '../module/async';
+import {callApiWithoutBody} from '../module/async';
 
 const qnaId = $('#qnaId').val(); //게시글식별키
 const $qnaTitle = $('#qnaTitle');
@@ -18,8 +18,7 @@ const $mainText = $('#mainText');
  */
 const search = () => {
     spinnerShow();
-    const url = `/api/qna/${qnaId}`;
-    callGetApi(url, searchSuccess, searchError);
+    callApiWithoutBody(`/api/qna/${qnaId}`, 'GET', searchSuccess, searchError);
 };
 
 /**

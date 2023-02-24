@@ -1,7 +1,7 @@
 import {setBasicViewer} from '../module/editor';
 import {setCodeSelBox, setCommSelBox} from '../module/component';
 import {spinnerHide, spinnerShow} from '../module/spinner';
-import {callGetApi} from '../module/async';
+import {callApiWithoutBody} from '../module/async';
 
 const userId = window.sessionStorage.getItem('userId'); //사용자식별키
 const postId = $('#postId').val(); //게시글식별키
@@ -17,8 +17,12 @@ const $createdId = $('#createdId'); //작성자식별키
  */
 const search = () => {
     spinnerShow();
-    const url = `/api/post/${postId}`;
-    callGetApi(url, searchSuccess, searchError);
+    callApiWithoutBody(
+        `/api/post/${postId}`,
+        'GET',
+        searchSuccess,
+        searchError
+    );
 };
 
 /**

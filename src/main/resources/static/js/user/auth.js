@@ -4,7 +4,7 @@ import {serializeFormJson} from '../module/json';
 import {setBasicGrid, setGridClickEvent} from '../module/grid';
 import {checkKr} from '../module/validation';
 import {spinnerHide, spinnerShow} from '../module/spinner';
-import {callApi, callGetApi} from '../module/async';
+import {callApi, callApiWithoutBody} from '../module/async';
 
 let page = new Page(1, false, 10, 0);
 let grid;
@@ -185,8 +185,12 @@ const saveError = response => {
 const getAuthData = authId => {
     spinnerShow();
 
-    const url = `/api/auth/${authId}`;
-    callGetApi(url, getAuthDataSuccess, getAuthDataError);
+    callApiWithoutBody(
+        `/api/auth/${authId}`,
+        'GET',
+        getAuthDataSuccess,
+        getAuthDataError
+    );
 };
 
 /**

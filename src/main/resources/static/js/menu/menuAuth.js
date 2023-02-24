@@ -2,7 +2,7 @@ import {setBasicTree} from '../module/tree';
 import {focustGridFirstRow, setBasicGrid} from '../module/grid';
 import {spinnerHide, spinnerShow} from '../module/spinner';
 import {setCodeSelBoxCall} from '../module/component';
-import {callApi, callGetApi} from '../module/async';
+import {callApi, callApiWithoutBody} from '../module/async';
 
 let tree;
 let grid;
@@ -16,8 +16,12 @@ const $menuId = $('#menuId'); //메뉴식별키
 const search = () => {
     spinnerShow();
 
-    const url = `/api/menu/tree/${$authRole.val()}`;
-    callGetApi(url, searchSuccess, searchError);
+    callApiWithoutBody(
+        `/api/menu/tree/${$authRole.val()}`,
+        'GET',
+        searchSuccess,
+        searchError
+    );
 };
 
 /**
@@ -113,8 +117,12 @@ const setAuthData = menuId => {
 const getAuthData = () => {
     spinnerShow();
 
-    const url = `/api/menuAuth/${$menuId.val()}`;
-    callGetApi(url, getAuthDataSuccess, getAuthDataError);
+    callApiWithoutBody(
+        `/api/menuAuth/${$menuId.val()}`,
+        'GET',
+        getAuthDataSuccess,
+        getAuthDataError
+    );
 };
 
 /**

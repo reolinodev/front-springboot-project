@@ -4,7 +4,7 @@ import {serializeFormJson} from '../module/json';
 import {setBasicGrid, setGridClickEvent} from '../module/grid';
 import {checkKr} from '../module/validation';
 import {spinnerHide, spinnerShow} from '../module/spinner';
-import {callApi, callGetApi} from '../module/async';
+import {callApi, callApiWithoutBody} from '../module/async';
 
 //변수설정
 const $writeLoginId = $('#writeLoginId'); //사용자등록 - 로그인아이디
@@ -192,8 +192,12 @@ const saveError = response => {
 const getUserData = userId => {
     spinnerShow();
 
-    const url = `/api/user/${userId}`;
-    callGetApi(url, getUserDataSuccess, getUserDataError);
+    callApiWithoutBody(
+        `/api/user/${userId}`,
+        'GET',
+        getUserDataSuccess,
+        getUserDataError
+    );
 };
 
 /**
@@ -276,8 +280,12 @@ const updateError = response => {
 const lockClear = () => {
     spinnerShow();
 
-    const url = `/api/user/pw-fail-cnt/${$editUserId.val()}`;
-    callGetApi(url, lockClearSuccess, lockClearError);
+    callApiWithoutBody(
+        `/api/user/pw-fail-cnt/${$editUserId.val()}`,
+        'GET',
+        lockClearSuccess,
+        lockClearError
+    );
 };
 
 /**

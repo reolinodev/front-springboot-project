@@ -2,7 +2,7 @@ import {setBasicEditor, setBasicViewer} from '../module/editor';
 import {setCodeSelBox, setCommSelBox} from '../module/component';
 import {serializeFormJson} from '../module/json';
 import {spinnerHide, spinnerShow} from '../module/spinner';
-import {callApi, callGetApi} from '../module/async';
+import {callApi, callApiWithoutBody} from '../module/async';
 
 let editor;
 let content = '';
@@ -22,8 +22,7 @@ const $mainText = $('#mainText');
  */
 const search = () => {
     spinnerShow();
-    const url = `/api/qna/${qnaId}`;
-    callGetApi(url, searchSuccess, searchError);
+    callApiWithoutBody(`/api/qna/${qnaId}`, 'GET', searchSuccess, searchError);
 };
 
 /**

@@ -19,12 +19,10 @@ export function pageRouter(url) {
 export function mainViewTokenInvalidate() {
     if (tokenAlert) {
         tokenAlert = false;
-        alert('인증토큰이 만료되었습니다. 로그인화면으로 이동합니다.');
+        alert('인증토큰이 만료되었습니다. 로그인화면으로 이동합니다');
         sessionStorage.clear();
-        const $frm = parent.$('#frm');
-        $frm.attr('action', '/login');
-        $frm.attr('method', 'get');
-        $frm.submit();
+
+        window.parent.location.href = '/';
     }
 }
 

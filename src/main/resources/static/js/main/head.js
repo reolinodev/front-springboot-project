@@ -1,14 +1,8 @@
 import {setCommSelBox} from '../module/component';
-import {
-    mainViewTokenInvalidate,
-    framePageRouter,
-    setAccessToken,
-} from '../module/router';
-import {getApi} from '../module/api';
-import {callApi, callGetApi} from '../module/async';
+import {framePageRouter} from '../module/router';
+import {callApi, callApiWithoutBody} from '../module/async';
 
 let mainUrl;
-const apiDomain = getApi();
 
 /**
  *  logout : 로그아웃
@@ -22,8 +16,12 @@ const logout = () => {
  * getUserData : 사용자 정보조회(토큰 내용 가져오기)
  */
 const getUserData = () => {
-    const url = '/api/main/user';
-    callGetApi(url, getUserDataSuccess, getUserDataError);
+    callApiWithoutBody(
+        '/api/main/user',
+        'GET',
+        getUserDataSuccess,
+        getUserDataError
+    );
 };
 
 /**

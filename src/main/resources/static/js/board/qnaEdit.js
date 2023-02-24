@@ -2,7 +2,7 @@ import {setBasicEditor, setBasicViewer} from '../module/editor';
 import {setCodeSelBox, setCommSelBox} from '../module/component';
 import {serializeFormJson} from '../module/json';
 import {spinnerHide, spinnerShow} from '../module/spinner';
-import {callApi, callDelApi, callGetApi} from '../module/async';
+import {callApi, callApiWithoutBody} from '../module/async';
 
 const qnaId = $('#qnaId').val(); //게시글식별키
 const $qnaTitle = $('#qnaTitle');
@@ -22,8 +22,7 @@ let editor;
  */
 const search = () => {
     spinnerShow();
-    const url = `/api/qna/${qnaId}`;
-    callGetApi(url, searchSuccess, searchError);
+    callApiWithoutBody(`/api/qna/${qnaId}`, 'GET', searchSuccess, searchError);
 };
 
 /**
@@ -120,7 +119,12 @@ const saveError = response => {
 };
 
 const deleteProc = () => {
-    callDelApi(`/api/qna/${qnaId}`, deleteProcSuccess, deleteProcError);
+    callApiWithoutBody(
+        `/api/qna/${qnaId}`,
+        'DELETE',
+        deleteProcSuccess,
+        deleteProcError
+    );
 };
 
 /**

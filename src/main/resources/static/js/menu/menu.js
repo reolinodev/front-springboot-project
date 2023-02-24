@@ -6,7 +6,7 @@ import {
 import {setBasicTree} from '../module/tree';
 import {checkKr} from '../module/validation';
 import {spinnerHide, spinnerShow} from '../module/spinner';
-import {callApi, callGetApi} from '../module/async';
+import {callApi, callApiWithoutBody} from '../module/async';
 
 let tree;
 
@@ -28,8 +28,12 @@ const $menuType2 = $('#menuType2 '); //메뉴타입 - 게시판
  */
 const search = () => {
     spinnerShow();
-    const url = `/api/menu/tree/${$authRole.val()}`;
-    callGetApi(url, searchSuccess, searchError);
+    callApiWithoutBody(
+        `/api/menu/tree/${$authRole.val()}`,
+        'GET',
+        searchSuccess,
+        searchError
+    );
 };
 
 /**
@@ -86,8 +90,12 @@ const setMenuTree = list => {
 const getMenuData = menuId => {
     spinnerShow();
 
-    const url = `/api/menu/${menuId}`;
-    callGetApi(url, getMenuDataSuccess, getMenuDataError);
+    callApiWithoutBody(
+        `/api/menu/${menuId}`,
+        'GET',
+        getMenuDataSuccess,
+        getMenuDataError
+    );
 };
 
 /**

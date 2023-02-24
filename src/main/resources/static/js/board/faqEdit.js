@@ -2,7 +2,7 @@ import {setBasicEditor} from '../module/editor';
 import {setCodeSelBox, setCommSelBox} from '../module/component';
 import {serializeFormJson} from '../module/json';
 import {spinnerHide, spinnerShow} from '../module/spinner';
-import {callApi, callGetApi} from '../module/async';
+import {callApi, callApiWithoutBody} from '../module/async';
 
 let editor;
 
@@ -18,8 +18,7 @@ const returnUrl = '/page/board/faq/list/back';
  */
 const search = () => {
     spinnerShow();
-    const url = `/api/faq/${faqId}`;
-    callGetApi(url, searchSuccess, searchError);
+    callApiWithoutBody(`/api/faq/${faqId}`, 'GET', searchSuccess, searchError);
 };
 
 /**

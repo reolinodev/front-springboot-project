@@ -2,7 +2,7 @@ import {setBasicEditor} from '../module/editor';
 import {setCodeSelBox, setCommSelBox} from '../module/component';
 import {serializeFormJson} from '../module/json';
 import {spinnerHide, spinnerShow} from '../module/spinner';
-import {callApi, callGetApi} from '../module/async';
+import {callApi, callApiWithoutBody} from '../module/async';
 
 let editor;
 const $postId = $('#postId'); //게시글식별키
@@ -14,8 +14,12 @@ const postType = $('#postType').val();
  */
 const search = () => {
     spinnerShow();
-    const url = `/api/post/${$postId.val()}`;
-    callGetApi(url, searchSuccess, searchError);
+    callApiWithoutBody(
+        `/api/post/${$postId.val()}`,
+        'GET',
+        searchSuccess,
+        searchError
+    );
 };
 
 /**

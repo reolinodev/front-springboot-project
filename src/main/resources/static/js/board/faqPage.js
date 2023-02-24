@@ -2,7 +2,7 @@ import Page, {setPagination} from '../module/pagination';
 import {setBasicGrid, setGridClickRowEvent} from '../module/grid';
 import {serializeFormJson} from '../module/json';
 import {spinnerHide, spinnerShow} from '../module/spinner';
-import {callApi, callGetApi} from '../module/async';
+import {callApi, callApiWithoutBody} from '../module/async';
 import {setBasicViewer} from '../module/editor';
 
 let page = new Page(1, false, 10, 0);
@@ -112,8 +112,12 @@ const faqView = rowData => {
  */
 const getFaqData = faqId => {
     spinnerShow();
-    const url = `/api/faq/${faqId}`;
-    callGetApi(url, getFaqDataSuccess, getFaqDataError);
+    callApiWithoutBody(
+        `/api/faq/${faqId}`,
+        'GET',
+        getFaqDataSuccess,
+        getFaqDataError
+    );
 };
 
 /**
