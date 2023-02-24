@@ -17,7 +17,7 @@ const $menuNm = $('#menuNm'); //메뉴명
 const $url = $('#url'); //url
 const $useYn = $('#useYn'); //사용여부
 const $ord = $('#ord'); //순서
-const $boardId = $('#boardId'); //게시판식별키
+const $boardVal = $('#boardVal'); //게시판식별키
 const $mainYn = $('#mainYn'); //메인여부
 const $prnMenuId = $('#prnMenuId'); //상위메뉴
 const $menuType1 = $('#menuType1'); //메뉴타입 - 도메인
@@ -121,16 +121,14 @@ const setMenuData = data => {
 
     if (data.menu_type === 'URL') {
         $menuType1.prop('checked', true);
-        $boardId.val('');
-        $boardId.hide();
+        $menuType2.prop('checked', false);
+        $boardVal.val('');
+        $boardVal.hide();
     } else {
+        $menuType1.prop('checked', false);
         $menuType2.prop('checked', true);
-        const url = data.url;
-        const boardId = url.substring(url.lastIndexOf('/') + 1);
-        if (boardId !== '') {
-            $boardId.val(boardId);
-        }
-        $boardId.show();
+        $boardVal.val(data.board_val);
+        $boardVal.show();
     }
 
     if (data.main_yn === 'Y') {
@@ -219,6 +217,7 @@ const save = () => {
         ord: $ord.val(),
         main_yn: mainYn,
         auth_role: $authRole.val(),
+        board_val: $boardVal.val(),
     };
 
     callApi(url, type, params, saveSuccess, saveError);
@@ -287,6 +286,10 @@ const initSelectBox = () => {
 
     setCodeSelBox('menuLv', 'MENU_LV', '', 'Y');
 
+    setBoardBox('');
+};
+
+const setBoardBox = selected => {
     const option = {
         oTxt: 'board_title',
         oVal: 'board_val',
@@ -295,11 +298,11 @@ const initSelectBox = () => {
     const params = {};
 
     setCommSelBox(
-        'boardId',
+        'boardVal',
         '/api/item/board/ALL/Y',
         'POST',
         'SEL',
-        '',
+        selected,
         params,
         option
     );
@@ -369,22 +372,22 @@ $(document).ready(() => {
     $("input[name='menu_type']").change(() => {
         const menuType = $("input[name='menu_type']:checked").val();
         $url.val('');
-        $boardId.val('');
+        $boardVal.val('');
         if (menuType === 'URL') {
-            $boardId.hide();
+            $boardVal.hide();
         } else {
-            $boardId.show();
+            $boardVal.show();
         }
     });
 
     // 게시판식별키 변경 이벤트
-    $('#boardId').change(() => {
-        const boardId = $boardId.val();
+    $('#boardVal').change(() => {
+        const boardId = $boardVal.val();
 
         if (boardId !== '') {
             const arr = boardId.split('/');
             const boardIdStr = arr[0];
-            const boardTypeStr = arr[1].toLowerCase();
+            const boardTypeStr = arr[1];
 
             $('#url').val(
                 `/page/board/${boardTypeStr}/list/init/` + boardIdStr

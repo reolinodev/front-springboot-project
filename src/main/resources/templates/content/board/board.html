@@ -12,6 +12,8 @@
 <div layout:fragment="content" id="container">
     <!-- 조회 화면 -->
     <form id="boardViewFrm" name="boardViewFrm">
+        <input type="hidden" id="pagePer" name="page_per" th:value="10"/>
+
         <div class="card">
             <div class="card-body">
                 <div class="row">
@@ -48,8 +50,6 @@
             </div>
         </div>
     </form>
-
-    <input type="hidden" id="pagePer" name="page_per" th:value="10"/>
 
     <!-- 그리드 영역-->
     <div id="grid"></div>

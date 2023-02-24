@@ -88,19 +88,10 @@ const searchSuccess = result => {
         page.totalCount = result.total;
         grid.resetData(gridData);
 
-        setGridClickEvent(grid, 'faq_title', 'faq_id', faqView);
-
-        if (status === 'init') {
-            if (page.pageInit === false) {
-                pagination.reset(result.total);
-                page.pageInit = true;
-            }
-        } else {
-            if (page.pageInit === false) {
-                page.pageInit = true;
-                pagination.reset(result.total);
-                pagination.movePageTo(sessionParam.current_page);
-            }
+        if (page.pageInit === false) {
+            pagination.reset(result.total);
+            page.pageInit = true;
+            setGridClickEvent(grid, 'faq_title', 'faq_id', faqView);
         }
     }
 
@@ -144,7 +135,17 @@ const setBoardBoxCall = (selected, callback) => {
 };
 
 const setUseYnCall = () => {
-    setCodeSelBoxCall('useYn', 'USE_YN', 'ALL', sessionParam.use_yn, search);
+    setCodeSelBoxCall(
+        'useYn',
+        'USE_YN',
+        'ALL',
+        sessionParam.use_yn,
+        setMoveToPagination
+    );
+};
+
+const setMoveToPagination = () => {
+    pagination.movePageTo(sessionParam.current_page);
 };
 
 $(document).ready(() => {

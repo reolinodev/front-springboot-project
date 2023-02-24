@@ -11,6 +11,8 @@
 
 <div layout:fragment="content" id="container">
     <form name="authViewFrm">
+        <input type="hidden" id="pagePer" name="page_per" th:value="10"/>
+
         <div class="card">
             <div class="card-body">
                 <div class="row">
@@ -45,8 +47,6 @@
             </div>
         </div>
     </form>
-
-    <input type="hidden" id="pagePer" name="page_per" th:value="10"/>
 
     <!-- 그리드 영역-->
     <div id="grid"></div>

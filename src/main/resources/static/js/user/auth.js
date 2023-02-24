@@ -93,9 +93,8 @@ const searchSuccess = result => {
     page.totalCount = result.total;
     grid.resetData(gridData);
 
-    setGridClickEvent(grid, 'auth_val', 'auth_id', getAuthData);
-
     if (page.pageInit === false) {
+        setGridClickEvent(grid, 'auth_val', 'auth_id', getAuthData);
         pagination.reset(result.total);
         page.pageInit = true;
     }

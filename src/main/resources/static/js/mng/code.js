@@ -8,7 +8,6 @@ import {
     setGridClickEvent,
 } from '../module/grid';
 import {checkDuplicateList, checkNullList} from '../module/validation';
-import {mainViewTokenInvalidate, setAccessToken} from '../module/router';
 import {spinnerHide, spinnerShow} from '../module/spinner';
 import {callApi, callGetApi} from '../module/async';
 
@@ -60,10 +59,14 @@ const searchGrpSuccess = result => {
         if (page.pageInit === false) {
             pagination.reset(result.total);
             page.pageInit = true;
+            setGridClickEvent(grid, 'code_grp_nm', 'code_grp_id', search);
+            setGridClickEvent(
+                grid,
+                'code_grp_val',
+                'code_grp_id',
+                getCodeGrpData
+            );
         }
-
-        setGridClickEvent(grid, 'code_grp_nm', 'code_grp_id', search);
-        setGridClickEvent(grid, 'code_grp_val', 'code_grp_id', getCodeGrpData);
     }
     spinnerHide();
 };
