@@ -1,5 +1,5 @@
 import {setBasicViewer} from '../module/editor';
-import {setCodeSelBox, setCommSelBox} from '../module/component';
+import {setCommSelBox} from '../module/component';
 import {spinnerHide, spinnerShow} from '../module/spinner';
 import {callApiWithoutBody} from '../module/async';
 
@@ -52,8 +52,6 @@ const setPostData = data => {
     $createdId.val(data.created_id);
 
     setBasicViewer('viewer', data.main_text);
-
-    setCodeSelBox('useYn', 'USE_YN', '', data.use_yn);
 
     $('#boardId').prop('disabled', true);
 
