@@ -1,6 +1,10 @@
 import {getApi} from './api';
 import {mainViewTokenInvalidate, setAccessToken} from './router';
 
+/*
+ * callApiWithoutToken
+ * : 토큰 없이 API를 호출
+ */
 export function callApiWithoutToken(
     url,
     type,
@@ -32,6 +36,10 @@ export function callApiWithoutToken(
     });
 }
 
+/*
+ * callApi
+ * : API를 호출(Body가 있는 경우)
+ */
 export function callApi(url, type, params, successCallback, errorCallback) {
     const apiDomain = getApi();
     const accessToken = localStorage.getItem('accessToken');
@@ -61,6 +69,10 @@ export function callApi(url, type, params, successCallback, errorCallback) {
     });
 }
 
+/*
+ * callApiWithoutBody
+ * : API를 호출(Body가 없는 경우)
+ */
 export function callApiWithoutBody(url, type, successCallback, errorCallback) {
     const apiDomain = getApi();
     const accessToken = localStorage.getItem('accessToken');

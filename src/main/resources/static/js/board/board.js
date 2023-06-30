@@ -16,6 +16,9 @@ const $writeMsg = $('#writeMsg');
 const $writeAuthArea = $('#writeAuthArea');
 
 const $editBoardTitle = $('#editBoardTitle');
+const $editBoardType = $('#editBoardType');
+const $editBoardTypeCd = $('#editBoardTypeCd');
+
 const $editUseYn = $('#editUseYn');
 const $editBoardId = $('#editBoardId');
 const $editMemo = $('#editMemo');
@@ -161,10 +164,22 @@ const setBoardData = (data, authList) => {
     $editBoardId.val(data.board_id);
     $editUpdatedNm.val(data.updated_nm);
     $editUpdatedAt.val(data.updated_at);
+    $editBoardTypeCd.val(data.board_type);
 
     setAuth('edit', authList);
 
     $('#editBoardType').prop('disabled', true);
+
+    $('#editAuthAll').click(function () {
+        if (
+            $('#editAuthAll').is(':checked') &&
+            $editBoardType.val() === 'post'
+        ) {
+            $('#boardEditFrm input[name=auth_id]').prop('checked', true);
+        } else {
+            $('#boardEditFrm input[name=auth_id]').prop('checked', false);
+        }
+    });
 
     window.$('#boardEdit').modal('show');
 };
@@ -326,8 +341,6 @@ const setAuth = (type, authList) => {
  *  setAuthSuccess : setAuth successCallback
  */
 const setAuthSuccess = result => {
-    console.log('sadfasdf', selectedAuthList);
-
     if (result.header.result_code === 'ok') {
         const dataList = result.data;
         let str = '';
@@ -373,6 +386,11 @@ const setAuthSuccess = result => {
             }
         }
     }
+
+    if ($editBoardTypeCd.val() !== 'post') {
+        $('#boardEditFrm input[name=auth_id]').prop('disabled', true);
+    }
+
     spinnerHide();
 };
 
@@ -422,19 +440,25 @@ $(document).ready(() => {
         update();
     });
 
-    $('#writeAuthAll').click(function () {
-        if ($('#writeAuthAll').is(':checked')) {
-            $('#boardWriteFrm input[name=auth_id]').prop('checked', true);
+    $writeBoardType.change(() => {
+        $('#boardWriteFrm input[name=auth_id]').prop('checked', false);
+        $('#writeAuthAll').prop('checked', false);
+
+        if ($writeBoardType.val() !== 'post') {
+            $('#boardWriteFrm input[name=auth_id]').prop('disabled', true);
         } else {
-            $('#boardWriteFrm input[name=auth_id]').prop('checked', false);
+            $('#boardWriteFrm input[name=auth_id]').prop('disabled', false);
         }
     });
 
-    $('#editAuthAll').click(function () {
-        if ($('#editAuthAll').is(':checked')) {
-            $('#boardEditFrm input[name=auth_id]').prop('checked', true);
+    $('#writeAuthAll').click(function () {
+        if (
+            $('#writeAuthAll').is(':checked') &&
+            $writeBoardType.val() === 'post'
+        ) {
+            $('#boardWriteFrm input[name=auth_id]').prop('checked', true);
         } else {
-            $('#boardEditFrm input[name=auth_id]').prop('checked', false);
+            $('#boardWriteFrm input[name=auth_id]').prop('checked', false);
         }
     });
 
