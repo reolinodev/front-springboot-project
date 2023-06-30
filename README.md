@@ -12,8 +12,11 @@ Maven 프로젝트인 만큼 pom.xml에 있는 라이브러리를 다운로드 �
 - [1.WEBPACK](https://github.com/reolinodev/front-springboot-project/tree/1.WEBPACK)
   : webpack, eslint, prettier 등이 설정된 초기 세팅입니다.
 
-- [2.ADMIN_FRONT](업데이트 예정)
-  : 간단한 웹포탈 예제화면입니다.
+- [2.ADMIN_FRONT](https://github.com/reolinodev/front-springboot-project/tree/2.ADMIN-WEBPACK)
+  : 간단한 웹포탈 예제화면입니다. 포탈의 기본적인 기능을 구현하였습니다.
+
+- [Backend](https://github.com/reolinodev/back-springboot-project/tree/4.ADMIN-JWT)
+  : 웹포탈의 백엔드 입니다. 
 
 
 
