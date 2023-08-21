@@ -19,13 +19,13 @@ const save = () => {
     let msg = '';
 
     if ($boardId.val() === '') {
-        msg = '게시판을 선택하세요';
+        msg = '게시판을 선택하세요.';
         alert(msg);
         $boardId.focus();
         return;
     }
     if ($postTitle.val() === '') {
-        msg = '제목을 입력하세요..';
+        msg = '제목을 입력하세요.';
         alert(msg);
         $postTitle.focus();
         return;
@@ -48,7 +48,7 @@ const save = () => {
  *  saveSuccess : save successCallback
  */
 const saveSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         alert(result.header.message);
         spinnerHide();
         location.href = returnPage();
@@ -63,8 +63,17 @@ const saveSuccess = result => {
  *  saveError : save errorCallback
  */
 const saveError = response => {
+
+    let errorMessage = '';
+    if(response["errorList"] !== undefined && response["errorList"].length !== 0){
+        errorMessage = response["errorList"][0].message;
+    }else{
+        errorMessage = response.message;
+    }
+
+    alert(errorMessage);
+
     spinnerHide();
-    alert(response.message);
 };
 
 const setBoardBox = () => {
@@ -75,15 +84,15 @@ const setBoardBox = () => {
     }
 
     const option = {
-        oTxt: 'board_title',
-        oVal: 'board_id',
+        oTxt: 'boardTitle',
+        oVal: 'boardId',
     };
 
     const params = {};
 
     setCommSelBox(
         'boardId',
-        '/api/item/board/post/Y',
+        '/api/item/board/POST',
         'POST',
         'SEL',
         boardId,

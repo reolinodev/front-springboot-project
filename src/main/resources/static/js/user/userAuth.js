@@ -15,23 +15,28 @@ let pagination;
 const setGridLayout = () => {
     // 헤더 생성
     const columns = [
-        {header: 'No', name: 'rnum', width: 100, align: 'center'},
         {
-            header: '권한식별키',
-            name: 'auth_id',
+            header: 'ID',
+            name: 'userAuthId',
+            align: 'center',
+            width: 50,
+        },
+        {
+            header: 'authId',
+            name: 'authId',
             align: 'center',
             hidden: true,
         },
         {
-            header: '사용자식별키',
-            name: 'user_id',
+            header: 'userId',
+            name: 'userId',
             align: 'center',
             hidden: true,
         },
-        {header: '권한구분', name: 'auth_role_nm', align: 'center'},
-        {header: '권한명', name: 'auth_nm', align: 'center'},
-        {header: '아이디', name: 'login_id', align: 'center'},
-        {header: '이름', name: 'user_nm', align: 'center'},
+        {header: '권한구분', name: 'authRoleLabel', align: 'center'},
+        {header: '권한명', name: 'authNm', align: 'center'},
+        {header: '아이디', name: 'loginId', align: 'center'},
+        {header: '이름', name: 'userNm', align: 'center'},
     ];
     // 데이터
     const gridData = [];
@@ -43,12 +48,12 @@ const setGridLayout = () => {
  * pagingCallback : 페이징 콜백
  */
 const pagingCallback = returnPage => {
-    page.currentPage = returnPage;
+    page.page = returnPage;
     search();
 };
 
 const pageInit = () => {
-    page = new Page(1, false, Number($('#pagePer').val()), 0);
+    page = new Page(1, false, Number($('#size').val()), 0);
 };
 
 /**
@@ -60,8 +65,8 @@ const search = () => {
     const url = '/api/userAuth';
     const type = 'POST';
     const params = serializeFormJson('authUserViewFrm');
-    params.current_page = page.currentPage;
-    params.page_per = page.pagePer;
+    params.page = page.page;
+    params.size = page.size;
 
     callApi(url, type, params, searchSuccess, searchError);
 };
@@ -73,11 +78,11 @@ const searchSuccess = result => {
     spinnerHide();
 
     const gridData = result.data;
-    page.totalCount = result.total;
+    page.totalCount = result.totalCount;
     grid.resetData(gridData);
 
     if (page.pageInit === false) {
-        pagination.reset(result.total);
+        pagination.reset(result.totalCount);
         page.pageInit = true;
     }
 
@@ -106,10 +111,10 @@ const userAuthDelete = () => {
         return;
     }
 
-    const userArr = [];
+    const userAuthArr = [];
 
     for (const obj of checkedRows) {
-        userArr.push(obj.user_id);
+        userAuthArr.push(obj.userAuthId);
     }
 
     spinnerShow();
@@ -117,8 +122,7 @@ const userAuthDelete = () => {
     const url = '/api/userAuth';
     const type = 'DELETE';
     const params = {
-        auth_id: $('#viewAuthId').val(),
-        user_arr: userArr,
+        userAuthArr: userAuthArr,
     };
 
     callApi(url, type, params, userAuthDeleteSuccess, userAuthDeleteError);
@@ -128,7 +132,7 @@ const userAuthDelete = () => {
  *  userAuthDelete : userAuthDelete successCallback
  */
 const userAuthDeleteSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header.resultCode === 'ok') {
         alert(result.header.message);
         pageInit();
         search();
@@ -151,12 +155,12 @@ const userAuthDeleteError = response => {
 const setAuthIdSelBox = () => {
     const params = {};
     const option = {
-        oTxt: 'auth_nm',
-        oVal: 'auth_id',
+        oTxt: 'authNm',
+        oVal: 'authId',
     };
     setCommSelBoxCall(
         'viewAuthId',
-        `/api/item/auth/auth-role/${$('#viewAuthRole').val()}`,
+        `/api/item/auth/auth-roles/${$('#viewAuthRole').val()}`,
         'POST',
         'ALL',
         '',

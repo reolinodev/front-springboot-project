@@ -19,7 +19,7 @@ const $authId = $('#authId'); //권한식별키
 
 // 페이징 초기화
 const pageInit = () => {
-    page = new Page(1, false, Number($('#pagePer').val()), 0);
+    page = new Page(1, false, Number($('#size').val()), 0);
 };
 
 /**
@@ -27,10 +27,10 @@ const pageInit = () => {
  */
 const search = () => {
     const params = serializeFormJson('userAuthWriteFrm');
-    params.current_page = page.currentPage;
-    params.page_per = page.pagePer;
+    params.page = page.page;
+    params.size = page.size;
 
-    if (params.auth_id === '') {
+    if (params.authId === '') {
         alert('권한을 선택하세요.');
         return;
     }
@@ -48,11 +48,11 @@ const search = () => {
  */
 const searchSuccess = result => {
     const gridData = result.data;
-    page.totalCount = result.total;
+    page.totalCount = result.totalCount;
     grid.resetData(gridData);
 
     if (page.pageInit === false) {
-        pagination.reset(result.total);
+        pagination.reset(result.totalCount);
         page.pageInit = true;
     }
 
@@ -72,10 +72,10 @@ const searchError = response => {
  */
 const setGridLayout = () => {
     const columns = [
-        {header: 'SEQ', name: 'user_id', align: 'center', hidden: true},
-        {header: '아이디', name: 'login_id', align: 'center'},
-        {header: '이름', name: 'user_nm', align: 'center'},
-        {header: '휴대폰번호', name: 'tel_no', align: 'center'},
+        {header: 'SEQ', name: 'userId', align: 'center', hidden: true},
+        {header: '아이디', name: 'loginId', align: 'center'},
+        {header: '이름', name: 'userNm', align: 'center'},
+        {header: '휴대폰번호', name: 'telNo', align: 'center'},
     ];
     const gridData = [];
 
@@ -87,10 +87,10 @@ const setGridLayout = () => {
  */
 const setGridLayout2 = () => {
     const columns = [
-        {header: 'SEQ', name: 'user_id', align: 'center', hidden: true},
-        {header: '아이디', name: 'login_id', align: 'center'},
-        {header: '이름', name: 'user_nm', align: 'center'},
-        {header: '휴대폰번호', name: 'tel_no', align: 'center'},
+        {header: 'SEQ', name: 'userId', align: 'center', hidden: true},
+        {header: '아이디', name: 'loginId', align: 'center'},
+        {header: '이름', name: 'userNm', align: 'center'},
+        {header: '휴대폰번호', name: 'telNo', align: 'center'},
     ];
     const gridData = [];
     return setCheckBoxGridId(columns, gridData, 'grid2');
@@ -100,7 +100,7 @@ const setGridLayout2 = () => {
  * pagingCallback : 페이징 콜백
  */
 const pagingCallback = returnPage => {
-    page.currentPage = returnPage;
+    page.page = returnPage;
     search();
 };
 
@@ -141,7 +141,7 @@ const removeDuplicateItem = data => {
     let uniqueData;
     uniqueData = data.filter(
         (character, idx, arr) =>
-            arr.findIndex(item => item.user_id === character.user_id) === idx
+            arr.findIndex(item => item.userId === character.userId) === idx
     );
 
     return uniqueData;
@@ -174,12 +174,12 @@ const save = () => {
     const userArr = [];
 
     for (const obj of selectedData) {
-        userArr.push(obj.user_id);
+        userArr.push(obj.userId);
     }
 
     const params = {
-        auth_id: $('#authId').val(),
-        user_arr: userArr,
+        authId: $('#authId').val(),
+        userArr: userArr,
     };
 
     const url = '/api/userAuth';
@@ -192,7 +192,7 @@ const save = () => {
  *  saveSuccess : save successCallback
  */
 const saveSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header.resultCode === 'ok') {
         alert(result.header.message);
         refreshSearch();
     }
@@ -225,12 +225,12 @@ const refreshSearch = () => {
 const setAuthIdSelBox = () => {
     const params = {};
     const option = {
-        oTxt: 'auth_nm',
-        oVal: 'auth_id',
+        oTxt: 'authNm',
+        oVal: 'authId',
     };
     setCommSelBox(
         'authId',
-        `/api/item/auth/auth-role/${$('#authRole').val()}`,
+        `/api/item/auth/auth-roles/${$('#authRole').val()}`,
         'POST',
         'SEL',
         '',
@@ -283,9 +283,18 @@ $(document).ready(() => {
         location.href = '/page/user/userAuth';
     });
 
-    const searchStrInput = document.getElementById('searchStr');
+    const loginId = document.getElementById('loginId');
 
-    searchStrInput.addEventListener('keyup', function (event) {
+    loginId.addEventListener('keyup', function (event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            document.getElementById('searchBtn').click();
+        }
+    });
+
+    const userNm = document.getElementById('userNm');
+
+    userNm.addEventListener('keyup', function (event) {
         if (event.keyCode === 13) {
             event.preventDefault();
             document.getElementById('searchBtn').click();

@@ -25,7 +25,7 @@ const search = () => {
  *  searchSuccess : search successCallback
  */
 const searchSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         setFaqData(result.data);
     }
     spinnerHide();
@@ -40,31 +40,31 @@ const searchError = response => {
 };
 
 const setFaqData = data => {
-    setBoardBox(data.board_id);
+    setBoardBox(data.boardId);
 
-    $faqTitle.val(data.faq_title);
-    $createdNm.val(data.created_nm);
-    $createdAt.val(data.created_at);
-    $createdId.val(data.created_id);
+    $faqTitle.val(data.faqTitle);
+    $createdNm.val(data.createdIdLabel);
+    $createdAt.val(data.createdAtLabel);
+    $createdId.val(data.createdId);
 
-    editor = setBasicEditor('editor', data.main_text, 500);
+    editor = setBasicEditor('editor', data.mainText, 500);
 
-    setCodeSelBox('useYn', 'USE_YN', '', data.use_yn);
+    setCodeSelBox('useYn', 'USE_YN', '', data.useYn);
 
     $('#boardId').prop('disabled', true);
 };
 
 const setBoardBox = boardId => {
     const option = {
-        oTxt: 'board_title',
-        oVal: 'board_id',
+        oTxt: 'boardTitle',
+        oVal: 'boardId',
     };
 
     const params = {};
 
     setCommSelBox(
         'boardId',
-        '/api/item/board/faq/Y',
+        '/api/item/board/FAQ',
         'POST',
         '',
         boardId,
@@ -98,7 +98,7 @@ const update = () => {
  *  updateSuccess : update successCallback
  */
 const updateSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         alert(result.header.message);
         location.href = returnUrl;
     } else {
@@ -113,7 +113,14 @@ const updateSuccess = result => {
  */
 const updateError = response => {
     spinnerHide();
-    alert(response.message);
+
+    let errorMessage;
+    if(response["errorList"] !== undefined && response["errorList"].length !== 0){
+        errorMessage = response["errorList"][0].message;
+    }else{
+        errorMessage = response.message;
+    }
+    alert(errorMessage);
 };
 
 $(document).ready(() => {

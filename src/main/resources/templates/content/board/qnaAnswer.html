@@ -19,18 +19,18 @@
         <form id="qnaEditFrm" name="qnaAnswerFrm" class="form-horizontal">
             <div class="card-body">
 
-                <input type="hidden" class="form-control" id="qnaId" name="qna_id" th:value="${qna_id}">
+                <input type="hidden" class="form-control" id="qnaId" name="qnaId" th:value="${qnaId}">
 
                 <div class="form-group row">
                     <label for="boardId" class="col-sm-1 col-form-label">게시판</label>
                     <div class="col-sm-5">
-                        <select class="custom-select rounded-0" id="boardId" name="board_id"></select>
+                        <select class="custom-select rounded-0" id="boardId" name="boardId"></select>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="qnaTitle" class="col-sm-1 col-form-label">제목</label>
                     <div class="col-sm-11">
-                        <input type="text" class="form-control" id="qnaTitle" name="qna_title" placeholder="제목을 입력하세요." readonly>
+                        <input type="text" class="form-control" id="qnaTitle" name="qnaTitle" placeholder="제목을 입력하세요." readonly>
                     </div>
                 </div>
 
@@ -63,12 +63,13 @@
                 <div class="form-group row">
                     <label for="useYn" class="col-sm-1 col-form-label">사용여부</label>
                     <div class="col-sm-3">
-                        <select class="custom-select rounded-0" id="useYn" name="use_yn"></select>
+                        <select class="custom-select rounded-0" id="useYn" name="useYn"></select>
                     </div>
                     <label for="hiddenYn" class="col-sm-1 col-form-label">공개여부</label>
                     <div class="col-sm-3">
-                        <select class="custom-select rounded-0" id="hiddenYn" name="hidden_yn"></select>
+                        <select class="custom-select rounded-0" id="hiddenYn" name="hiddenYn" disabled></select>
                     </div>
+                    <input type="hidden" class="form-control" id="qnaPw">
                 </div>
                 <div class="form-group row">
                     <label for="questions" class="col-sm-1 col-form-label">문의</label>
@@ -79,7 +80,7 @@
                 </div>
                 <div class="form-group row">
                     <label for="mainText" class="col-sm-1 col-form-label">답변</label>
-                    <textarea id="mainText" name="main_text" style="display: none" ></textarea>
+                    <textarea id="mainText" name="mainText" style="display: none" ></textarea>
                     <div class="col-sm-11">
                         <div id="editor"></div>
                     </div>
@@ -87,6 +88,9 @@
             </div>
             <div class="card-footer">
                 <div class="row justify-content-end">
+                    <div class="col-2">
+                        <button type="button" class="btn btn-block btn-warning" id="qnaPwBtn">비밀번호 초기화</button>
+                    </div>
                     <div class="col-2">
                         <button type="button" class="btn btn-block btn-default" id="backBtn">뒤로가기</button>
                     </div>

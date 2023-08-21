@@ -13,38 +13,38 @@ const logout = () => {
 };
 
 /**
- * getUserData : 사용자 정보조회(토큰 내용 가져오기)
+ * getUser : 사용자 정보조회(토큰 내용 가져오기)
  */
-const getUserData = () => {
+const getUser = () => {
     callApiWithoutBody(
         '/api/main/user',
         'GET',
-        getUserDataSuccess,
-        getUserDataError
+        getUserSuccess,
+        getUserError
     );
 };
 
 /**
- *  getUserDataSuccess : getUserData successCallback
+ *  getUserSuccess : getUser successCallback
  *  :
  */
-const getUserDataSuccess = result => {
+const getUserSuccess = result => {
     const data = result.data;
 
-    $('#userNm').html(data.user_nm);
-    $('#userId').val(data.user_id);
+    $('#userNm').html(data.userNm);
+    $('#userId').val(data.userId);
 
-    sessionStorage.setItem('userId', data.user_id);
-    sessionStorage.setItem('authId', data.auth_id);
+    sessionStorage.setItem('userId', data.userId);
+    sessionStorage.setItem('authId', data.authId);
 
     setMyAuthItem();
-    getNavList(data.auth_id);
+    getNavList(data.authId);
 };
 
 /**
- *  getUserDataError : getUserData errorCallback
+ *  getUserError : getUser errorCallback
  */
-const getUserDataError = response => {
+const getUserError = response => {
     console.log(response);
 };
 
@@ -56,8 +56,8 @@ const setMyAuthItem = () => {
 
     const params = {};
     const option = {
-        oTxt: 'auth_nm',
-        oVal: 'auth_id',
+        oTxt: 'authNm',
+        oVal: 'authId',
     };
 
     setCommSelBox(
@@ -75,13 +75,10 @@ const setMyAuthItem = () => {
  * getNavList : 네비게이션 리스트 조회
  */
 const getNavList = authId => {
-    const url = '/api/main/nav';
-    const type = 'POST';
-    const params = {
-        auth_id: authId,
-    };
+    const url = `/api/main/nav/${authId}`;
+    const type = 'GET';
 
-    callApi(url, type, params, getNavListSuccess, getNavListError);
+    callApiWithoutBody(url, type, getNavListSuccess, getNavListError);
 };
 
 /**
@@ -89,7 +86,7 @@ const getNavList = authId => {
  *  :
  */
 const getNavListSuccess = result => {
-    setNaviList(result.data);
+    setNavis(result.data);
 };
 
 /**
@@ -102,16 +99,16 @@ const getNavListError = response => {
 /**
  * setNavigation : 네비게이션 구성
  */
-const setNaviList = data => {
+const setNavis = data => {
     const menuUrl = data.menuUrl;
     mainUrl = menuUrl;
     const menuLv1List = data.menuLv1List;
     const menuLv2List = data.menuLv2List;
 
-    $('#navFrm #menuId').val(menuUrl.menu_id);
-    $('#navFrm #menuNm').val(menuUrl.menu_nm);
-    $('#navFrm #prnMenuId').val(menuUrl.prn_menu_id);
-    $('#navFrm #prnMenuNm').val(menuUrl.prn_menu_nm);
+    $('#navFrm #menuId').val(menuUrl.menuId);
+    $('#navFrm #menuNm').val(menuUrl.menuNm);
+    $('#navFrm #prnMenuId').val(menuUrl.prnMenuId);
+    $('#navFrm #prnMenuNm').val(menuUrl.prnMenuNm);
     $('#navFrm #url').val(menuUrl.url);
 
     $('#navUl').html('');
@@ -119,11 +116,11 @@ const setNaviList = data => {
     for (let i = 0; i < menuLv1List.length; i++) {
         const menu1Data = menuLv1List[i];
         let str1 = '';
-        str1 += `<li class="nav-item menu-open" id="li_${menu1Data.menu_id}">`;
+        str1 += `<li class="nav-item menu-open" id="li_${menu1Data.menuId}">`;
         str1 += `    <a href="javascript:" class="nav-link">`;
         str1 += `        <i class="nav-icon fas fa-hockey-puck"></i>`;
         str1 += `        <p>`;
-        str1 += `            ${menu1Data.menu_nm}`;
+        str1 += `            ${menu1Data.menuNm}`;
         str1 += `            <i class="right fas fa-angle-left"></i>`;
         str1 += `        </p>`;
         str1 += `    </a>`;
@@ -138,18 +135,18 @@ const setNaviList = data => {
         str2 += `    <ul class="nav nav-treeview">`;
         str2 += `        <li class= "nav-item">`;
         str2 += `            <a href="javascript:" class="nav-link"`;
-        str2 += `               id="menu_${menu2Data.menu_id}"`;
-        str2 += `               data-id="${menu2Data.menu_id}"`;
+        str2 += `               id="menu_${menu2Data.menuId}"`;
+        str2 += `               data-id="${menu2Data.menuId}"`;
         str2 += `               data-url="${menu2Data.url}"`;
-        str2 += `               data-menunm="${menu2Data.menu_nm}"`;
-        str2 += `               data-parentnm="${menu2Data.prn_menu_nm}"`;
+        str2 += `               data-menunm="${menu2Data.menuNm}"`;
+        str2 += `               data-parentnm="${menu2Data.prnMenuNm}"`;
         str2 += `            >`;
         str2 += `                <i class="far fa-circle nav-icon"></i>`;
-        str2 += `                <p>${menu2Data.menu_nm}</p>`;
+        str2 += `                <p>${menu2Data.menuNm}</p>`;
         str2 += `            </a>`;
         str2 += `        </li>`;
         str2 += `    </ul>`;
-        $('#li_' + menu2Data.prn_menu_id).append(str2);
+        $('#li_' + menu2Data.prnMenuId).append(str2);
     }
 
     setNaviEvent();
@@ -192,8 +189,8 @@ const setNaviEvent = () => {
 
     $("a[id='menuUrl']").click(function () {
         const url = mainUrl.url;
-        const menuNm = mainUrl.menu_nm;
-        const prnMenuNm = mainUrl.prn_menu_nm;
+        const menuNm = mainUrl.menuNm;
+        const prnMenuNm = mainUrl.prnMenuNm;
         framePageRouter(url, prnMenuNm, menuNm);
     });
 };
@@ -214,7 +211,7 @@ const calcHeight = () => {
 $(document).ready(() => {
     calcHeight();
 
-    getUserData();
+    getUser();
 
     // 권한 변경시
     $('#frm #authId').change(() => {

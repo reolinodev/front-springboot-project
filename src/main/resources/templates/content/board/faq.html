@@ -17,16 +17,19 @@
                 <div class="row">
                     <div class="col-4">
                         <label for="boardId">게시판</label>
-                        <select class="custom-select rounded-0" id="boardId" name="board_id"></select>
+                        <select class="custom-select rounded-0" id="boardId" name="boardId"></select>
                     </div>
                     <div class="col-4">
                         <label for="faqTitle">게시글제목</label>
-                        <input type="text" class="form-control" id="faqTitle" name="faq_title">
+                        <input type="text" class="form-control" id="faqTitle" name="faqTitle">
+                        <label>
+                            <input type="text" class="form-control" style="display: none">
+                        </label>
                     </div>
 
                     <div class="col-2">
                         <label for="useYn">사용여부</label>
-                        <select class="custom-select rounded-0" id="useYn" name="use_yn"></select>
+                        <select class="custom-select rounded-0" id="useYn" name="useYn"></select>
                     </div>
                 </div>
             </div>
@@ -44,7 +47,7 @@
     </form>
 
     <input type="hidden" id="status" th:value="${status}">
-    <input type="hidden" id="pagePer" name="page_per" th:value="10"/>
+    <input type="hidden" id="size" name="size" th:value="10"/>
 
     <!-- 그리드 영역-->
     <div id="grid"></div>

@@ -17,7 +17,7 @@ const search = () => {
     spinnerShow();
 
     callApiWithoutBody(
-        `/api/menu/tree/${$authRole.val()}`,
+        `/api/menu/menu-tree/${$authRole.val()}`,
         'GET',
         searchSuccess,
         searchError
@@ -28,7 +28,7 @@ const search = () => {
  *  searchSuccess : search successCallback
  */
 const searchSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         setMenuTree(result.data);
     }
     spinnerHide();
@@ -49,17 +49,17 @@ const setMenuTree = list => {
     const menu = [];
 
     for (const data of list) {
-        if (data.menu_lv === 1) {
+        if (data.menuLv === 1) {
             const obj1 = {};
             const children = [];
 
-            obj1.text = data.menu_nm;
-            obj1.target = data.menu_id;
+            obj1.text = data.menuNm;
+            obj1.target = data.menuId;
             for (const data2 of list) {
-                if (data.menu_id === data2.prn_menu_id) {
+                if (data.menuId === data2.prnMenuId) {
                     const obj2 = {};
-                    obj2.text = data2.menu_nm;
-                    obj2.target = data2.menu_id;
+                    obj2.text = data2.menuNm;
+                    obj2.target = data2.menuId;
                     children.push(obj2);
                 }
             }
@@ -76,11 +76,11 @@ const setMenuTree = list => {
  */
 const setGridLayout = () => {
     const columns = [
-        {header: 'Auth Id', name: 'auth_id', align: 'center', hidden: true},
-        {header: '권한명', name: 'auth_nm', align: 'left'},
+        {header: 'Auth Id', name: 'authId', align: 'center', hidden: true},
+        {header: '권한명', name: 'authNm', align: 'left'},
         {
             header: '사용여부',
-            name: 'use_yn',
+            name: 'useYn',
             align: 'center',
             formatter: 'listItemText',
             editor: {
@@ -100,8 +100,8 @@ const setGridLayout = () => {
                 },
             },
         },
-        {header: '수정된 날짜', name: 'updated_at', align: 'left'},
-        {header: '수정자', name: 'updated_nm', align: 'center'},
+        {header: '수정된 날짜', name: 'updatedAtLabel', align: 'left'},
+        {header: '수정자', name: 'createdIdLabel', align: 'center'},
     ];
     const gridData = [];
     return setBasicGrid(columns, gridData);
@@ -129,7 +129,7 @@ const getAuthData = () => {
  *  getAuthDataSuccess : getAuthData successCallback
  */
 const getAuthDataSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         const gridData = result.data;
         grid.resetData(gridData);
     }
@@ -150,12 +150,11 @@ const getAuthDataError = response => {
 const save = updatedRows => {
     spinnerShow();
 
-    let url = '/api/menuAuth';
+    let url = `/api/menuAuth/${$menuId.val()}`;
 
     const type = 'PUT';
     const params = {
-        menu_id: $menuId.val(),
-        updated_rows: updatedRows,
+        updatedRows: updatedRows,
     };
 
     callApi(url, type, params, saveSuccess, saveError);
@@ -166,7 +165,7 @@ const save = updatedRows => {
  */
 const saveSuccess = result => {
     alert(result.header.message);
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         getAuthData();
     }
 

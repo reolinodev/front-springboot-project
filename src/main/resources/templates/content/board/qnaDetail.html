@@ -21,13 +21,13 @@
                 <div class="form-group row" style="display: none">
                     <label for="boardId" class="col-sm-1 col-form-label">게시판</label>
                     <div class="col-sm-5">
-                        <select class="custom-select rounded-0" id="boardId" name="board_id"></select>
+                        <select class="custom-select rounded-0" id="boardId" name="boardId"></select>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="qnaTitle" class="col-sm-1 col-form-label">제목</label>
                     <div class="col-sm-11">
-                        <input type="text" class="form-control" id="qnaTitle" name="qna_title" placeholder="제목을 입력하세요." readonly>
+                        <input type="text" class="form-control" id="qnaTitle" name="qnaTitle" placeholder="제목을 입력하세요." readonly>
                     </div>
                 </div>
                 <div class="form-group row">
@@ -72,7 +72,7 @@
                     </div>
                 </div>
 
-                <input type="hidden" class="form-control" id="qnaId" name="qna_id" th:value="${qna_id}">
+                <input type="hidden" class="form-control" id="qnaId" name="qnaId" th:value="${qnaId}">
             </div>
             <div class="card-footer">
                 <div class="row justify-content-end">

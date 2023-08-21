@@ -13,28 +13,39 @@
     <!-- 조회 화면 -->
     <form id="postViewFrm" name="postViewFrm">
         <input type="hidden" id="status" th:value="${status}">
-        <input type="hidden" id="pagePer" name="page_per" th:value="10"/>
+        <input type="hidden" id="size" name="size" th:value="10"/>
 
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-3">
+                    <div class="col-6">
                         <label for="boardId">게시판</label>
-                        <select class="custom-select rounded-0" id="boardId" name="board_id"></select>
+                        <select class="custom-select rounded-0" id="boardId" name="boardId"></select>
                     </div>
-                    <div class="col-4">
+                    <div class="col-6">
                         <label>작성일</label>
                         <div id="dateRange"></div>
                     </div>
-                    <div class="col-3">
-                        <label for="searchStr">게시글제목 / 작성자</label>
-                        <input type="text" class="form-control" id="searchStr" name="search_str">
-                        <input type="text" class="form-control" style="display: none"> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <label for="postTitle">게시글제목</label>
+                        <input type="text" class="form-control" id="postTitle" name="postTitle">
+                        <label>
+                            <input type="text" class="form-control" style="display: none">
+                        </label> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
+                    </div>
+                    <div class="col-4">
+                        <label for="createdNm">작성자</label>
+                        <input type="text" class="form-control" id="createdNm" name="createdNm">
+                        <label>
+                            <input type="text" class="form-control" style="display: none">
+                        </label> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
                     </div>
 
-                    <div class="col-2">
+                    <div class="col-4">
                         <label for="useYn">사용여부</label>
-                        <select class="custom-select rounded-0" id="useYn" name="use_yn"></select>
+                        <select class="custom-select rounded-0" id="useYn" name="useYn"></select>
                     </div>
                 </div>
             </div>

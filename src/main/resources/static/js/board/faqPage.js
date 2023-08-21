@@ -12,7 +12,7 @@ let pagination;
 const $viewFaqTitle = $('#viewFaqTitle');
 
 const pageInit = () => {
-    page = new Page(1, false, Number($('#pagePer').val()), 0);
+    page = new Page(1, false, Number($('#size').val()), 0);
 };
 
 /**
@@ -21,17 +21,15 @@ const pageInit = () => {
 const setGridLayout = () => {
     // 헤더 생성
     const columns = [
-        {header: 'No', name: 'rnum', width: 100, align: 'center'},
         {
-            header: 'SEQ',
-            name: 'faq_id',
+            header: 'ID',
+            name: 'faqId',
             width: 100,
             align: 'center',
-            hidden: true,
         },
         {
             header: '제목',
-            name: 'faq_title',
+            name: 'faqTitle',
             align: 'center',
             renderer: {
                 styles: {
@@ -58,8 +56,8 @@ const search = () => {
     const type = 'POST';
 
     const params = serializeFormJson('faqFrm');
-    params.current_page = page.currentPage;
-    params.page_per = page.pagePer;
+    params.page = page.page;
+    params.size = page.size;
     window.sessionStorage.setItem('params', JSON.stringify(params));
 
     callApi(url, type, params, searchSuccess, searchError);
@@ -69,15 +67,15 @@ const search = () => {
  *  searchSuccess : search successCallback
  */
 const searchSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         const gridData = result.data;
-        page.totalCount = result.total;
+        page.totalCount = result.totalCount;
         grid.resetData(gridData);
 
         if (page.pageInit === false) {
             page.pageInit = true;
-            setGridClickRowEvent(grid, 'faq_title', faqView);
-            pagination.reset(result.total);
+            setGridClickRowEvent(grid, 'faqTitle', faqView);
+            pagination.reset(result.totalCount);
         }
     }
 
@@ -96,7 +94,7 @@ const searchError = response => {
  * pagingCallback : 페이징 콜백
  */
 const pagingCallback = returnPage => {
-    page.currentPage = returnPage;
+    page.page = returnPage;
     search();
 };
 
@@ -104,7 +102,7 @@ const pagingCallback = returnPage => {
  * faqView : 상세화면 및 수정화면 이동
  */
 const faqView = rowData => {
-    getFaqData(rowData.faq_id);
+    getFaqData(rowData.faqId);
 };
 
 /**
@@ -124,7 +122,7 @@ const getFaqData = faqId => {
  *  getFaqDataSuccess : getFaqData successCallback
  */
 const getFaqDataSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         setFaqData(result.data);
     }
     spinnerHide();
@@ -139,8 +137,8 @@ const getFaqDataError = response => {
 };
 
 const setFaqData = data => {
-    $viewFaqTitle.val(data.faq_title);
-    setBasicViewer('viewer', data.main_text);
+    $viewFaqTitle.val(data.faqTitle);
+    setBasicViewer('viewer', data.mainText);
 
     window.$('#faqView').modal('show');
 };

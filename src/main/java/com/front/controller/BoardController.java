@@ -37,11 +37,11 @@ public class BoardController {
     /***
      * 게시글정보 화면(개별)
      ***/
-    @GetMapping(value = "/page/board/post/list/{status}/{board_id}")
-    public ModelAndView postPageView(@PathVariable String status, @PathVariable String board_id) {
+    @GetMapping(value = "/page/board/post/list/{status}/{boardId}")
+    public ModelAndView postPageView(@PathVariable String status, @PathVariable Long boardId) {
         ModelAndView mav = new ModelAndView();
         mav.addObject("status", status);
-        mav.addObject("board_id", board_id);
+        mav.addObject("boardId", boardId);
         mav.setViewName("content/board/postPage");
         return mav;
     }
@@ -50,11 +50,11 @@ public class BoardController {
     /***
      * 게시글등록 화면
      ***/
-    @GetMapping(value = "/page/board/post/write/{post_type}/{board_id}")
-    public ModelAndView postWriteView(@PathVariable String post_type, @PathVariable String board_id) {
+    @GetMapping(value = "/page/board/post/write/{postType}/{boardId}")
+    public ModelAndView postWriteView(@PathVariable String postType, @PathVariable Long boardId) {
         ModelAndView mav = new ModelAndView();
-        mav.addObject("post_type", post_type);
-        mav.addObject("board_id", board_id);
+        mav.addObject("postType", postType);
+        mav.addObject("boardId", boardId);
         mav.setViewName("content/board/postWrite");
         return mav;
     }
@@ -62,11 +62,11 @@ public class BoardController {
     /***
      * 게시글등록 상세화면
      ***/
-    @GetMapping(value = "/page/board/post/view/{post_type}/{post_id}")
-    public ModelAndView postView(@PathVariable String post_type, @PathVariable String post_id) {
+    @GetMapping(value = "/page/board/post/view/{postType}/{postId}")
+    public ModelAndView postView(@PathVariable String postType, @PathVariable Long postId) {
         ModelAndView mav = new ModelAndView();
-        mav.addObject("post_type", post_type);
-        mav.addObject("post_id", post_id);
+        mav.addObject("postType", postType);
+        mav.addObject("postId", postId);
         mav.setViewName("content/board/postView");
         return mav;
     }
@@ -74,11 +74,11 @@ public class BoardController {
     /***
      * 게시글등록 수정화면
      ***/
-    @GetMapping(value = "/page/board/post/edit/{post_type}/{post_id}")
-    public ModelAndView postEditView(@PathVariable String post_type, @PathVariable String post_id) {
+    @GetMapping(value = "/page/board/post/edit/{postType}/{postId}")
+    public ModelAndView postEditView(@PathVariable String postType, @PathVariable Long postId) {
         ModelAndView mav = new ModelAndView();
-        mav.addObject("post_type", post_type);
-        mav.addObject("post_id", post_id);
+        mav.addObject("postType", postType);
+        mav.addObject("postId", postId);
         mav.setViewName("content/board/postEdit");
         return mav;
     }
@@ -98,11 +98,11 @@ public class BoardController {
     /***
      * FAQ 정보화면(개별)
      ***/
-    @GetMapping(value = "/page/board/faq/list/{status}/{board_id}")
-    public ModelAndView faqPageView(@PathVariable String status, @PathVariable String board_id) {
+    @GetMapping(value = "/page/board/faq/list/{status}/{boardId}")
+    public ModelAndView faqPageView(@PathVariable String status, @PathVariable Long boardId) {
         ModelAndView mav = new ModelAndView();
         mav.addObject("status", status);
-        mav.addObject("board_id", board_id);
+        mav.addObject("boardId", boardId);
         mav.setViewName("content/board/faqPage");
         return mav;
     }
@@ -121,10 +121,10 @@ public class BoardController {
     /***
      * FAQ 수정화면
      ***/
-    @GetMapping(value = "/page/board/faq/edit/{faq_id}")
-    public ModelAndView faqEditView(@PathVariable String faq_id) {
+    @GetMapping(value = "/page/board/faq/edit/{faqId}")
+    public ModelAndView faqEditView(@PathVariable String faqId) {
         ModelAndView mav = new ModelAndView();
-        mav.addObject("faq_id", faq_id);
+        mav.addObject("faqId", faqId);
         mav.setViewName("content/board/faqEdit");
         return mav;
     }
@@ -143,11 +143,11 @@ public class BoardController {
     /***
      * QNA 정보화면(개별)
      ***/
-    @GetMapping(value = "/page/board/qna/list/{status}/{board_id}")
-    public ModelAndView qnaPageView(@PathVariable String status, @PathVariable String board_id) {
+    @GetMapping(value = "/page/board/qna/list/{status}/{boardId}")
+    public ModelAndView qnaPageView(@PathVariable String status, @PathVariable Long boardId) {
         ModelAndView mav = new ModelAndView();
         mav.addObject("status", status);
-        mav.addObject("board_id", board_id);
+        mav.addObject("boardId", boardId);
         mav.setViewName("content/board/qnaPage");
         return mav;
     }
@@ -156,10 +156,10 @@ public class BoardController {
     /***
      * QNA 등록 화면
      ***/
-    @GetMapping(value = "/page/board/qna/write/{board_id}")
-    public ModelAndView postWriteView(@PathVariable String board_id) {
+    @GetMapping(value = "/page/board/qna/write/{boardId}")
+    public ModelAndView postWriteView(@PathVariable Long boardId) {
         ModelAndView mav = new ModelAndView();
-        mav.addObject("board_id", board_id);
+        mav.addObject("boardId", boardId);
         mav.setViewName("content/board/qnaWrite");
         return mav;
     }
@@ -168,10 +168,10 @@ public class BoardController {
     /***
      * QNA 수정 화면
      ***/
-    @GetMapping(value = "/page/board/qna/edit/{qna_id}")
-    public ModelAndView qnaEditView(@PathVariable String qna_id) {
+    @GetMapping(value = "/page/board/qna/edit/{qnaId}")
+    public ModelAndView qnaEditView(@PathVariable String qnaId) {
         ModelAndView mav = new ModelAndView();
-        mav.addObject("qna_id", qna_id);
+        mav.addObject("qnaId", qnaId);
         mav.setViewName("content/board/qnaEdit");
         return mav;
     }
@@ -179,10 +179,10 @@ public class BoardController {
     /***
      * QNA 상세 화면
      ***/
-    @GetMapping(value = "/page/board/qna/detail/{qna_id}")
-    public ModelAndView qnaDetailView(@PathVariable String qna_id) {
+    @GetMapping(value = "/page/board/qna/detail/{qnaId}")
+    public ModelAndView qnaDetailView(@PathVariable String qnaId) {
         ModelAndView mav = new ModelAndView();
-        mav.addObject("qna_id", qna_id);
+        mav.addObject("qnaId", qnaId);
         mav.setViewName("content/board/qnaDetail");
         return mav;
     }
@@ -191,10 +191,10 @@ public class BoardController {
     /***
      * QNA 답변화면
      ***/
-    @GetMapping(value = "/page/board/qna/answer/{qna_id}")
-    public ModelAndView qnaAnswerView(@PathVariable String qna_id) {
+    @GetMapping(value = "/page/board/qna/answer/{qnaId}")
+    public ModelAndView qnaAnswerView(@PathVariable String qnaId) {
         ModelAndView mav = new ModelAndView();
-        mav.addObject("qna_id", qna_id);
+        mav.addObject("qnaId", qnaId);
         mav.setViewName("content/board/qnaAnswer");
         return mav;
     }

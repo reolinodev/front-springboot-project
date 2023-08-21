@@ -17,25 +17,25 @@
 
         <form id="postEditFrm" name="postEditFrm" class="form-horizontal">
             <div class="card-body">
-                <input type="hidden" class="form-control" id="postId" name="post_id" th:value="${post_id}">
-                <input type="hidden" class="form-control" id="postType" th:value="${post_type}">
+                <input type="hidden" class="form-control" id="postId" name="postId" th:value="${postId}">
+                <input type="hidden" class="form-control" id="postType" th:value="${postType}">
 
                 <div class="form-group row">
                     <label for="boardId" class="col-sm-2 col-form-label">게시판</label>
                     <div class="col-sm-10">
-                        <select class="custom-select rounded-0" id="boardId" name="board_id"></select>
+                        <select class="custom-select rounded-0" id="boardId" name="boardId"></select>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="postTitle" class="col-sm-2 col-form-label">* 제목</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="postTitle" name="post_title">
+                        <input type="text" class="form-control" id="postTitle" name="postTitle">
                     </div>
                 </div>
 
                 <div class="form-group row">
                     <label for="editor" class="col-sm-2 col-form-label">본문</label>
-                    <textarea id="mainText" name="main_text" style="display: none"></textarea>
+                    <textarea id="mainText" name="mainText" style="display: none"></textarea>
                     <div class="col-sm-10" >
                         <div id="editor"></div>
                     </div>
@@ -43,7 +43,7 @@
                 <div class="form-group row">
                     <label for="useYn" class="col-sm-2 col-form-label">* 사용여부</label>
                     <div class="col-sm-2">
-                        <select class="custom-select rounded-0" id="useYn" name="use_yn"></select>
+                        <select class="custom-select rounded-0" id="useYn" name="useYn"></select>
                     </div>
                 </div>
             </div>

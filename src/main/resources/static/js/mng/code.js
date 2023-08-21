@@ -29,7 +29,7 @@ const $editMsg = $('#editMsg'); //코드그룹수정 - 메시지
 
 // 페이징 초기화
 const pageInit = () => {
-    page = new Page(1, false, Number($('#pagePer').val()), 0);
+    page = new Page(1, false, Number($('#size').val()), 0);
 };
 
 /**
@@ -41,8 +41,8 @@ const searchGrp = () => {
     let url = '/api/codeGrp';
     const type = 'POST';
     const params = serializeFormJson('codeGrpFrm');
-    params.current_page = page.currentPage;
-    params.page_per = page.pagePer;
+    params.page = page.page;
+    params.size = page.size;
 
     callApi(url, type, params, searchGrpSuccess, searchGrpError);
 };
@@ -51,19 +51,19 @@ const searchGrp = () => {
  *  searchGrpSuccess : searchGrp successCallback
  */
 const searchGrpSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         const gridData = result.data;
-        page.totalCount = result.total;
+        page.totalCount = result.totalCount;
         grid.resetData(gridData);
 
         if (page.pageInit === false) {
-            pagination.reset(result.total);
+            pagination.reset(result.totalCount);
             page.pageInit = true;
-            setGridClickEvent(grid, 'code_grp_nm', 'code_grp_id', search);
+            setGridClickEvent(grid, 'codeGrpNm', 'codeGrpId', search);
             setGridClickEvent(
                 grid,
-                'code_grp_val',
-                'code_grp_id',
+                'codeGrpVal',
+                'codeGrpId',
                 getCodeGrpData
             );
         }
@@ -86,13 +86,13 @@ const setGridLayout = () => {
     const columns = [
         {
             header: 'SEQ',
-            name: 'code_grp_id',
+            name: 'codeGrpId',
             align: 'center',
             hidden: true,
         },
         {
             header: '코드그룹명',
-            name: 'code_grp_nm',
+            name: 'codeGrpNm',
             align: 'center',
             renderer: {
                 styles: {
@@ -104,7 +104,7 @@ const setGridLayout = () => {
         },
         {
             header: '코드그룹값',
-            name: 'code_grp_val',
+            name: 'codeGrpVal',
             align: 'center',
             renderer: {
                 styles: {
@@ -126,34 +126,34 @@ const setGridLayout = () => {
 const setGridLayout2 = () => {
     const columns = [
         {
-            header: 'Code Id',
-            name: 'code_id',
+            header: 'id',
+            name: 'id',
             align: 'center',
             hidden: true,
         },
         {
-            header: 'Code Grp Id',
-            name: 'code_grp_id',
+            header: 'codeGrpId',
+            name: 'codeGrpId',
             align: 'center',
             hidden: true,
         },
         {
             header: '* 코드명',
-            name: 'code_nm',
+            name: 'codeNm',
             align: 'left',
             editor: 'text',
             validation: {required: true},
         },
         {
             header: '* 코드값',
-            name: 'code_val',
+            name: 'codeVal',
             align: 'left',
             editor: 'text',
             validation: {required: true},
         },
         {
             header: '상위코드',
-            name: 'prn_code_val',
+            name: 'prnCodeVal',
             align: 'left',
             editor: 'text',
         },
@@ -167,7 +167,7 @@ const setGridLayout2 = () => {
         {header: '비고', name: 'memo', align: 'left', editor: 'text'},
         {
             header: '* 사용여부',
-            name: 'use_yn',
+            name: 'useYn',
             align: 'center',
             formatter: 'listItemText',
             editor: {
@@ -196,7 +196,7 @@ const setGridLayout2 = () => {
  * pagingCallback : 페이징 콜백
  */
 const pagingCallback = returnPage => {
-    page.currentPage = returnPage;
+    page.page = returnPage;
     searchGrp();
 };
 
@@ -224,8 +224,8 @@ const saveGrp = () => {
     let url = '/api/codeGrp';
     const type = 'PUT';
     const params = {
-        code_grp_nm: $writeCodeGrpNm.val(),
-        code_grp_val: $writeCodeGrpVal.val(),
+        codeGrpNm: $writeCodeGrpNm.val(),
+        codeGrpVal: $writeCodeGrpVal.val(),
     };
 
     callApi(url, type, params, saveGrpSuccess, saveGrpError);
@@ -235,7 +235,7 @@ const saveGrp = () => {
  *  saveGrpSuccess : saveGrp successCallback
  */
 const saveGrpSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         alert(result.header.message);
         pageInit();
         searchGrp();
@@ -270,7 +270,7 @@ const getCodeGrpData = codeGrpId => {
  *  getCodeGrpDataSuccess : getCodeGrpData successCallback
  */
 const getCodeGrpDataSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         setEditData(result.data);
     }
     spinnerHide();
@@ -288,11 +288,11 @@ const getCodeGrpDataError = response => {
  *  setEditData : 데이터 매핑 및 모달 오픈
  */
 const setEditData = data => {
-    setCodeSelBox('editUseYn', 'USE_YN', '', data.use_yn);
+    setCodeSelBox('editUseYn', 'USE_YN', '', data.useYn);
 
-    $editCodeGrpId.val(data.code_grp_id);
-    $editCodeGrpNm.val(data.code_grp_nm);
-    $editCodeGrpVal.val(data.code_grp_val);
+    $editCodeGrpId.val(data.codeGrpId);
+    $editCodeGrpNm.val(data.codeGrpNm);
+    $editCodeGrpVal.val(data.codeGrpVal);
 
     window.$('#codeGrpEdit').modal('show');
 };
@@ -315,9 +315,9 @@ const updateGrp = () => {
     let url = `/api/codeGrp/${$editCodeGrpId.val()}`;
     const type = 'PUT';
     const params = {
-        code_grp_nm: $editCodeGrpNm.val(),
-        code_grp_val: $editCodeGrpVal.val(),
-        use_yn: $editUseYn.val(),
+        codeGrpNm: $editCodeGrpNm.val(),
+        codeGrpVal: $editCodeGrpVal.val(),
+        useYn: $editUseYn.val(),
     };
 
     callApi(url, type, params, updateGrpSuccess, updateGrpError);
@@ -327,7 +327,7 @@ const updateGrp = () => {
  *  updateGrpSuccess : updateGrp successCallback
  */
 const updateGrpSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         alert(result.header.message);
         pageInit();
         searchGrp();
@@ -364,7 +364,7 @@ const search = codeGrpId => {
  *  searchSuccess : search successCallback
  */
 const searchSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         const gridData = result.data;
         grid2.resetData(gridData);
     }
@@ -403,17 +403,17 @@ const saveCode = () => {
         return;
     }
 
-    if (!checkNullList(data, 'code_nm')) {
+    if (!checkNullList(data, 'codeNm')) {
         alert('코드명이 비어있습니다.');
         return;
     }
 
-    if (!checkNullList(data, 'code_val')) {
+    if (!checkNullList(data, 'codeVal')) {
         alert('코드값이 비어있습니다.');
         return;
     }
 
-    if (!checkDuplicateList(data, 'code_val')) {
+    if (!checkDuplicateList(data, 'codeVal')) {
         alert('코드값이 중복입니다.');
         return;
     }
@@ -423,9 +423,9 @@ const saveCode = () => {
     let url = `/api/code/${selectedCodeGrpId}`;
     const type = 'PUT';
     const params = {
-        created_rows: createdRows,
-        updated_rows: updatedRows,
-        deleted_rows: deletedRows,
+        createdRows: createdRows,
+        updatedRows: updatedRows,
+        deletedRows: deletedRows,
     };
 
     callApi(url, type, params, saveCodeSuccess, saveCodeError);
@@ -435,7 +435,7 @@ const saveCode = () => {
  *  saveCodeSuccess : saveCode successCallback
  */
 const saveCodeSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         alert(result.header.message);
     }
     spinnerHide();
@@ -496,14 +496,14 @@ $(document).ready(() => {
         }
 
         const row = {
-            code_id: '',
-            code_grp_id: selectedCodeGrpId,
-            code_nm: '',
-            code_val: '',
-            prn_code_val: '',
+            codeId: '',
+            codeGrpId: selectedCodeGrpId,
+            codeNm: '',
+            codeVal: '',
+            prnCodeVal: '',
             ord: '',
             memo: '',
-            use_yn: 'Y',
+            useYn: 'Y',
         };
         grid2.appendRow(row);
     });
@@ -523,9 +523,18 @@ $(document).ready(() => {
         saveCode();
     });
 
-    const searchStrInput = document.getElementById('searchStr');
+    const codeGrpNm = document.getElementById('codeGrpNm');
 
-    searchStrInput.addEventListener('keyup', function (event) {
+    codeGrpNm.addEventListener('keyup', function (event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            document.getElementById('searchGrpBtn').click();
+        }
+    });
+
+    const codeGrpVal = document.getElementById('codeGrpVal');
+
+    codeGrpVal.addEventListener('keyup', function (event) {
         if (event.keyCode === 13) {
             event.preventDefault();
             document.getElementById('searchGrpBtn').click();

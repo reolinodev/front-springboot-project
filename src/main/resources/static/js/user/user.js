@@ -27,7 +27,7 @@ let grid;
 let pagination;
 
 const pageInit = () => {
-    page = new Page(1, false, Number($('#pagePer').val()), 0);
+    page = new Page(1, false, Number($('#size').val()), 0);
 };
 
 /**
@@ -39,8 +39,8 @@ const search = () => {
     const url = '/api/user';
     const type = 'POST';
     const params = serializeFormJson('userViewFrm');
-    params.current_page = page.currentPage;
-    params.page_per = page.pagePer;
+    params.page = page.page;
+    params.size = page.size;
 
     callApi(url, type, params, searchSuccess, searchError);
 };
@@ -51,12 +51,12 @@ const search = () => {
  */
 const searchSuccess = result => {
     const gridData = result.data;
-    page.totalCount = result.total;
+    page.totalCount = result.totalCount;
     grid.resetData(gridData);
 
     if (page.pageInit === false) {
-        setGridClickEvent(grid, 'login_id', 'user_id', getUserData);
-        pagination.reset(result.total);
+        setGridClickEvent(grid, 'loginId', 'userId', getUser);
+        pagination.reset(result.totalCount);
         page.pageInit = true;
     }
 
@@ -77,17 +77,15 @@ const searchError = response => {
 const setGridLayout = () => {
     // 헤더 생성
     const columns = [
-        {header: 'No', name: 'rnum', width: 50, align: 'center'},
         {
-            header: 'SEQ',
-            name: 'user_id',
-            width: 100,
+            header: 'ID',
+            name: 'userId',
+            width: 50,
             align: 'center',
-            hidden: true,
         },
         {
             header: '아이디',
-            name: 'login_id',
+            name: 'loginId',
             align: 'center',
             renderer: {
                 styles: {
@@ -97,10 +95,10 @@ const setGridLayout = () => {
                 },
             },
         },
-        {header: '이름', name: 'user_nm', align: 'center'},
-        {header: '휴대폰번호', name: 'tel_no', align: 'center'},
-        {header: '최근접속시간', name: 'last_login_at', align: 'center'},
-        {header: '사용여부', name: 'use_yn_nm', width: 150, align: 'center'},
+        {header: '이름', name: 'userNm', align: 'center'},
+        {header: '휴대폰번호', name: 'telNo', align: 'center'},
+        {header: '최근접속시간', name: 'lastLoginLabel', align: 'center'},
+        {header: '사용여부', name: 'useYnLabel', width: 150, align: 'center'},
     ];
     // 데이터
     const gridData = [];
@@ -112,7 +110,7 @@ const setGridLayout = () => {
  * pagingCallback : 페이징 콜백
  */
 const pagingCallback = returnPage => {
-    page.currentPage = returnPage;
+    page.page = returnPage;
     search();
 };
 
@@ -123,7 +121,7 @@ const initWrite = () => {
     $writeLoginId.val('');
     $writeUserNm.val('');
     $writeTelNo.val('');
-    $writeMsg.val('');
+    $writeMsg.html('');
 };
 
 /**
@@ -157,9 +155,9 @@ const save = () => {
     const url = '/api/user';
     const type = 'PUT';
     const params = {
-        login_id: $writeLoginId.val(),
-        user_nm: $writeUserNm.val(),
-        tel_no: $writeTelNo.val(),
+        loginId: $writeLoginId.val(),
+        userNm: $writeUserNm.val(),
+        telNo: $writeTelNo.val(),
     };
 
     callApi(url, type, params, saveSuccess, saveError);
@@ -169,7 +167,7 @@ const save = () => {
  *  saveSuccess : save successCallback
  */
 const saveSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header.resultCode === 'ok') {
         alert(result.header.message);
         search();
         closeModal();
@@ -182,37 +180,45 @@ const saveSuccess = result => {
  *  saveError : save errorCallback
  */
 const saveError = response => {
-    $writeMsg.html(response.message);
+
+    let errorMessage = '';
+    if(response["errorList"] !== undefined && response["errorList"].length !== 0){
+        errorMessage = response["errorList"][0].message;
+    }else{
+        errorMessage = response.message;
+    }
+
+    $writeMsg.html(errorMessage);
     spinnerHide();
 };
 
 /**
- * getUserData : 사용자 수정 화면 호출
+ * getUser : 사용자 수정 화면 호출
  */
-const getUserData = userId => {
+const getUser = userId => {
     spinnerShow();
 
     callApiWithoutBody(
         `/api/user/${userId}`,
         'GET',
-        getUserDataSuccess,
-        getUserDataError
+        getUserSuccess,
+        getUserError
     );
 };
 
 /**
- *  getUserDataSuccess : getUserData successCallback
+ *  getUserSuccess : getUser successCallback
  */
-const getUserDataSuccess = result => {
+const getUserSuccess = result => {
     spinnerHide();
 
     setEditData(result.data);
 };
 
 /**
- *  getUserDataError : getUserData errorCallback
+ *  getUserError : getUser errorCallback
  */
-const getUserDataError = response => {
+const getUserError = response => {
     spinnerHide();
 
     console.log(response);
@@ -222,15 +228,16 @@ const getUserDataError = response => {
  * setEditData : 에디트 데이터 셋
  */
 const setEditData = data => {
-    $editLoginId.val(data.login_id);
-    $editUserId.val(data.user_id);
-    $editTelno.val(data.tel_no);
-    $editPwInitYn.val(data.pw_init_yn);
-    $editUserNm.val(data.user_nm);
-    $editPwFailCnt.val(data.pw_fail_cnt);
-    $editLastLoginAt.val(data.last_login_at);
+    $editLoginId.val(data.loginId);
+    $editUserId.val(data.userId);
+    $editTelno.val(data.telNo);
+    $editPwInitYn.val(data.pwInitYn);
+    $editUserNm.val(data.userNm);
+    $editPwFailCnt.val(data.pwFailCnt);
+    $editLastLoginAt.val(data.lastLoginAt);
+    $editMsg.html('');
 
-    setCodeSelBox('editUseYn', 'USE_YN', '', data.use_yn);
+    setCodeSelBox('editUseYn', 'USE_YN', '', data.useYn);
 
     window.$('#userEdit').modal('show');
 };
@@ -244,9 +251,9 @@ const update = () => {
     const url = `/api/user/${$editUserId.val()}`;
     const type = 'PUT';
     const params = {
-        user_nm: $editUserNm.val(),
-        tel_no: $editTelno.val(),
-        use_yn: $editUseYn.val(),
+        userNm: $editUserNm.val(),
+        telNo: $editTelno.val(),
+        useYn: $editUseYn.val(),
     };
 
     callApi(url, type, params, updateSuccess, updateError);
@@ -256,7 +263,7 @@ const update = () => {
  *  updateSuccess : update successCallback
  */
 const updateSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header.resultCode === 'ok') {
         alert(result.header.message);
         search();
         closeModal();
@@ -270,7 +277,14 @@ const updateSuccess = result => {
  *  updateError : update errorCallback
  */
 const updateError = response => {
-    $editMsg.html(response.message);
+    let errorMessage = '';
+    if(response.errorList !== undefined && response.errorList.length !== 0){
+        errorMessage = response.errorList[0].message;
+    }else{
+        errorMessage = response.message;
+    }
+
+    $editMsg.html(errorMessage);
     spinnerHide();
 };
 
@@ -281,7 +295,7 @@ const lockClear = () => {
     spinnerShow();
 
     callApiWithoutBody(
-        `/api/user/pw-fail-cnt/${$editUserId.val()}`,
+        `/api/user/init-login-fail-cnt/${$editUserId.val()}`,
         'GET',
         lockClearSuccess,
         lockClearError
@@ -292,7 +306,7 @@ const lockClear = () => {
  *  lockClearSuccess : lockClear successCallback
  */
 const lockClearSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header.resultCode === 'ok') {
         alert(result.header.message);
         search();
         closeModal();
@@ -316,21 +330,17 @@ const lockClearError = response => {
 const pwInit = () => {
     spinnerShow();
 
-    const url = `/api/user/user-pw`;
-    const type = 'PUT';
-    const params = {
-        login_id: $editLoginId.val(),
-        user_id: $editUserId.val(),
-    };
+    const url = `/api/user/init-user-pw/${$editUserId.val()}`;
+    const type = 'GET';
 
-    callApi(url, type, params, pwInitSuccess, pwInitError);
+    callApiWithoutBody(url, type, pwInitSuccess, pwInitError);
 };
 
 /**
  *  pwInitSuccess : pwInit successCallback
  */
 const pwInitSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header.resultCode === 'ok') {
         alert(result.header.message);
         search();
         closeModal();

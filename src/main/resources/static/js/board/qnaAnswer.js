@@ -16,6 +16,8 @@ const $responseNm = $('#responseNm');
 const $responseAt = $('#responseAt');
 const $questions = $('#questions');
 const $mainText = $('#mainText');
+const $qnaPw = $('#qnaPw');
+
 
 /**
  * search : 게시판 수정 화면 호출
@@ -29,7 +31,7 @@ const search = () => {
  *  searchSuccess : search successCallback
  */
 const searchSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         setQnaData(result.data);
     }
     spinnerHide();
@@ -44,41 +46,46 @@ const searchError = response => {
 };
 
 const setQnaData = data => {
-    setBoardBox(data.board_id);
+    setBoardBox(data.boardId);
 
-    $qnaTitle.val(data.qna_title);
-    $createdNm.val(data.created_nm);
-    $createdAt.val(data.created_at);
-    $responseYnNm.val(data.response_yn_nm);
-    $responseNm.val(data.response_nm);
-    $responseAt.val(data.response_at);
+    $qnaTitle.val(data.qnaTitle);
+    $createdNm.val(data.createdIdLabel);
+    $createdAt.val(data.createdAtLabel);
+    $responseYnNm.val(data.responseLabel);
+    $responseNm.val(data.responseIdLabel);
+    $responseAt.val(data.responseAtLabel);
     $questions.val(data.questions);
-    $mainText.val(data.main_text);
+    $mainText.val(data.mainText);
+    $qnaPw.val(data.qnaPw);
+
+    if(data.hiddenYn === 'N'){
+        $('#qnaPwBtn').hide();
+    }
 
     setBasicViewer('viewer', data.questions);
 
-    if (data.main_text != null) {
-        content = data.main_text;
+    if (data.mainText != null) {
+        content = data.mainText;
     }
     editor = setBasicEditor('editor', content, 400);
 
-    setCodeSelBox('useYn', 'USE_YN', '', data.use_yn);
-    setCodeSelBox('hiddenYn', 'HIDDEN_YN', '', data.hidden_yn);
+    setCodeSelBox('useYn', 'USE_YN', '', data.useYn);
+    setCodeSelBox('hiddenYn', 'HIDDEN_YN', '', data.hiddenYn);
 
     $('#boardId').prop('disabled', true);
 };
 
 const setBoardBox = boardId => {
     const option = {
-        oTxt: 'board_title',
-        oVal: 'board_id',
+        oTxt: 'boardTitle',
+        oVal: 'boardId',
     };
 
     const params = {};
 
     setCommSelBox(
         'boardId',
-        '/api/item/board/qna/Y',
+        '/api/item/board/QNA',
         'POST',
         '',
         boardId,
@@ -93,17 +100,17 @@ const setBoardBox = boardId => {
 const save = () => {
     $('#mainText').val(editor.getMarkdown());
 
-    let url = `/api/qna/${qnaId}`;
+    let url = `/api/qna/admin/${qnaId}`;
     const type = 'PUT';
     const params = serializeFormJson('qnaAnswerFrm');
     callApi(url, type, params, saveSuccess, saveError);
 };
 
 /**
- *  searchSuccess : search successCallback
+ *  saveSuccess : save successCallback
  */
 const saveSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         alert(result.header.message);
         location.href = '/page/board/qna/list/init';
     }
@@ -111,12 +118,46 @@ const saveSuccess = result => {
 };
 
 /**
- *  searchError : search errorCallback
+ *  saveError : save errorCallback
  */
 const saveError = response => {
     spinnerHide();
     console.log(response.message);
 };
+
+
+/**
+ *  initQnaPw : Qna 패스워드변경
+ */
+const initQnaPw = () => {
+
+    callApiWithoutBody(
+        `/api/qna/init-qna-pw/${qnaId}`,
+        'GET',
+        initQnaPwSuccess,
+        initQnaPwError
+    );
+};
+
+/**
+ *  initQnaPwSuccess : initQnaPw successCallback
+ */
+const initQnaPwSuccess = result => {
+    if (result.header["resultCode"] === 'ok') {
+        alert(result.header.message);
+    }
+    spinnerHide();
+};
+
+/**
+ * initQnaPwError : initQnaPw errorCallback
+ */
+const initQnaPwError = response => {
+    spinnerHide();
+    console.log(response.message);
+};
+
+
 
 $(document).ready(() => {
     $('#backBtn').click(() => {
@@ -125,6 +166,10 @@ $(document).ready(() => {
 
     $('#saveBtn').click(() => {
         save();
+    });
+
+    $('#qnaPwBtn').click(() => {
+        initQnaPw();
     });
 
     search();

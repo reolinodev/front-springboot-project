@@ -1,8 +1,7 @@
-import {setCodeSelBox, setCommSelBoxCall} from '../module/component';
+import {setCommSelBoxCall} from '../module/component';
 import Page, {setPagination} from '../module/pagination';
 import {
     setBasicGrid,
-    setGridClickEvent,
     setGridClickRowEvent,
 } from '../module/grid';
 import {serializeFormJson} from '../module/json';
@@ -18,7 +17,7 @@ const status = $('#status').val();
 const boardId = $('#boardId').val();
 
 const pageInit = () => {
-    page = new Page(1, false, Number($('#pagePer').val()), 0);
+    page = new Page(1, false, Number($('#size').val()), 0);
 };
 
 /**
@@ -27,17 +26,10 @@ const pageInit = () => {
 const setGridLayout = () => {
     // 헤더 생성
     const columns = [
-        {header: 'No', name: 'rnum', width: 100, align: 'center'},
-        {
-            header: 'SEQ',
-            name: 'qna_id',
-            width: 100,
-            align: 'center',
-            hidden: true,
-        },
+        {header: 'ID', name: 'qnaId', width: 100, align: 'center', hidden: true,},
         {
             header: '게시글명',
-            name: 'qna_title',
+            name: 'qnaTitle',
             align: 'center',
             renderer: {
                 styles: {
@@ -47,15 +39,11 @@ const setGridLayout = () => {
                 },
             },
         },
-        {header: '작성자', name: 'created_nm', width: 100, align: 'center'},
-        {header: '답변자', name: 'response_nm', width: 100, align: 'center'},
-        {header: '공개여부', name: 'hidden_yn_nm', width: 100, align: 'center'},
-        {
-            header: '답변여부',
-            name: 'response_yn_nm',
-            width: 100,
-            align: 'center',
-        },
+        {header: '작성자', name: 'createdIdLabel', width: 100, align: 'center'},
+        {header: '답변자', name: 'responseIdLabel', width: 100, align: 'center'},
+        {header: '공개여부', name: 'hiddenYnLabel', width: 100, align: 'center'},
+        {header: '답변여부', name: 'responseLabel', width: 100, align: 'center',},
+        {header: '비밀번호', name: 'qnaPw', width: 50, align: 'center', hidden: true,},
     ];
     // 데이터
     const gridData = [];
@@ -67,16 +55,27 @@ const setGridLayout = () => {
  * qnaView : 상세화면 및 수정화면 이동
  */
 const qnaView = rowData => {
-    const hiddenYn = rowData.hidden_yn;
-    const createdId = rowData.created_id;
-    const userId = sessionStorage.getItem('userId');
-    const qnaId = rowData.qna_id;
+    const hiddenYn = rowData.hiddenYn;
+    const createdId = rowData.createdId;
+    const qnaPw = rowData.qnaPw;
+    const qnaId = rowData.qnaId;
 
-    if (createdId === userId) {
+    const userId = sessionStorage.getItem('userId');
+
+    if (hiddenYn === 'N' && Number(createdId) === Number(userId)) {
         location.href = `/page/board/qna/edit/${qnaId}`;
-    } else if (hiddenYn === 'Y') {
+    } else if (hiddenYn === 'Y' && Number(createdId) === Number(userId)) {
+        const inputString = prompt('비공개 글입니다.');
+        if(inputString !== qnaPw){
+            alert('비밀번호가 일치하지 않습니다. 비밀번호를 잊었을 경우 관리자에게 문의하세요.');
+        }else{
+            location.href = `/page/board/qna/edit/${qnaId}`;
+        }
+
+    } else if (hiddenYn === 'Y' ) {
         alert('비공개 글입니다.');
-    } else {
+    }
+    else {
         location.href = `/page/board/qna/detail/${qnaId}`;
     }
 };
@@ -91,8 +90,8 @@ const search = () => {
     const type = 'POST';
 
     const params = serializeFormJson('qnaFrm');
-    params.current_page = page.currentPage;
-    params.page_per = page.pagePer;
+    params.page = page.page;
+    params.size = page.size;
     window.sessionStorage.setItem('params', JSON.stringify(params));
 
     callApi(url, type, params, searchSuccess, searchError);
@@ -102,15 +101,15 @@ const search = () => {
  *  searchSuccess : search successCallback
  */
 const searchSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header.resultCode === 'ok') {
         const gridData = result.data;
-        page.totalCount = result.total;
+        page.totalCount = result.totalCount;
         grid.resetData(gridData);
 
         if (page.pageInit === false) {
             page.pageInit = true;
-            setGridClickRowEvent(grid, 'qna_title', qnaView);
-            pagination.reset(result.total);
+            setGridClickRowEvent(grid, 'qnaTitle', qnaView);
+            pagination.reset(result.totalCount);
         }
     }
 
@@ -129,7 +128,7 @@ const searchError = response => {
  * pagingCallback : 페이징 콜백
  */
 const pagingCallback = returnPage => {
-    page.currentPage = returnPage;
+    page.page = returnPage;
     search();
 };
 
@@ -137,13 +136,13 @@ const setBoardBoxCall = (selected, callback) => {
     const params = {};
 
     const option = {
-        oTxt: 'board_title',
-        oVal: 'board_id',
+        oTxt: 'boardTitle',
+        oVal: 'boardId',
     };
 
     setCommSelBoxCall(
         'boardId',
-        '/api/item/board/qna/Y',
+        '/api/item/board/QNA',
         'POST',
         'ALL',
         selected,
@@ -154,11 +153,11 @@ const setBoardBoxCall = (selected, callback) => {
 };
 
 const setMoveToPagination = () => {
-    pagination.movePageTo(sessionParam.current_page);
+    pagination.movePageTo(sessionParam.page);
 };
 
 $(document).ready(() => {
-    setBasicDataRange('start_date', 'end_date', '1years');
+    setBasicDataRange('startDate', 'endDate', '1years');
 
     grid = setGridLayout();
 
@@ -213,13 +212,13 @@ $(document).ready(() => {
     } else {
         sessionParam = JSON.parse(window.sessionStorage.getItem('params'));
 
-        $('input[name=qna_title]').val(sessionParam.qna_title);
+        $('input[name=qnaTitle]').val(sessionParam.qnaTitle);
         $('input[name=created_nm]').val(sessionParam.created_nm);
-        $('input[name=start_date]').val(sessionParam.start_date);
-        $('input[name=end_date]').val(sessionParam.end_date);
+        $('input[name=startDate]').val(sessionParam.startDate);
+        $('input[name=endDate]').val(sessionParam.endDate);
 
-        page.currentPage = sessionParam.current_page;
-        page.page_per = sessionParam.page_per;
+        page.page = sessionParam.page;
+        page.size = sessionParam.size;
 
         setBoardBoxCall(boardId, setMoveToPagination);
     }

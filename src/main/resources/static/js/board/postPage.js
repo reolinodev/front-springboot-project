@@ -16,7 +16,7 @@ const boardId = $('#boardId').val();
 const authId = window.sessionStorage.getItem('authId');
 
 const pageInit = () => {
-    page = new Page(1, false, Number($('#pagePer').val()), 0);
+    page = new Page(1, false, Number($('#size').val()), 0);
 };
 
 /**
@@ -25,17 +25,15 @@ const pageInit = () => {
 const setGridLayout = () => {
     // 헤더 생성
     const columns = [
-        {header: 'No', name: 'rnum', width: 50, align: 'center'},
         {
-            header: 'SEQ',
-            name: 'post_id',
+            header: 'ID',
+            name: 'postId',
             width: 100,
             align: 'center',
-            hidden: true,
         },
         {
             header: '게시글명',
-            name: 'post_title',
+            name: 'postTitle',
             align: 'center',
             renderer: {
                 styles: {
@@ -45,9 +43,9 @@ const setGridLayout = () => {
                 },
             },
         },
-        {header: '작성자', name: 'created_nm', width: 200, align: 'center'},
-        {header: '작성일', name: 'created_at', width: 200, align: 'center'},
-        {header: '사용여부', name: 'use_yn_nm', width: 150, align: 'center'},
+        {header: '작성자', name: 'createdIdLabel', width: 200, align: 'center'},
+        {header: '작성일', name: 'createdAtLabel', width: 200, align: 'center'},
+        {header: '사용여부', name: 'useYnLabel', width: 150, align: 'center'},
     ];
     // 데이터
     const gridData = [];
@@ -72,8 +70,8 @@ const search = () => {
     const type = 'POST';
 
     const params = serializeFormJson('postViewFrm');
-    params.current_page = page.currentPage;
-    params.page_per = page.pagePer;
+    params.page = page.page;
+    params.size = page.size;
     window.sessionStorage.setItem('params', JSON.stringify(params));
 
     callApi(url, type, params, searchSuccess, searchError);
@@ -83,23 +81,23 @@ const search = () => {
  *  searchSuccess : search successCallback
  */
 const searchSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         const gridData = result.data;
-        page.totalCount = result.total;
+        page.totalCount = result.totalCount;
         grid.resetData(gridData);
 
-        setGridClickEvent(grid, 'post_title', 'post_id', postView);
+        setGridClickEvent(grid, 'postTitle', 'postId', postView);
 
         if (status === 'init') {
             if (page.pageInit === false) {
-                pagination.reset(result.total);
+                pagination.reset(result.totalCount);
                 page.pageInit = true;
             }
         } else {
             if (page.pageInit === false) {
                 page.pageInit = true;
-                pagination.reset(result.total);
-                pagination.movePageTo(sessionParam.current_page);
+                pagination.reset(result.totalCount);
+                pagination.movePageTo(sessionParam.page);
             }
         }
     }
@@ -119,7 +117,7 @@ const searchError = response => {
  * pagingCallback : 페이징 콜백
  */
 const pagingCallback = returnPage => {
-    page.currentPage = returnPage;
+    page.page = returnPage;
     search();
 };
 
@@ -127,15 +125,15 @@ const pagingCallback = returnPage => {
  * setUseYnCall :  사용여부 콜백
  */
 const setUseYnCall = () => {
-    setCodeSelBoxCall('useYn', 'USE_YN', 'ALL', sessionParam.use_yn, search);
+    setCodeSelBoxCall('useYn', 'USE_YN', 'ALL', sessionParam.useYn, search);
 };
 
 const getBoardAuth = () => {
     const url = '/api/post/auth';
     const type = 'POST';
     const params = {
-        board_id: boardId,
-        auth_id: authId,
+        boardId: boardId,
+        authId: authId,
     };
 
     callApi(url, type, params, getBoardAuthSuccess, getBoardAuthError);
@@ -145,7 +143,7 @@ const getBoardAuth = () => {
  *  getBoardAuthSuccess : getBoardAuth successCallback
  */
 const getBoardAuthSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         if (result.data !== 1) {
             $('#writeBtn').hide();
         } else {
@@ -165,7 +163,7 @@ const getBoardAuthError = response => {
 };
 
 $(document).ready(() => {
-    setBasicDataRange('start_date', 'end_date', '1years');
+    setBasicDataRange('startDate', 'endDate', '1years');
 
     getBoardAuth();
 
@@ -191,9 +189,18 @@ $(document).ready(() => {
         search();
     });
 
-    const searchStrInput = document.getElementById('searchStr');
+    const postTitle = document.getElementById('postTitle');
 
-    searchStrInput.addEventListener('keyup', function (event) {
+    postTitle.addEventListener('keyup', function (event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            document.getElementById('searchBtn').click();
+        }
+    });
+
+    const createdNm = document.getElementById('createdNm');
+
+    createdNm.addEventListener('keyup', function (event) {
         if (event.keyCode === 13) {
             event.preventDefault();
             document.getElementById('searchBtn').click();
@@ -208,12 +215,13 @@ $(document).ready(() => {
     } else {
         sessionParam = JSON.parse(window.sessionStorage.getItem('params'));
 
-        $('input[name=start_date]').val(sessionParam.start_date);
-        $('input[name=end_date]').val(sessionParam.end_date);
-        $('input[name=search_str]').val(sessionParam.search_str);
+        $('input[name=startDate]').val(sessionParam.startDate);
+        $('input[name=endDate]').val(sessionParam.endDate);
+        $('input[name=postTitle]').val(sessionParam.postTitle);
+        $('input[name=createdNm]').val(sessionParam.createdNm);
 
-        page.currentPage = sessionParam.current_page;
-        page.page_per = sessionParam.page_per;
+        page.page = sessionParam.page;
+        page.size = sessionParam.size;
 
         setUseYnCall();
     }

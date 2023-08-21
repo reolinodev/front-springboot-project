@@ -12,24 +12,28 @@
 <div layout:fragment="content" id="container">
     <!-- 조회 화면 -->
     <form id="postViewFrm" name="postViewFrm">
-        <input type="hidden" id="boardId" name="board_id" th:value="${board_id}">
+        <input type="hidden" id="boardId" name="boardId" th:value="${boardId}">
         <input type="hidden" id="status" th:value="${status}">
-        <input type="hidden" id="pagePer" name="page_per" th:value="10"/>
+        <input type="hidden" id="size" name="size" th:value="10"/>
 
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-4">
-                        <label for="searchStr">게시글제목 / 작성자</label>
-                        <input type="text" class="form-control" id="searchStr" name="search_str">
+                    <div class="col-3">
+                        <label for="postTitle">게시글제목</label>
+                        <input type="text" class="form-control" id="postTitle" name="postTitle">
                     </div>
-                    <div class="col-5">
+                    <div class="col-3">
+                        <label for="createdNm">작성자</label>
+                        <input type="text" class="form-control" id="createdNm" name="createdNm">
+                    </div>
+                    <div class="col-4">
                         <label>작성일</label>
                         <div id="dateRange"></div>
                     </div>
-                    <div class="col-3">
+                    <div class="col-2">
                         <label for="useYn">사용여부</label>
-                        <select class="custom-select rounded-0" id="useYn" name="use_yn"></select>
+                        <select class="custom-select rounded-0" id="useYn" name="useYn"></select>
                     </div>
                 </div>
             </div>

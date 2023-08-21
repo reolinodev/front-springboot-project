@@ -15,7 +15,7 @@
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-body">
-                        <select class="custom-select rounded-0" id="authRole" name="auth_role"></select>
+                        <label for="authRole"></label><select class="custom-select rounded-0" id="authRole" name="authRole"></select>
 
                         <div id="tree" class="tui-tree-wrap" style="width: 100%;"></div>
                     </div>
@@ -41,35 +41,35 @@
                         <div class="form-group row">
                             <div class="col-6">
                                 <label for="menuLv">* 레벨</label>
-                                <select class="custom-select rounded-0" id="menuLv" name="menu_lv"></select>
-                                <input type="hidden" id="menuId" name="menu_id" class="form-control">
+                                <select class="custom-select rounded-0" id="menuLv" name="menuLv"></select>
+                                <input type="hidden" id="menuId" name="menuId" class="form-control">
                             </div>
                             <div class="col-6">
                                 <label for="prnMenuId">* 대메뉴</label>
-                                <select class="custom-select rounded-0" id="prnMenuId" name="prn_menu_id">
+                                <select class="custom-select rounded-0" id="prnMenuId" name="prnMenuId">
                                     <option value="0">-- 없음 --</option>
                                 </select>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="menuNm">* 메뉴명</label>
-                            <input type="text" id="menuNm" name="menu_nm" class="form-control">
+                            <input type="text" id="menuNm" name="menuNm" class="form-control">
                         </div>
                         <div class="form-group row">
                             <div class="col-3">
                                 <div class="custom-control custom-radio">
-                                    <input class="custom-control-input" type="radio" id="menuType1" name="menu_type" value="URL" checked>
+                                    <input class="custom-control-input" type="radio" id="menuType1" name="menuType" value="URL" checked>
                                     <label for="menuType1" class="custom-control-label">도메인</label>
                                 </div>
                             </div>
                             <div class="col-3">
                                 <div class="custom-control custom-radio">
-                                    <input class="custom-control-input" type="radio" id="menuType2" name="menu_type" value="BOARD" >
+                                    <input class="custom-control-input" type="radio" id="menuType2" name="menuType" value="BOARD" >
                                     <label for="menuType2" class="custom-control-label">게시판</label>
                                 </div>
                             </div>
                             <div class="col-6">
-                                <select class="custom-select rounded-0" id="boardVal" name="board_val" style="display: none"></select>
+                                <label for="boardVal"></label><select class="custom-select rounded-0" id="boardVal" name="boardVal" style="display: none"></select>
                             </div>
                         </div>
                         <div class="form-group">
@@ -77,19 +77,17 @@
                             <input type="text" id="url" name="url"  class="form-control">
                         </div>
                         <div class="form-group row">
-                            <div class="col-6">
+                            <div class="col-4">
                                 <label for="ord">순서</label>
                                 <input type="number" id="ord" name="ord" class="form-control">
                             </div>
-                            <div class="col-6">
+                            <div class="col-4">
                                 <label for="useYn">* 사용여부</label>
-                                <select class="custom-select rounded-0" id="useYn" name="use_yn"></select>
+                                <select class="custom-select rounded-0" id="useYn" name="useYn"></select>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="custom-control custom-switch">
-                                <input type="checkbox" class="custom-control-input" id="mainYn" name="main_yn">
-                                <label class="custom-control-label" for="mainYn">메인페이지 여부</label>
+                            <div class="col-4">
+                                <label for="ord">* 메뉴구성여부</label>
+                                <label for="navYn"></label><select class="custom-select rounded-0" id="navYn" name="navYn"></select>
                             </div>
                         </div>
                     </div>

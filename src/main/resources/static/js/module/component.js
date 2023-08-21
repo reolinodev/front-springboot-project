@@ -21,11 +21,11 @@ export function setCodeSelBox(id, codeGrp, type, selectedValue) {
             for (let i = 0; i < dataList.length; i++) {
                 if (
                     selectedValue !== '' &&
-                    selectedValue === dataList[i].code_val
+                    selectedValue === dataList[i].codeVal
                 ) {
-                    str += `<option value="${dataList[i].code_val}" selected> ${dataList[i].code_nm}</option>`;
+                    str += `<option value="${dataList[i].codeVal}" selected> ${dataList[i].codeNm}</option>`;
                 } else {
-                    str += `<option value="${dataList[i].code_val}"> ${dataList[i].code_nm}</option>`;
+                    str += `<option value="${dataList[i].codeVal}"> ${dataList[i].codeNm}</option>`;
                 }
             }
 
@@ -61,11 +61,11 @@ export function setCodeSelBoxCall(id, codeGrp, type, selectedValue, callBack) {
             for (let i = 0; i < dataList.length; i++) {
                 if (
                     selectedValue !== '' &&
-                    selectedValue === dataList[i].code_val
+                    selectedValue === dataList[i].codeVal
                 ) {
-                    str += `<option value="${dataList[i].code_val}" selected> ${dataList[i].code_nm}</option>`;
+                    str += `<option value="${dataList[i].codeVal}" selected> ${dataList[i].codeNm}</option>`;
                 } else {
-                    str += `<option value="${dataList[i].code_val}"> ${dataList[i].code_nm}</option>`;
+                    str += `<option value="${dataList[i].codeVal}"> ${dataList[i].codeNm}</option>`;
                 }
             }
 
@@ -84,14 +84,14 @@ export function setCodeSelBoxCall(id, codeGrp, type, selectedValue, callBack) {
 
 /**
  * setCommSelBox : 공통코드를 사용하지 않는 경우 셀렉트 박스 생성
- * 생성할 아이디, url, url_type(url 전송 타입) ,타입(전체, 선택, ''), 선택된 값(''), 파라미터(''), option(옵션안에 넣을 텍스트와 value의 값을 추출)
+ * 생성할 아이디, url, urlType(url 전송 타입) ,타입(전체, 선택, ''), 선택된 값(''), 파라미터(''), option(옵션안에 넣을 텍스트와 value의 값을 추출)
  */
 export function setCommSelBox(
     id,
     url,
-    url_type,
+    urlType,
     type,
-    selected_value,
+    selectedValue,
     params,
     option
 ) {
@@ -105,13 +105,14 @@ export function setCommSelBox(
         params = {};
     }
 
+
     if (url === '') {
         str += '</select>';
         $(`#${id}`).html(str);
     } else {
         $.ajax({
             url: `${apiDomain}${url}`,
-            type: url_type,
+            type: urlType,
             data: JSON.stringify(params),
             success(result) {
                 const list = result.data;
@@ -125,10 +126,10 @@ export function setCommSelBox(
                         const {oTxt} = option;
                         const {oVal} = option;
 
-                        if (selected_value !== '') {
+                        if (selectedValue !== '') {
                             if (
                                 list[i][oVal].toString() ===
-                                selected_value.toString()
+                                selectedValue.toString()
                             ) {
                                 str += `<option value="${list[i][oVal]}" selected> ${list[i][oTxt]}</option>`;
                             } else {
@@ -154,14 +155,14 @@ export function setCommSelBox(
 
 /**
  * setCommSelBoxCall : 공통코드를 사용하지 않는 경우 셀렉트 박스 생성, 콜백함수가 필요한 경우
- * 생성할 아이디, url, url_type(url 전송 타입) ,타입(전체, 선택, ''), 선택된 값(''), 파라미터(''), option(옵션안에 넣을 텍스트와 value의 값을 추출), callback
+ * 생성할 아이디, url, urlType(url 전송 타입) ,타입(전체, 선택, ''), 선택된 값(''), 파라미터(''), option(옵션안에 넣을 텍스트와 value의 값을 추출), callback
  */
 export function setCommSelBoxCall(
     id,
     url,
-    url_type,
+    urlType,
     type,
-    selected_value,
+    selectedValue,
     params,
     option,
     callback
@@ -182,7 +183,7 @@ export function setCommSelBoxCall(
     } else {
         $.ajax({
             url: `${apiDomain}${url}`,
-            type: url_type,
+            type: urlType,
             data: JSON.stringify(params),
             success(result) {
                 const list = result.data;
@@ -196,10 +197,10 @@ export function setCommSelBoxCall(
                         const {oTxt} = option;
                         const {oVal} = option;
 
-                        if (selected_value !== '') {
+                        if (selectedValue !== '') {
                             if (
                                 list[i][oVal].toString() ===
-                                selected_value.toString()
+                                selectedValue.toString()
                             ) {
                                 str += `<option value="${list[i][oVal]}" selected> ${list[i][oTxt]}</option>`;
                             } else {

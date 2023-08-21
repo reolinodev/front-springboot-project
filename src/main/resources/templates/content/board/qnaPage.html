@@ -12,18 +12,18 @@
 <div layout:fragment="content" id="container">
     <!-- 조회 화면 -->
     <form id="qnaFrm" name="qnaFrm">
-        <input type="hidden" id="boardId" name="board_id" th:value="${board_id}">
+        <input type="hidden" id="boardId" name="boardId" th:value="${boardId}">
         <input type="hidden" id="status" th:value="${status}">
-        <input type="hidden" id="pagePer" name="page_per" th:value="10"/>
+        <input type="hidden" id="size" name="size" th:value="10"/>
 
         <div class="card">
             <div class="card-body">
                 <div class="row">
                     <div class="col-4">
                         <label for="qnaTitle">게시글제목</label>
-                        <input type="text" class="form-control" id="qnaTitle" name="qna_title">
+                        <input type="text" class="form-control" id="qnaTitle" name="qnaTitle">
                         <input type="text" class="form-control" style="display: none"> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
-                        <input type="hidden" id="useYn" name="use_yn" th:value="Y">
+                        <input type="hidden" id="useYn" name="useYn" th:value="Y">
                     </div>
                     <div class="col-4">
                         <label>작성일</label>

@@ -26,7 +26,7 @@ const search = () => {
  *  searchSuccess : search successCallback
  */
 const searchSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         setPostData(result.data);
     }
     spinnerHide();
@@ -44,12 +44,12 @@ const searchError = response => {
  *  setPostData : 게시판 화면세팅
  */
 const setPostData = data => {
-    setBoardBoxCall(data.board_id);
-    $postTitle.val(data.post_title);
+    setBoardBoxCall(data.boardId);
+    $postTitle.val(data.postTitle);
 
-    editor = setBasicEditor('editor', data.main_text, 500);
+    editor = setBasicEditor('editor', data.mainText, 500);
 
-    setCodeSelBox('useYn', 'USE_YN', '', data.use_yn);
+    setCodeSelBox('useYn', 'USE_YN', '', data.useYn);
 
     $('#boardId').prop('disabled', true);
 };
@@ -81,7 +81,7 @@ const save = () => {
  *  saveSuccess : save successCallback
  */
 const saveSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         alert(result.header.message);
         pageMove();
     } else {
@@ -95,8 +95,16 @@ const saveSuccess = result => {
  *  saveError : save errorCallback
  */
 const saveError = response => {
+
+    let errorMessage = '';
+    if(response["errorList"] !== undefined && response["errorList"].length !== 0){
+        errorMessage = response["errorList"][0].message;
+    }else{
+        errorMessage = response.message;
+    }
+    alert(errorMessage);
+
     spinnerHide();
-    alert(response.message);
 };
 
 const pageMove = () => {
@@ -110,15 +118,15 @@ const pageMove = () => {
 
 const setBoardBoxCall = boardId => {
     const option = {
-        oTxt: 'board_title',
-        oVal: 'board_id',
+        oTxt: 'boardTitle',
+        oVal: 'boardId',
     };
 
     const params = {};
 
     setCommSelBox(
         'boardId',
-        '/api/item/board/post/Y',
+        '/api/item/board/POST',
         'POST',
         'SEL',
         boardId,

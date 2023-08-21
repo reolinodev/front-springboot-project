@@ -18,7 +18,7 @@ const $url = $('#url'); //url
 const $useYn = $('#useYn'); //사용여부
 const $ord = $('#ord'); //순서
 const $boardVal = $('#boardVal'); //게시판식별키
-const $mainYn = $('#mainYn'); //메인여부
+const $navYn = $('#navYn'); //메뉴구성여부
 const $prnMenuId = $('#prnMenuId'); //상위메뉴
 const $menuType1 = $('#menuType1'); //메뉴타입 - 도메인
 const $menuType2 = $('#menuType2 '); //메뉴타입 - 게시판
@@ -29,7 +29,7 @@ const $menuType2 = $('#menuType2 '); //메뉴타입 - 게시판
 const search = () => {
     spinnerShow();
     callApiWithoutBody(
-        `/api/menu/tree/${$authRole.val()}`,
+        `/api/menu/menu-tree/${$authRole.val()}`,
         'GET',
         searchSuccess,
         searchError
@@ -40,7 +40,7 @@ const search = () => {
  *  searchSuccess : search successCallback
  */
 const searchSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         setMenuTree(result.data);
     }
     spinnerHide();
@@ -61,18 +61,18 @@ const setMenuTree = list => {
     const menu = [];
 
     for (const data of list) {
-        if (data.menu_lv === 1) {
+        if (data.menuLv === 1) {
             const obj1 = {};
             const children = [];
 
-            obj1.text = data.menu_nm;
-            obj1.target = data.menu_id;
+            obj1.text = data.menuNm;
+            obj1.target = data.menuId;
 
             for (const data2 of list) {
-                if (data.menu_id === data2.prn_menu_id) {
+                if (data.menuId === data2.prnMenuId) {
                     const obj2 = {};
-                    obj2.text = data2.menu_nm;
-                    obj2.target = data2.menu_id;
+                    obj2.text = data2.menuNm;
+                    obj2.target = data2.menuId;
                     children.push(obj2);
                 }
             }
@@ -102,7 +102,7 @@ const getMenuData = menuId => {
  *  getMenuDataSuccess : getMenuData successCallback
  */
 const getMenuDataSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         setMenuData(result.data);
     }
     spinnerHide();
@@ -120,36 +120,32 @@ const getMenuDataError = response => {
  * setMenuData : 조회된 메뉴 데이터 화면에 매핑
  */
 const setMenuData = data => {
-    $menuId.val(data.menu_id);
-    $menuLv.val(data.menu_lv);
-    $menuNm.val(data.menu_nm);
+    $menuId.val(data.menuId);
+    $menuLv.val(data.menuLv);
+    $menuNm.val(data.menuNm);
     $url.val(data.url);
-    $useYn.val(data.use_yn);
+    $useYn.val(data.useYn);
+    $navYn.val(data.navYn);
     $ord.val(data.ord);
 
-    if (data.menu_type === 'URL') {
+    if (data.menuType === 'URL') {
         $menuType1.prop('checked', true);
         $menuType2.prop('checked', false);
         $boardVal.val('');
         $boardVal.hide();
-    } else {
+    }
+    else {
         $menuType1.prop('checked', false);
         $menuType2.prop('checked', true);
-        $boardVal.val(data.board_val);
+        $boardVal.val(data.boardVal);
         $boardVal.show();
     }
 
-    if (data.main_yn === 'Y') {
-        $mainYn.prop('checked', true);
-    } else {
-        $mainYn.prop('checked', false);
-    }
-
-    if (data.menu_lv === 1) {
+    if (data.menuLv === 1) {
         const str = '<option value="0">-- 없음 --</option>';
         $prnMenuId.html(str);
     } else {
-        setPrnMenuSelectBox('', data.prn_menu_id);
+        setPrnMenuSelectBox('', data.prnMenuId);
     }
 
     $menuLv.attr('disabled', true);
@@ -171,8 +167,7 @@ const initMenuAdd = () => {
     $url.val('');
     $useYn.val('Y');
     $ord.val('');
-    $mainYn.prop('checked', false);
-
+    $navYn.prop('checked', false);
     $menuLv.attr('disabled', false);
     $prnMenuId.attr('disabled', false);
 };
@@ -202,11 +197,6 @@ const save = () => {
         return;
     }
 
-    let mainYn = 'N';
-    if ($('input[name="main_yn"]').is(':checked')) {
-        mainYn = 'Y';
-    }
-
     spinnerShow();
 
     let url = '/api/menu';
@@ -216,16 +206,16 @@ const save = () => {
 
     const type = 'PUT';
     const params = {
-        menu_lv: $menuLv.val(),
-        prn_menu_id: $prnMenuId.val(),
-        menu_nm: $menuNm.val(),
-        menu_type: $("input[name='menu_type']:checked").val(),
+        menuLv: $menuLv.val(),
+        prnMenuId: $prnMenuId.val(),
+        menuNm: $menuNm.val(),
+        menuType: $("input[name='menuType']:checked").val(),
         url: $url.val(),
-        use_yn: $useYn.val(),
+        useYn: $useYn.val(),
         ord: $ord.val(),
-        main_yn: mainYn,
-        auth_role: $authRole.val(),
-        board_val: $boardVal.val(),
+        navYn: $navYn.val(),
+        authRole: $authRole.val(),
+        boardVal: $boardVal.val(),
     };
 
     callApi(url, type, params, saveSuccess, saveError);
@@ -236,7 +226,7 @@ const save = () => {
  */
 const saveSuccess = result => {
     alert(result.header.message);
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         search();
     }
 
@@ -257,16 +247,11 @@ const saveError = response => {
 const menuDelete = () => {
     spinnerShow();
 
-    let url = '/api/menu';
+    let url = `/api/menu/${$('#menuId').val()}`;
 
     const type = 'DELETE';
 
-    const params = {
-        menu_id: $('#menuId').val(),
-        menu_lv: $('#menuLv').val(),
-    };
-
-    callApi(url, type, params, menuDeleteSuccess, menuDeleteError);
+    callApiWithoutBody(url, type, menuDeleteSuccess, menuDeleteError);
 };
 
 /**
@@ -274,7 +259,7 @@ const menuDelete = () => {
  */
 const menuDeleteSuccess = result => {
     alert(result.header.message);
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         search();
     }
 
@@ -291,7 +276,7 @@ const menuDeleteError = response => {
 
 const initSelectBox = () => {
     setCodeSelBox('useYn', 'USE_YN', '', 'Y');
-
+    setCodeSelBox('navYn', 'USE_YN', '', 'Y');
     setCodeSelBox('menuLv', 'MENU_LV', '', 'Y');
 
     setBoardBox('');
@@ -299,15 +284,15 @@ const initSelectBox = () => {
 
 const setBoardBox = selected => {
     const option = {
-        oTxt: 'board_title',
-        oVal: 'board_val',
+        oTxt: 'boardTitle',
+        oVal: 'boardVal',
     };
 
     const params = {};
 
     setCommSelBox(
         'boardVal',
-        '/api/item/board/ALL/Y',
+        '/api/item/board/ALL',
         'POST',
         'SEL',
         selected,
@@ -319,8 +304,8 @@ const setBoardBox = selected => {
 const setPrnMenuSelectBox = (type, prnMenuId) => {
     const params = {};
     const option = {
-        oTxt: 'menu_nm',
-        oVal: 'menu_id',
+        oTxt: 'menuNm',
+        oVal: 'menuId',
     };
     setCommSelBox(
         'prnMenuId',
@@ -377,8 +362,8 @@ $(document).ready(() => {
         }
     });
 
-    $("input[name='menu_type']").change(() => {
-        const menuType = $("input[name='menu_type']:checked").val();
+    $("input[name='menuType']").change(() => {
+        const menuType = $("input[name='menuType']:checked").val();
         $url.val('');
         $boardVal.val('');
         if (menuType === 'URL') {
@@ -394,11 +379,11 @@ $(document).ready(() => {
 
         if (boardId !== '') {
             const arr = boardId.split('/');
-            const boardIdStr = arr[0];
+            const boardIdStr = arr[0].toLowerCase();
             const boardTypeStr = arr[1];
 
             $('#url').val(
-                `/page/board/${boardTypeStr}/list/init/` + boardIdStr
+                `/page/board/${boardTypeStr.lo}/list/init/` + boardIdStr
             );
         }
     });

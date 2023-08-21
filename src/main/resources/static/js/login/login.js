@@ -30,8 +30,8 @@ const certification = () => {
     const url = '/api/certification';
     const type = 'POST';
     const params = {
-        login_id: $loginId.val(),
-        user_pw: $userPw.val(),
+        loginId: $loginId.val(),
+        userPw: $userPw.val(),
     };
 
     callApiWithoutToken(
@@ -50,8 +50,8 @@ const certification = () => {
  *  : accessToken을 localStorage에 저장하고 로그인
  */
 const certificationSuccess = result => {
-    const resultCode = result.header.result_code;
-    const accessToken = result.header.access_token;
+    const resultCode = result.header.resultCode;
+    const accessToken = result.header.accessToken;
 
     if (resultCode === 'ok') {
         $('#msg').html('');
@@ -104,10 +104,10 @@ const login = () => {
     const type = 'POST';
 
     const params = {
-        login_id: $loginId.val(),
-        user_pw: $userPw.val(),
-        login_device: $loginDevice.val(),
-        device_browser: $deviceBrowser.val(),
+        loginId: $loginId.val(),
+        userPw: $userPw.val(),
+        loginDevice: $loginDevice.val(),
+        deviceBrowser: $deviceBrowser.val(),
     };
 
     callApi(url, type, params, loginSuccess, loginError);
@@ -118,14 +118,14 @@ const login = () => {
  *  : 비밀번호 초기화가 필요한 경우 비밀번호변경 페이지 이동, 로그인 성공시 메인페이지 이동
  */
 const loginSuccess = result => {
-    const resultCode = result.header.result_code;
+    const resultCode = result.header.resultCode;
     const message = result.header.message;
 
     if (resultCode === 'ok') {
         pageRouter('/page/main');
     } else if (resultCode === 'pwchange') {
         alert('비밀번호 초기화가 필요합니다. 비밀번호 변경화면으로 이동합니다');
-        pageRouter('/page/pwChange');
+        pageRouter('/page/pwChange/'+$loginId.val());
     } else if (resultCode === 'fail') {
         $('#msg').html(message);
     }

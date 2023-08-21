@@ -1,5 +1,5 @@
 import {setBasicViewer} from '../module/editor';
-import {setCommSelBox} from '../module/component';
+import {setCodeSelBox, setCommSelBox} from '../module/component';
 import {spinnerHide, spinnerShow} from '../module/spinner';
 import {callApiWithoutBody} from '../module/async';
 
@@ -29,8 +29,8 @@ const search = () => {
  *  searchSuccess : search successCallback
  */
 const searchSuccess = result => {
-    if (result.header.result_code === 'ok') {
-        setPostData(result.data);
+    if (result.header["resultCode"] === 'ok') {
+        setPostData(result.data, result.myPost);
     }
     spinnerHide();
 };
@@ -43,19 +43,21 @@ const searchError = response => {
     console.log(response.message);
 };
 
-const setPostData = data => {
-    setBoardBoxCall(data.board_id);
+const setPostData = (data, myPost) => {
+    setBoardBoxCall(data.boardId);
 
-    $postTitle.val(data.post_title);
-    $createdNm.val(data.created_nm);
-    $createdAt.val(data.created_at);
-    $createdId.val(data.created_id);
+    $postTitle.val(data.postTitle);
+    $createdNm.val(data.createdIdLabel);
+    $createdAt.val(data.createdAtLabel);
+    $createdId.val(data.createdId);
 
-    setBasicViewer('viewer', data.main_text);
+    setCodeSelBox('useYn', 'USE_YN', '', data.useYn);
+
+    setBasicViewer('viewer', data.mainText);
 
     $('#boardId').prop('disabled', true);
 
-    if (userId === $createdId.val()) {
+    if (myPost) {
         $('#updateBtnArea').show();
     } else {
         $('#updateBtnArea').hide();
@@ -64,15 +66,15 @@ const setPostData = data => {
 
 const setBoardBoxCall = boardId => {
     const option = {
-        oTxt: 'board_title',
-        oVal: 'board_id',
+        oTxt: 'boardTitle',
+        oVal: 'boardId',
     };
 
     const params = {};
 
     setCommSelBox(
         'boardId',
-        '/api/item/board/post/Y',
+        '/api/item/board/POST',
         'POST',
         'SEL',
         boardId,

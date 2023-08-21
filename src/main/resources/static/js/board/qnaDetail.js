@@ -25,7 +25,7 @@ const search = () => {
  *  searchSuccess : search successCallback
  */
 const searchSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         setQnaData(result.data);
     }
     spinnerHide();
@@ -46,26 +46,26 @@ const setQnaData = data => {
     let content = '';
     let content2 = '';
 
-    setBoardBox(data.board_id);
+    setBoardBox(data.boardId);
 
-    $qnaTitle.val(data.qna_title);
-    $createdNm.val(data.created_nm);
-    $createdAt.val(data.created_at);
-    $responseYnNm.val(data.response_yn_nm);
-    $responseNm.val(data.response_nm);
-    $responseAt.val(data.response_at);
+    $qnaTitle.val(data.qnaTitle);
+    $createdNm.val(data.createdIdLabel);
+    $createdAt.val(data.createdAtLabel);
+    $responseYnNm.val(data.responseLabel);
+    $responseNm.val(data.responseIdLabel);
+    $responseAt.val(data.responseAtLabel);
     $questions.val(data.questions);
-    $mainText.val(data.main_text);
+    $mainText.val(data.mainText);
 
     if (data.questions != null) {
         content = data.questions;
     }
     setBasicViewer('viewer', content);
 
-    if (data.main_text == null) {
+    if (data.mainText == null) {
         content2 = '답변대기중';
     } else {
-        content2 = data.main_text;
+        content2 = data.mainText;
     }
 
     setBasicViewer('viewer2', content2);
@@ -73,15 +73,15 @@ const setQnaData = data => {
 
 const setBoardBox = boardId => {
     const option = {
-        oTxt: 'board_title',
-        oVal: 'board_id',
+        oTxt: 'boardTitle',
+        oVal: 'boardId',
     };
 
     const params = {};
 
     setCommSelBox(
         'boardId',
-        '/api/item/board/qna/Y',
+        '/api/item/board/QNA',
         'POST',
         '',
         boardId,

@@ -11,27 +11,27 @@
 
 <div layout:fragment="content" id="container">
     <form name="authViewFrm">
-        <input type="hidden" id="pagePer" name="page_per" th:value="10"/>
+        <input type="hidden" id="size" name="size" th:value="10"/>
 
         <div class="card">
             <div class="card-body">
                 <div class="row">
                     <div class="col-3">
                         <label for="viewUseYn">권한구분</label>
-                        <select class="custom-select rounded-0" id="viewAuthRole" name="auth_role"></select>
+                        <select class="custom-select rounded-0" id="viewAuthRole" name="authRole"></select>
                     </div>
                     <div class="col-3">
                         <label for="viewAuthVal">권한코드</label>
-                        <input type="text" class="form-control" id="viewAuthVal" name="auth_val">
+                        <input type="text" class="form-control" id="viewAuthVal" name="authVal">
                     </div>
                     <div class="col-3">
                         <label for="viewAuthNm">권한명</label>
-                        <input type="text" class="form-control" id="viewAuthNm" name="auth_nm">
+                        <input type="text" class="form-control" id="viewAuthNm" name="authNm">
                     </div>
                     <div class="col-3">
                         <input type="text" class="form-control" style="display: none">
                         <label for="viewUseYn">사용여부</label>
-                        <select class="custom-select rounded-0" id="viewUseYn" name="use_yn"></select>
+                        <select class="custom-select rounded-0" id="viewUseYn" name="useYn"></select>
                     </div>
                 </div>
             </div>
@@ -69,18 +69,18 @@
                         <div class="form-group row">
                             <div class="col-6">
                                 <label for="writeAuthRole">* 권한구분</label>
-                                <select class="custom-select rounded-0" id="writeAuthRole" name="auth_role"></select>
+                                <select class="custom-select rounded-0" id="writeAuthRole" name="authRole"></select>
                             </div>
                             <div class="col-6">
                                 <label for="writeAuthNm">* 권한명</label>
-                                <input type="text" class="form-control" id="writeAuthNm" name="auth_nm" placeholder="권한명">
+                                <input type="text" class="form-control" id="writeAuthNm" name="authNm" placeholder="권한명">
                             </div>
 
                         </div>
                         <div class="form-group row">
                             <div class="col-6">
                                 <label for="writeAuthVal">* 권한코드</label>
-                                <input type="text" class="form-control" id="writeAuthVal" name="auth_val" placeholder="권한코드">
+                                <input type="text" class="form-control" id="writeAuthVal" name="authVal" placeholder="권한코드">
                             </div>
                             <div class="col-6">
                                 <label for="writeOrd">순서</label>
@@ -96,7 +96,7 @@
                         <div class="form-group row">
                             <div class="col-12">
                                 <label for="writeMainUrl">메인URL</label>
-                                <input type="text" class="form-control" id="writeMainUrl" name="main_url" placeholder="메인URL">
+                                <input type="text" class="form-control" id="writeMainUrl" name="mainUrl" placeholder="메인URL">
                             </div>
                         </div>
                         <div class="form-group row">
@@ -131,14 +131,14 @@
                             </div>
                             <div class="col-6">
                                 <label for="editAuthNm">* 권한명</label>
-                                <input type="text" class="form-control" id="editAuthNm" name="auth_nm" placeholder="권한명">
-                                <input type="hidden" class="form-control" id="editAuthId" name="auth_id">
+                                <input type="text" class="form-control" id="editAuthNm" name="authNm" placeholder="권한명">
+                                <input type="hidden" class="form-control" id="editAuthId" name="authId">
                             </div>
                         </div>
                         <div class="form-group row">
                             <div class="col-4">
                                 <label for="editAuthVal">권한코드</label>
-                                <input type="text" class="form-control" id="editAuthVal" name="auth_val" readonly>
+                                <input type="text" class="form-control" id="editAuthVal" name="authVal" readonly>
                             </div>
                             <div class="col-4">
                                 <label for="editOrd">순서</label>
@@ -146,7 +146,7 @@
                             </div>
                             <div class="col-4">
                                 <label for="editUseYn">* 사용여부</label>
-                                <select class="custom-select rounded-0" id="editUseYn" name="use_yn"></select>
+                                <select class="custom-select rounded-0" id="editUseYn" name="useYn"></select>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -158,7 +158,7 @@
                         <div class="form-group row">
                             <div class="col-12">
                                 <label for="editMainUrl">메인URL</label>
-                                <input type="text" class="form-control" id="editMainUrl" name="main_url" placeholder="메인URL">
+                                <input type="text" class="form-control" id="editMainUrl" name="mainUrl" placeholder="메인URL">
                             </div>
                         </div>
                         <div class="form-group row">

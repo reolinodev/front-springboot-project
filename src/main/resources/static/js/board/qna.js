@@ -17,7 +17,7 @@ let sessionParam;
 const status = $('#status').val();
 
 const pageInit = () => {
-    page = new Page(1, false, Number($('#pagePer').val()), 0);
+    page = new Page(1, false, Number($('#size').val()), 0);
 };
 
 /**
@@ -26,18 +26,11 @@ const pageInit = () => {
 const setGridLayout = () => {
     // 헤더 생성
     const columns = [
-        {header: 'No', name: 'rnum', width: 100, align: 'center'},
-        {
-            header: 'SEQ',
-            name: 'qna_id',
-            width: 100,
-            align: 'center',
-            hidden: true,
-        },
-        {header: '게시판', name: 'board_title', width: 150, align: 'center'},
+        {header: 'ID', name: 'qnaId', width: 100, align: 'center'},
+        {header: '게시판', name: 'boardTitle', width: 150, align: 'center'},
         {
             header: '게시글명',
-            name: 'qna_title',
+            name: 'qnaTitle',
             align: 'center',
             renderer: {
                 styles: {
@@ -47,20 +40,14 @@ const setGridLayout = () => {
                 },
             },
         },
-        {header: '작성자', name: 'created_nm', width: 100, align: 'center'},
-        {header: '답변자', name: 'response_nm', width: 100, align: 'center'},
-        {header: '작성일', name: 'created_at', width: 150, align: 'center'},
-        {
-            header: '답변여부',
-            name: 'response_yn_nm',
-            width: 100,
-            align: 'center',
-        },
-        {header: '사용여부', name: 'use_yn_nm', width: 100, align: 'center'},
+        {header: '작성자', name: 'createdIdLabel', width: 100, align: 'center'},
+        {header: '답변자', name: 'responseIdLabel', width: 100, align: 'center'},
+        {header: '작성일', name: 'createdAtLabel', width: 150, align: 'center'},
+        {header: '답변여부', name: 'responseLabel', width: 100, align: 'center'},
+        {header: '사용여부', name: 'useYnLabel', width: 100, align: 'center'},
     ];
     // 데이터
     const gridData = [];
-
     return setBasicGrid(columns, gridData);
 };
 
@@ -81,8 +68,8 @@ const search = () => {
     const type = 'POST';
 
     const params = serializeFormJson('qnaFrm');
-    params.current_page = page.currentPage;
-    params.page_per = page.pagePer;
+    params.page = page.page;
+    params.size = page.size;
     window.sessionStorage.setItem('params', JSON.stringify(params));
 
     callApi(url, type, params, searchSuccess, searchError);
@@ -92,15 +79,15 @@ const search = () => {
  *  searchSuccess : search successCallback
  */
 const searchSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         const gridData = result.data;
-        page.totalCount = result.total;
+        page.totalCount = result.totalCount;
         grid.resetData(gridData);
 
         if (page.pageInit === false) {
             page.pageInit = true;
-            setGridClickEvent(grid, 'qna_title', 'qna_id', qnaAnswer);
-            pagination.reset(result.total);
+            setGridClickEvent(grid, 'qnaTitle', 'qnaId', qnaAnswer);
+            pagination.reset(result.totalCount);
         }
     }
 
@@ -119,7 +106,7 @@ const searchError = response => {
  * pagingCallback : 페이징 콜백
  */
 const pagingCallback = returnPage => {
-    page.currentPage = returnPage;
+    page.page = returnPage;
     search();
 };
 
@@ -127,13 +114,13 @@ const setBoardBoxCall = (selected, callback) => {
     const params = {};
 
     const option = {
-        oTxt: 'board_title',
-        oVal: 'board_id',
+        oTxt: 'boardTitle',
+        oVal: 'boardId',
     };
 
     setCommSelBoxCall(
         'boardId',
-        '/api/item/board/qna/Y',
+        '/api/item/board/QNA',
         'POST',
         'ALL',
         selected,
@@ -146,9 +133,9 @@ const setBoardBoxCall = (selected, callback) => {
 const setUseYnCall = () => {
     setCodeSelBoxCall(
         'useYn',
-        'USE_YN',
+        'useYn',
         'ALL',
-        sessionParam.use_yn,
+        sessionParam.useYn,
         setResponseYnCall
     );
 };
@@ -164,11 +151,11 @@ const setResponseYnCall = () => {
 };
 
 const setMoveToPagination = () => {
-    pagination.movePageTo(sessionParam.current_page);
+    pagination.movePageTo(sessionParam.page);
 };
 
 $(document).ready(() => {
-    setBasicDataRange('start_date', 'end_date', '1years');
+    setBasicDataRange('startDate', 'endDate', '1years');
 
     grid = setGridLayout();
 
@@ -221,14 +208,14 @@ $(document).ready(() => {
     } else {
         sessionParam = JSON.parse(window.sessionStorage.getItem('params'));
 
-        $('input[name=qna_title]').val(sessionParam.qna_title);
+        $('input[name=qnaTitle]').val(sessionParam.qnaTitle);
         $('input[name=created_nm]').val(sessionParam.created_nm);
-        $('input[name=start_date]').val(sessionParam.start_date);
-        $('input[name=end_date]').val(sessionParam.end_date);
+        $('input[name=startDate]').val(sessionParam.startDate);
+        $('input[name=endDate]').val(sessionParam.endDate);
 
-        page.currentPage = sessionParam.current_page;
-        page.page_per = sessionParam.page_per;
+        page.page = sessionParam.page;
+        page.size = sessionParam.size;
 
-        setBoardBoxCall(sessionParam.board_id, setUseYnCall);
+        setBoardBoxCall(sessionParam.boardId, setUseYnCall);
     }
 });

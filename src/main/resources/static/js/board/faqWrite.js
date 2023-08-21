@@ -38,7 +38,7 @@ const save = () => {
 };
 
 const saveSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header.resultCode === 'ok') {
         alert(result.header.message);
         spinnerHide();
         location.href = '/page/board/faq/list/init';
@@ -54,20 +54,27 @@ const saveSuccess = result => {
  */
 const saveError = response => {
     spinnerHide();
-    alert(response.message);
+
+    let errorMessage = '';
+    if(response["errorList"] !== undefined && response["errorList"].length !== 0){
+        errorMessage = response["errorList"][0].message;
+    }else{
+        errorMessage = response.message;
+    }
+    alert(errorMessage);
 };
 
 const setBoardBox = () => {
     const option = {
-        oTxt: 'board_title',
-        oVal: 'board_id',
+        oTxt: 'boardTitle',
+        oVal: 'boardId',
     };
 
     const params = {};
 
     setCommSelBox(
         'boardId',
-        '/api/item/board/faq/Y',
+        '/api/item/board/FAQ',
         'POST',
         'SEL',
         '',

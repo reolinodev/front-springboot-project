@@ -2,10 +2,10 @@ import Pagination from 'tui-pagination';
 
 export default class Page {
     // 현재페이지, 페이징 초기화, 페이지별 항목수, 총 카운트
-    constructor(currentPage, pageInit, pagePer, totalCount) {
-        this.currentPage = currentPage;
+    constructor(page, pageInit, size, totalCount) {
+        this.page = page;
         this.pageInit = pageInit;
-        this.pagePer = pagePer;
+        this.size = size;
         this.totalCount = totalCount;
     }
 }
@@ -16,7 +16,7 @@ export default class Page {
 export function setPagination(page, callBackFunc) {
     const pagination = new Pagination('pagination', {
         totalItems: page.totalCount,
-        itemsPerPage: page.pagePer,
+        itemsPerPage: page.size,
         visiblePages: 10,
     });
 

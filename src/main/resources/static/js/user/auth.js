@@ -29,7 +29,7 @@ const $editMainUrl = $('#editMainUrl'); //권한수정 - 메인URL
 const $editMsg = $('#editMsg'); //권한수정 - 메시지
 
 const pageInit = () => {
-    page = new Page(1, false, Number($('#pagePer').val()), 0);
+    page = new Page(1, false, Number($('#size').val()), 0);
 };
 
 /**
@@ -38,18 +38,16 @@ const pageInit = () => {
 const setGridLayout = () => {
     // 헤더 생성
     const columns = [
-        {header: 'No', name: 'rnum', width: 50, align: 'center'},
         {
-            header: 'SEQ',
-            name: 'auth_id',
-            width: 100,
+            header: 'ID',
+            name: 'authId',
+            width: 50,
             align: 'center',
-            hidden: true,
         },
-        {header: '권한구분', name: 'auth_role_nm', align: 'center'},
+        {header: '권한구분', name: 'authRoleLabel', align: 'center'},
         {
             header: '권한코드',
-            name: 'auth_val',
+            name: 'authVal',
             align: 'center',
             renderer: {
                 styles: {
@@ -59,8 +57,8 @@ const setGridLayout = () => {
                 },
             },
         },
-        {header: '권한명', name: 'auth_nm', align: 'center'},
-        {header: '사용여부', name: 'use_yn_nm', width: 150, align: 'center'},
+        {header: '권한명', name: 'authNm', align: 'center'},
+        {header: '사용여부', name: 'useYnLabel', width: 150, align: 'center'},
     ];
     // 데이터
     const gridData = [];
@@ -77,8 +75,8 @@ const search = () => {
     const url = '/api/auth';
     const type = 'POST';
     const params = serializeFormJson('authViewFrm');
-    params.current_page = page.currentPage;
-    params.page_per = page.pagePer;
+    params.page = page.page;
+    params.size = page.size;
 
     callApi(url, type, params, searchSuccess, searchError);
 };
@@ -90,12 +88,12 @@ const searchSuccess = result => {
     spinnerHide();
 
     const gridData = result.data;
-    page.totalCount = result.total;
+    page.totalCount = result.totalCount;
     grid.resetData(gridData);
 
     if (page.pageInit === false) {
-        setGridClickEvent(grid, 'auth_val', 'auth_id', getAuthData);
-        pagination.reset(result.total);
+        setGridClickEvent(grid, 'authVal', 'authId', getAuthData);
+        pagination.reset(result.totalCount);
         page.pageInit = true;
     }
 };
@@ -112,7 +110,7 @@ const searchError = response => {
  * pagingCallback : 페이징 콜백
  */
 const pagingCallback = returnPage => {
-    page.currentPage = returnPage;
+    page.page = returnPage;
     search();
 };
 
@@ -147,12 +145,12 @@ const save = () => {
     const url = '/api/auth';
     const type = 'PUT';
     const params = {
-        auth_role: $writeAuthRole.val(),
-        auth_nm: $writeAuthNm.val(),
-        auth_val: $writeAuthVal.val(),
+        authRole: $writeAuthRole.val(),
+        authNm: $writeAuthNm.val(),
+        authVal: $writeAuthVal.val(),
         ord: $writeOrd.val(),
         memo: $writeMemo.val(),
-        main_url: $writeMainUrl.val(),
+        mainUrl: $writeMainUrl.val(),
     };
 
     callApi(url, type, params, saveSuccess, saveError);
@@ -162,7 +160,7 @@ const save = () => {
  *  saveSuccess : save successCallback
  */
 const saveSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header.resultCode === 'ok') {
         alert(result.header.message);
         search();
         closeModal();
@@ -175,7 +173,15 @@ const saveSuccess = result => {
  *  saveError : save errorCallback
  */
 const saveError = response => {
-    $writeMsg.html(response.message);
+    let errorMessage = '';
+    if(response.errorList !== undefined && response.errorList.length !== 0){
+        errorMessage = response.errorList[0].message;
+    }else{
+        errorMessage = response.message;
+    }
+
+    $writeMsg.html(errorMessage);
+
     spinnerHide();
 };
 
@@ -213,15 +219,16 @@ const getAuthDataError = response => {
  * setEditData : 에디트 데이터 셋
  */
 const setEditData = data => {
-    $editAuthRoleNm.val(data.auth_role_nm);
-    $editAuthId.val(data.auth_id);
-    $editAuthNm.val(data.auth_nm);
-    $editAuthVal.val(data.auth_val);
+    $editAuthRoleNm.val(data.authRoleLabel);
+    $editAuthId.val(data.authId);
+    $editAuthNm.val(data.authNm);
+    $editAuthVal.val(data.authVal);
     $editOrd.val(data.ord);
     $editMemo.val(data.memo);
-    $editMainUrl.val(data.main_url);
+    $editMainUrl.val(data.mainUrl);
+    $editMsg.html('');
 
-    setCodeSelBox('editUseYn', 'USE_YN', '', data.use_yn);
+    setCodeSelBox('editUseYn', 'USE_YN', '', data.useYn);
 
     window.$('#authEdit').modal('show');
 };
@@ -235,11 +242,11 @@ const update = () => {
     const url = `/api/auth/${$editAuthId.val()}`;
     const type = 'PUT';
     const params = {
-        auth_nm: $editAuthNm.val(),
+        authNm: $editAuthNm.val(),
         ord: $editOrd.val(),
         memo: $editMemo.val(),
-        use_yn: $editUseYn.val(),
-        main_url: $editMainUrl.val(),
+        useYn: $editUseYn.val(),
+        mainUrl: $editMainUrl.val(),
     };
 
     callApi(url, type, params, updateSuccess, updateError);
@@ -249,7 +256,7 @@ const update = () => {
  *  updateSuccess : update successCallback
  */
 const updateSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header.resultCode === 'ok') {
         alert(result.header.message);
         search();
         closeModal();
@@ -263,7 +270,16 @@ const updateSuccess = result => {
  *  updateError : update errorCallback
  */
 const updateError = response => {
-    $editMsg.html(response.message);
+
+    let errorMessage = '';
+    if(response.errorList !== undefined && response.errorList.length !== 0){
+        errorMessage = response.errorList[0].message;
+    }else{
+        errorMessage = response.message;
+    }
+
+    $editMsg.html(errorMessage);
+
     spinnerHide();
 };
 
@@ -276,10 +292,10 @@ const closeModal = () => {
 };
 
 $(document).ready(() => {
-    // 셀렉트 박스(공통코드) : 권한구분 => AUTH_ROLE
+    // 셀렉트 박스(공통코드) : 권한구분 => authRole
     setCodeSelBox('viewAuthRole', 'AUTH_ROLE', 'ALL', '');
 
-    // 셀렉트 박스(공통코드) : 사용구분 => USE_YN
+    // 셀렉트 박스(공통코드) : 사용구분 => useYn
     setCodeSelBox('viewUseYn', 'USE_YN', 'ALL', '');
 
     // 그리드 세팅

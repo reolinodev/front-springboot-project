@@ -4,6 +4,7 @@ import {callApi} from '../module/async';
 // 변수설정
 const $userPw = $('#userPw'); //비밀번호
 const $userPwRe = $('#userPwRe'); //비밀번호확인
+const $loginId = $('#loginId'); //로그인 아이디
 
 /**
  *  update : 비밀번호 변경실행
@@ -28,10 +29,11 @@ const update = () => {
         return;
     }
 
-    const url = '/api/user/user-page/user-pw';
+    const url = '/api/user/user-pw';
     const type = 'PUT';
     const params = {
-        user_pw: $userPw.val(),
+        loginId:$loginId.val(),
+        userPw: $userPw.val(),
     };
 
     callApi(url, type, params, updateSuccess, updateError);
@@ -42,7 +44,7 @@ const update = () => {
  *  :
  */
 const updateSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header.resultCode === 'ok') {
         alert(result.header.message);
         back();
     } else {

@@ -21,13 +21,13 @@
                 <div class="form-group row" style="display: none">
                     <label for="boardId" class="col-sm-1 col-form-label">게시판</label>
                     <div class="col-sm-5">
-                        <select class="custom-select rounded-0" id="boardId" name="board_id"></select>
+                        <select class="custom-select rounded-0" id="boardId" name="boardId"></select>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="qnaTitle" class="col-sm-1 col-form-label">제목</label>
                     <div class="col-sm-11">
-                        <input type="text" class="form-control" id="qnaTitle" name="qna_title" placeholder="제목을 입력하세요.">
+                        <input type="text" class="form-control" id="qnaTitle" name="qnaTitle" placeholder="제목을 입력하세요.">
                     </div>
                 </div>
                 <div class="form-group row">
@@ -59,7 +59,11 @@
                 <div class="form-group row">
                     <label for="hiddenYn" class="col-sm-1 col-form-label">공개여부</label>
                     <div class="col-sm-3">
-                        <select class="custom-select rounded-0" id="hiddenYn" name="hidden_yn"></select>
+                        <select class="custom-select rounded-0" id="hiddenYn" name="hiddenYn"></select>
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="password" class="form-control" id="qnaPw" name="qnaPw" placeholder="비밀번호를 입력하세요."
+                               style="display: none">
                     </div>
                 </div>
 
@@ -79,8 +83,8 @@
                     </div>
                 </div>
 
-                <input type="hidden" class="form-control" id="qnaId" name="qna_id" th:value="${qna_id}">
-                <input type="hidden" class="form-control" id="useYn" name="use_yn">
+                <input type="hidden" class="form-control" id="qnaId" name="qnaId" th:value="${qnaId}">
+                <input type="hidden" class="form-control" id="useYn" name="useYn">
             </div>
             <div class="card-footer">
                 <div class="row justify-content-end">

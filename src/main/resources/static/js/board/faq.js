@@ -16,7 +16,7 @@ let sessionParam;
 const status = $('#status').val();
 
 const pageInit = () => {
-    page = new Page(1, false, Number($('#pagePer').val()), 0);
+    page = new Page(1, false, Number($('#size').val()), 0);
 };
 
 /**
@@ -25,18 +25,16 @@ const pageInit = () => {
 const setGridLayout = () => {
     // 헤더 생성
     const columns = [
-        {header: 'No', name: 'rnum', width: 50, align: 'center'},
         {
-            header: 'SEQ',
-            name: 'faq_id',
-            width: 100,
+            header: 'ID',
+            name: 'faqId',
+            width: 50,
             align: 'center',
-            hidden: true,
         },
-        {header: '게시판', name: 'board_title', width: 200, align: 'center'},
+        {header: '게시판', name: 'boardTitle', width: 200, align: 'center'},
         {
             header: '게시글명',
-            name: 'faq_title',
+            name: 'faqTitle',
             align: 'center',
             renderer: {
                 styles: {
@@ -46,8 +44,8 @@ const setGridLayout = () => {
                 },
             },
         },
-        {header: '작성자', name: 'created_nm', width: 200, align: 'center'},
-        {header: '사용여부', name: 'use_yn_nm', width: 150, align: 'center'},
+        {header: '작성자', name: 'createdIdLabel', width: 200, align: 'center'},
+        {header: '사용여부', name: 'useYnLabel', width: 150, align: 'center'},
     ];
     // 데이터
     const gridData = [];
@@ -72,8 +70,8 @@ const search = () => {
     const type = 'POST';
 
     const params = serializeFormJson('faqFrm');
-    params.current_page = page.currentPage;
-    params.page_per = page.pagePer;
+    params.page = page.page;
+    params.size = page.size;
     window.sessionStorage.setItem('params', JSON.stringify(params));
 
     callApi(url, type, params, searchSuccess, searchError);
@@ -83,15 +81,15 @@ const search = () => {
  *  searchSuccess : search successCallback
  */
 const searchSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         const gridData = result.data;
-        page.totalCount = result.total;
+        page.totalCount = result.totalCount;
         grid.resetData(gridData);
 
         if (page.pageInit === false) {
-            pagination.reset(result.total);
+            pagination.reset(result.totalCount);
             page.pageInit = true;
-            setGridClickEvent(grid, 'faq_title', 'faq_id', faqView);
+            setGridClickEvent(grid, 'faqTitle', 'faqId', faqView);
         }
     }
 
@@ -110,7 +108,7 @@ const searchError = response => {
  * pagingCallback : 페이징 콜백
  */
 const pagingCallback = returnPage => {
-    page.currentPage = returnPage;
+    page.page = returnPage;
     search();
 };
 
@@ -118,13 +116,13 @@ const setBoardBoxCall = (selected, callback) => {
     const params = {};
 
     const option = {
-        oTxt: 'board_title',
-        oVal: 'board_id',
+        oTxt: 'boardTitle',
+        oVal: 'boardId',
     };
 
     setCommSelBoxCall(
         'boardId',
-        '/api/item/board/faq/Y',
+        '/api/item/board/FAQ',
         'POST',
         'ALL',
         selected,
@@ -137,15 +135,15 @@ const setBoardBoxCall = (selected, callback) => {
 const setUseYnCall = () => {
     setCodeSelBoxCall(
         'useYn',
-        'USE_YN',
+        'useYn',
         'ALL',
-        sessionParam.use_yn,
+        sessionParam.useYn,
         setMoveToPagination
     );
 };
 
 const setMoveToPagination = () => {
-    pagination.movePageTo(sessionParam.current_page);
+    pagination.movePageTo(sessionParam.page);
 };
 
 $(document).ready(() => {
@@ -188,11 +186,11 @@ $(document).ready(() => {
     } else {
         sessionParam = JSON.parse(window.sessionStorage.getItem('params'));
 
-        $('input[name=faq_title]').val(sessionParam.faq_title);
+        $('input[name=faqTitle]').val(sessionParam.faqTitle);
 
-        page.currentPage = sessionParam.current_page;
-        page.page_per = sessionParam.page_per;
+        page.page = sessionParam.page;
+        page.size = sessionParam.size;
 
-        setBoardBoxCall(sessionParam.board_id, setUseYnCall);
+        setBoardBoxCall(sessionParam.boardId, setUseYnCall);
     }
 });

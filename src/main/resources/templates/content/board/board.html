@@ -12,29 +12,24 @@
 <div layout:fragment="content" id="container">
     <!-- 조회 화면 -->
     <form id="boardViewFrm" name="boardViewFrm">
-        <input type="hidden" id="pagePer" name="page_per" th:value="10"/>
+        <input type="hidden" id="size" name="size" th:value="10"/>
 
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-3">
+                    <div class="col-4">
                         <label for="viewUseYn">게시판유형</label>
-                        <select class="custom-select rounded-0" id="viewBoardType" name="board_type"></select>
+                        <select class="custom-select rounded-0" id="viewBoardType" name="boardType"></select>
                     </div>
-                    <div class="col-3">
+                    <div class="col-4">
                         <label for="viewBoardTitle">게시판명</label>
-                        <input type="text" class="form-control" id="viewBoardTitle" name="board_title">
-                        <input type="text" class="form-control" style="display: none"> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
-                    </div>
-                    <div class="col-3">
-                        <label for="viewUpdatedNm">작성자명</label>
-                        <input type="text" class="form-control" id="viewUpdatedNm" name="updated_nm">
+                        <input type="text" class="form-control" id="viewBoardTitle" name="boardTitle">
                         <input type="text" class="form-control" style="display: none"> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
                     </div>
 
-                    <div class="col-3">
+                    <div class="col-4">
                         <label for="viewUseYn">사용여부</label>
-                        <select class="custom-select rounded-0" id="viewUseYn" name="use_yn"></select>
+                        <select class="custom-select rounded-0" id="viewUseYn" name="useYn"></select>
                     </div>
                 </div>
             </div>
@@ -75,13 +70,23 @@
                                 <div class="form-group row">
                                     <div class="col-12">
                                         <label for="writeBoardTitle">* 게시판명</label>
-                                        <input type="text" class="form-control" id="writeBoardTitle" name="board_title" placeholder="게시판명을 입력하세요.">
+                                        <input type="text" class="form-control" id="writeBoardTitle" name="boardTitle" placeholder="게시판명을 입력하세요.">
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-12">
                                         <label for="writeBoardType">* 게시판유형</label>
-                                        <select class="custom-select rounded-0" id="writeBoardType" name="board_type"></select>
+                                        <select class="custom-select rounded-0" id="writeBoardType" name="boardType"></select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-6">
+                                        <label for="writeBoardType">* 첨부파일사용여부</label>
+                                        <select class="custom-select rounded-0" id="writeAttachYn" name="attachYn"></select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="writeBoardType">* 댓글사용여부</label>
+                                        <select class="custom-select rounded-0" id="writeCommentYn" name="commentYn"></select>
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -146,29 +151,39 @@
                                 <div class="form-group row">
                                     <div class="col-12">
                                         <label for="editBoardTitle">* 게시판명</label>
-                                        <input type="text" class="form-control" id="editBoardTitle" name="board_title" placeholder="게시판명을 입력하세요.">
-                                        <input type="hidden" id="editBoardId" name="board_id">
+                                        <input type="text" class="form-control" id="editBoardTitle" name="boardTitle" placeholder="게시판명을 입력하세요.">
+                                        <input type="hidden" id="editBoardId" name="boardId">
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-6">
                                         <label for="editBoardType">게시판유형</label>
-                                        <select class="custom-select rounded-0" id="editBoardType" name="board_type"></select>
+                                        <select class="custom-select rounded-0" id="editBoardType" name="boardType"></select>
                                         <input type="hidden" id="editBoardTypeCd">
                                     </div>
                                     <div class="col-6">
                                         <label for="editUseYn">사용여부</label>
-                                        <select class="custom-select rounded-0" id="editUseYn" name="use_yn"></select>
+                                        <select class="custom-select rounded-0" id="editUseYn" name="useYn" ></select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-6">
+                                        <label for="writeBoardType">* 첨부파일사용여부</label>
+                                        <select class="custom-select rounded-0" id="editAttachYn" name="attachYn"></select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="writeBoardType">* 댓글사용여부</label>
+                                        <select class="custom-select rounded-0" id="editCommentYn" name="commentYn"></select>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-6">
                                         <label for="editUpdatedNm">작성자</label>
-                                        <input type="text" class="form-control" id="editUpdatedNm" name="updated_nm" placeholder="작성자를 입력하세요." readonly>
+                                        <input type="text" class="form-control" id="editUpdatedNm" name="updatedNm" placeholder="작성자를 입력하세요." readonly>
                                     </div>
                                     <div class="col-6">
                                         <label for="editUpdatedAt">수정일자</label>
-                                        <input type="text" class="form-control" id="editUpdatedAt" name="updated_at" placeholder="수정일자를 입력하세요." readonly>
+                                        <input type="text" class="form-control" id="editUpdatedAt" name="updatedAt" placeholder="수정일자를 입력하세요." readonly>
                                     </div>
                                 </div>
                                 <div class="form-group row">

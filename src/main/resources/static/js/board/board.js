@@ -14,11 +14,13 @@ const $writeBoardType = $('#writeBoardType');
 const $writeMemo = $('#writeMemo');
 const $writeMsg = $('#writeMsg');
 const $writeAuthArea = $('#writeAuthArea');
+const $writeAttachYn = $('#writeAttachYn');
+const $writeCommentYn = $('#writeCommentYn');
+
 
 const $editBoardTitle = $('#editBoardTitle');
 const $editBoardType = $('#editBoardType');
 const $editBoardTypeCd = $('#editBoardTypeCd');
-
 const $editUseYn = $('#editUseYn');
 const $editBoardId = $('#editBoardId');
 const $editMemo = $('#editMemo');
@@ -26,12 +28,14 @@ const $editMsg = $('#editMsg');
 const $editUpdatedNm = $('#editUpdatedNm');
 const $editUpdatedAt = $('#editUpdatedAt');
 const $editAuthArea = $('#editAuthArea');
+const $editAttachYn = $('#editAttachYn');
+const $editCommentYn = $('#editCommentYn');
 
 let selectedType;
 let selectedAuthList;
 
 const pageInit = () => {
-    page = new Page(1, false, Number($('#pagePer').val()), 0);
+    page = new Page(1, false, Number($('#size').val()), 0);
 };
 
 let writeAuthArr = [];
@@ -46,8 +50,8 @@ const search = () => {
     let url = `/api/board`;
     const type = 'POST';
     const params = serializeFormJson('boardViewFrm');
-    params.current_page = page.currentPage;
-    params.page_per = page.pagePer;
+    params.page = page.page;
+    params.size = page.size;
 
     callApi(url, type, params, searchSuccess, searchError);
 };
@@ -56,14 +60,14 @@ const search = () => {
  *  searchSuccess : search successCallback
  */
 const searchSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         const gridData = result.data;
-        page.totalCount = result.total;
+        page.totalCount = result.totalCount;
         grid.resetData(gridData);
 
         if (page.pageInit === false) {
-            setGridClickEvent(grid, 'board_title', 'board_id', getBoardData);
-            pagination.reset(result.total);
+            setGridClickEvent(grid, 'boardTitle', 'boardId', getBoardData);
+            pagination.reset(result.totalCount);
             page.pageInit = true;
         }
     }
@@ -84,23 +88,21 @@ const searchError = response => {
 const setGridLayout = () => {
     // 헤더 생성
     const columns = [
-        {header: 'No', name: 'rnum', width: 50, align: 'center'},
         {
-            header: 'SEQ',
-            name: 'board_id',
-            width: 100,
+            header: 'ID',
+            name: 'boardId',
+            width: 50,
             align: 'center',
-            hidden: true,
         },
         {
             header: '게시판유형',
-            name: 'board_type_nm',
+            name: 'boardTypeLabel',
             width: 150,
             align: 'center',
         },
         {
             header: '게시판명',
-            name: 'board_title',
+            name: 'boardTitle',
             align: 'center',
             renderer: {
                 styles: {
@@ -110,9 +112,9 @@ const setGridLayout = () => {
                 },
             },
         },
-        {header: '작성자명', name: 'updated_nm', width: 150, align: 'center'},
+        {header: '작성자명', name: 'createdIdLabel', width: 150, align: 'center'},
         {header: '비고', name: 'memo', align: 'center'},
-        {header: '사용여부', name: 'use_yn_nm', width: 150, align: 'center'},
+        {header: '사용여부', name: 'useYnLabel', width: 150, align: 'center'},
     ];
     // 데이터
     const gridData = [];
@@ -138,8 +140,8 @@ const getBoardData = boardId => {
  *  getBoardDataSuccess : getBoardData successCallback
  */
 const getBoardDataSuccess = result => {
-    if (result.header.result_code === 'ok') {
-        setBoardData(result.data, result.boardAuthList);
+    if (result.header["resultCode"] === 'ok') {
+        setBoardData(result.data, result["boardAuths"]);
     }
     spinnerHide();
 };
@@ -155,29 +157,32 @@ const getBoardDataError = response => {
 /**
  * setBoardEditData : 수정화면
  */
-const setBoardData = (data, authList) => {
-    setCodeSelBox('editUseYn', 'USE_YN', '', data.use_yn);
-    setCodeSelBox('editBoardType', 'BOARD_TYPE', '', data.board_type);
+const setBoardData = (data, boardAuths) => {
+    setCodeSelBox('editUseYn', 'USE_YN', '', data.useYn);
+    setCodeSelBox('editBoardType', 'BOARD_TYPE', '', data.boardType);
+    setCodeSelBox('editAttachYn', 'USE_YN', '', data.attachYn);
+    setCodeSelBox('editCommentYn', 'USE_YN', '', data.commentYn);
 
-    $editBoardTitle.val(data.board_title);
+    $editBoardTitle.val(data.boardTitle);
     $editMemo.val(data.memo);
-    $editBoardId.val(data.board_id);
-    $editUpdatedNm.val(data.updated_nm);
-    $editUpdatedAt.val(data.updated_at);
-    $editBoardTypeCd.val(data.board_type);
+    $editBoardId.val(data.boardId);
+    $editUpdatedNm.val(data.createdIdLabel);
+    $editUpdatedAt.val(data.updatedAtLabel);
+    $editBoardTypeCd.val(data.boardType);
+    $editMsg.html('');
 
-    setAuth('edit', authList);
+    setAuth('edit', boardAuths);
 
     $('#editBoardType').prop('disabled', true);
 
     $('#editAuthAll').click(function () {
         if (
             $('#editAuthAll').is(':checked') &&
-            $editBoardType.val() === 'post'
+            $editBoardType.val() === 'POST'
         ) {
-            $('#boardEditFrm input[name=auth_id]').prop('checked', true);
+            $('#boardEditFrm input[name=authId]').prop('checked', true);
         } else {
-            $('#boardEditFrm input[name=auth_id]').prop('checked', false);
+            $('#boardEditFrm input[name=authId]').prop('checked', false);
         }
     });
 
@@ -192,6 +197,9 @@ const initWrite = () => {
     $('#writeMemo').val('');
     writeAuthArr = [];
     setAuth('write', '');
+    setCodeSelBox('writeAttachYn', 'USE_YN', 'SEL', '');
+    setCodeSelBox('writeCommentYn', 'USE_YN', 'SEL', '');
+    $writeMsg.html('');
 };
 
 /**
@@ -201,7 +209,7 @@ const save = () => {
     let msg = '';
     writeAuthArr = [];
 
-    $('#boardWriteFrm input:checkbox[name=auth_id]').each(function (index) {
+    $('#boardWriteFrm input:checkbox[name=authId]').each(function (index) {
         if ($(this).is(':checked') === true) {
             writeAuthArr.push($(this).val());
         }
@@ -214,15 +222,30 @@ const save = () => {
         return;
     }
 
+
+    if ($writeAttachYn.val() === '') {
+        msg = '첨부파일사용여부를 선택하세요.';
+        $writeMsg.html(msg);
+        return;
+    }
+
+    if ($writeCommentYn.val() === '') {
+        msg = '댓글사용여부를 선택하세요.';
+        $writeMsg.html(msg);
+        return;
+    }
+
     spinnerShow();
 
     let url = `/api/board`;
     const type = 'PUT';
     const params = {
-        board_title: $writeBoardTitle.val(),
-        board_type: $writeBoardType.val(),
+        boardTitle: $writeBoardTitle.val(),
+        boardType: $writeBoardType.val(),
+        attachYn: $writeAttachYn.val(),
+        commentYn: $writeCommentYn.val(),
         memo: $writeMemo.val(),
-        auth_id_arr: writeAuthArr,
+        authIdArr: writeAuthArr,
     };
 
     callApi(url, type, params, saveSuccess, saveError);
@@ -232,7 +255,7 @@ const save = () => {
  *  saveSuccess : save successCallback
  */
 const saveSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header.resultCode === 'ok') {
         alert(result.header.message);
         search();
         closeModal();
@@ -255,7 +278,7 @@ const update = () => {
     let msg = '';
     editAuthArr = [];
 
-    $('#boardEditFrm input:checkbox[name=auth_id]').each(function (index) {
+    $('#boardEditFrm input:checkbox[name=authId]').each(function (index) {
         if ($(this).is(':checked') === true) {
             editAuthArr.push($(this).val());
         }
@@ -273,10 +296,12 @@ const update = () => {
     let url = `/api/board/${$editBoardId.val()}`;
     const type = 'PUT';
     const params = {
-        board_title: $editBoardTitle.val(),
+        boardTitle: $editBoardTitle.val(),
         memo: $editMemo.val(),
-        use_yn: $editUseYn.val(),
-        auth_id_arr: editAuthArr,
+        useYn: $editUseYn.val(),
+        attachYn: $editAttachYn.val(),
+        commentYn: $editCommentYn.val(),
+        authIdArr: editAuthArr,
     };
 
     callApi(url, type, params, updateSuccess, updateError);
@@ -286,7 +311,7 @@ const update = () => {
  *  updateSuccess : update successCallback
  */
 const updateSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header.resultCode === 'ok') {
         alert(result.header.message);
         search();
         closeModal();
@@ -308,7 +333,7 @@ const updateError = response => {
  * pagingCallback : 페이징 콜백
  */
 const pagingCallback = returnPage => {
-    page.currentPage = returnPage;
+    page.page = returnPage;
     search();
 };
 
@@ -330,7 +355,7 @@ const setAuth = (type, authList) => {
     selectedAuthList = authList;
 
     callApiWithoutBody(
-        `/api/item/auth/use-yn/Y`,
+        `/api/item/auth/used-auths`,
         'GET',
         setAuthSuccess,
         setAuthError
@@ -341,36 +366,26 @@ const setAuth = (type, authList) => {
  *  setAuthSuccess : setAuth successCallback
  */
 const setAuthSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         const dataList = result.data;
         let str = '';
 
         if (selectedType === 'edit') {
             $editAuthArea.html('');
 
-            for (let i = 0; i < dataList.length; i++) {
-                const data = dataList[i];
-                let equalFlg = false;
-
-                for (let j = 0; j < selectedAuthList.length; j++) {
-                    const authData = selectedAuthList[j];
-                    if (data.auth_id === authData.auth_id) {
-                        equalFlg = true;
-                    }
-                }
-
-                if (equalFlg) {
+            for (let i = 0; i < selectedAuthList.length; i++) {
+                const data = selectedAuthList[i];
+                if (data.useYn ==="Y" ) {
                     str = `<div className="custom-control custom-checkbox">
-                                <input className="custom-control-input" type="checkbox" name="auth_id" value="${data.auth_id}" checked>
-                                <label className="custom-control-label">${data.auth_nm}</label>
+                                <input className="custom-control-input" type="checkbox" name="authId" value="${data.authId}" checked>
+                                <label className="custom-control-label">${data.authNm}</label>
                            </div>`;
                 } else {
                     str = `<div className="custom-control custom-checkbox">
-                                <input className="custom-control-input" type="checkbox" name="auth_id" value="${data.auth_id}">
-                                <label className="custom-control-label">${data.auth_nm}</label>
+                                <input className="custom-control-input" type="checkbox" name="authId" value="${data.authId}">
+                                <label className="custom-control-label">${data.authNm}</label>
                             </div>`;
                 }
-
                 $editAuthArea.append(str);
             }
         } else {
@@ -379,16 +394,16 @@ const setAuthSuccess = result => {
             for (let i = 0; i < dataList.length; i++) {
                 const data = dataList[i];
                 str = `<div className="custom-control custom-checkbox">
-                            <input className="custom-control-input" type="checkbox" name="auth_id" value="${data.auth_id}">
-                            <label className="custom-control-label">${data.auth_nm}</label>
+                            <input className="custom-control-input" type="checkbox" name="authId" value="${data.authId}">
+                            <label className="custom-control-label">${data.authNm}</label>
                         </div>`;
                 $writeAuthArea.append(str);
             }
         }
     }
 
-    if ($editBoardTypeCd.val() !== 'post') {
-        $('#boardEditFrm input[name=auth_id]').prop('disabled', true);
+    if ($editBoardTypeCd.val() !== 'POST') {
+        $('#boardEditFrm input[name=authId]').prop('disabled', true);
     }
 
     spinnerHide();
@@ -412,6 +427,8 @@ $(document).ready(() => {
     grid = setGridLayout();
 
     pagination = setPagination(page, pagingCallback);
+
+    search();
 
     $('#searchBtn').click(() => {
         pageInit();
@@ -440,30 +457,30 @@ $(document).ready(() => {
         update();
     });
 
+    //게시판 유형이 바뀌면 권한을 넣지 않는다.
     $writeBoardType.change(() => {
-        $('#boardWriteFrm input[name=auth_id]').prop('checked', false);
+        $('#boardWriteFrm input[name=authId]').prop('checked', false);
         $('#writeAuthAll').prop('checked', false);
 
-        if ($writeBoardType.val() !== 'post') {
-            $('#boardWriteFrm input[name=auth_id]').prop('disabled', true);
+        if ($writeBoardType.val() !== 'POST') {
+            $('#boardWriteFrm input[name=authId]').prop('disabled', true);
         } else {
-            $('#boardWriteFrm input[name=auth_id]').prop('disabled', false);
+            $('#boardWriteFrm input[name=authId]').prop('disabled', false);
         }
     });
 
     $('#writeAuthAll').click(function () {
         if (
             $('#writeAuthAll').is(':checked') &&
-            $writeBoardType.val() === 'post'
+            $writeBoardType.val() === 'POST'
         ) {
-            $('#boardWriteFrm input[name=auth_id]').prop('checked', true);
+            $('#boardWriteFrm input[name=authId]').prop('checked', true);
         } else {
-            $('#boardWriteFrm input[name=auth_id]').prop('checked', false);
+            $('#boardWriteFrm input[name=authId]').prop('checked', false);
         }
     });
 
     const viewBoardTitle = document.getElementById('viewBoardTitle');
-    const viewUpdatedNm = document.getElementById('viewUpdatedNm');
 
     viewBoardTitle.addEventListener('keyup', function (event) {
         if (event.keyCode === 13) {
@@ -471,13 +488,4 @@ $(document).ready(() => {
             document.getElementById('searchBtn').click();
         }
     });
-
-    viewUpdatedNm.addEventListener('keyup', function (event) {
-        if (event.keyCode === 13) {
-            event.preventDefault();
-            document.getElementById('searchBtn').click();
-        }
-    });
-
-    search();
 });

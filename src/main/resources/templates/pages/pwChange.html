@@ -19,6 +19,8 @@
             <form name="frm" id="frm" method="POST">
                 <!-- 페이지 이동을 위해 url 필드 넣음 -->
                 <input type="hidden" name="url" id="url"/>
+                <input type="hidden" name="loginId" id="loginId" th:value="${loginId}"/>
+
                 <div class="input-group mb-3">
                     <label for="userPw"></label>
                     <input type="password" name="user_pw" id="userPw" class="form-control" placeholder="비밀번호"/>

@@ -26,19 +26,29 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col-6">
-                                <select class="custom-select rounded-0" id="authRole" name="auth_role"></select>
+                                <label for="authRole"></label><select class="custom-select rounded-0" id="authRole" name="authRole"></select>
                             </div>
                             <div class="col-6">
-                                <select class="custom-select rounded-0" id="authId" name="auth_id"></select>
+                                <label for="authId"></label><select class="custom-select rounded-0" id="authId" name="authId"></select>
                             </div>
                         </div>
                     </div>
                     <div class="card-header">
                         <div class="row justify-content-end">
-                            <div class="col-8">
+                            <div class="col-4">
                                 <div class="input-group input-group-sm">
-                                    <label for="searchStr"></label><input type="text" class="form-control" id="searchStr" name="search_str" placeholder="아이디/이름">
-                                    <input type="text" class="form-control" style="display: none">
+                                    <label for="loginId"></label><input type="text" class="form-control" id="loginId" name="loginId" placeholder="아이디">
+                                    <label>
+                                        <input type="text" class="form-control" style="display: none">
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="input-group input-group-sm">
+                                    <label for="userNm"></label><input type="text" class="form-control" id="userNm" name="userNm" placeholder="이름">
+                                    <label>
+                                        <input type="text" class="form-control" style="display: none">
+                                    </label>
                                 </div>
                             </div>
                             <div class="col-2">
@@ -50,7 +60,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <input type="hidden" class="form-control" id="pagePer" name="page_per" value="10">
+                        <input type="hidden" class="form-control" id="size" name="size" value="10">
                         <!-- 그리드 영역-->
                         <div id="grid"></div>
 

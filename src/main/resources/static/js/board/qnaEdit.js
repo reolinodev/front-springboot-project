@@ -14,6 +14,7 @@ const $responseAt = $('#responseAt');
 const $questions = $('#questions');
 const $mainText = $('#mainText');
 const $useYn = $('#useYn');
+const $qnaPw = $('#qnaPw');
 
 let editor;
 
@@ -29,7 +30,7 @@ const search = () => {
  *  searchSuccess : search successCallback
  */
 const searchSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header.resultCode === 'ok') {
         setQnaData(result.data);
     }
     spinnerHide();
@@ -50,32 +51,39 @@ const setQnaData = data => {
     let content = '';
     let content2 = '';
 
-    setBoardBox(data.board_id);
+    setBoardBox(data.boardId);
 
-    $qnaTitle.val(data.qna_title);
-    $createdNm.val(data.created_nm);
-    $createdAt.val(data.created_at);
-    $responseYnNm.val(data.response_yn_nm);
-    $responseNm.val(data.response_nm);
-    $responseAt.val(data.response_at);
+    $qnaTitle.val(data.qnaTitle);
+    $createdNm.val(data.createdIdLabel);
+    $createdAt.val(data.createdAtLabel);
+    $responseYnNm.val(data.responseLabel);
+    $responseNm.val(data.responseIdLabel);
+    $responseAt.val(data.responseAtLabel);
     $questions.val(data.questions);
-    $mainText.val(data.main_text);
-    $useYn.val(data.use_yn);
+    $mainText.val(data.mainText);
+    $useYn.val(data.useYn);
+    $qnaPw.val(data.qnaPw);
 
     if (data.questions != null) {
         content = data.questions;
     }
     editor = setBasicEditor('editor', content, 400);
 
-    if (data.main_text == null) {
+    if (data.mainText == null) {
         content2 = '답변대기중';
     } else {
-        content2 = data.main_text;
+        content2 = data.mainText;
     }
 
     setBasicViewer('viewer', content2);
 
-    setCodeSelBox('hiddenYn', 'HIDDEN_YN', '', data.hidden_yn);
+    setCodeSelBox('hiddenYn', 'HIDDEN_YN', '', data.hiddenYn);
+
+    if(data.hiddenYn==="Y"){
+        $('#qnaPw').show();
+    }else{
+        $('#qnaPw').hide();
+    }
 };
 
 /**
@@ -93,7 +101,7 @@ const save = () => {
 
     $questions.val(editor.getMarkdown());
 
-    let url = `/api/qna/${qnaId}`;
+    let url = `/api/qna/user/${qnaId}`;
     const type = 'PUT';
     const params = serializeFormJson('qnaEditFrm');
     callApi(url, type, params, saveSuccess, saveError);
@@ -103,7 +111,7 @@ const save = () => {
  *  searchSuccess : search successCallback
  */
 const saveSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         alert(result.header.message);
         location.href = `/page/board/qna/list/back/${$('#boardId').val()}`;
     }
@@ -115,7 +123,15 @@ const saveSuccess = result => {
  */
 const saveError = response => {
     spinnerHide();
-    console.log(response.message);
+
+    let errorMessage = '';
+    if(response["errorList"] !== undefined && response["errorList"].length !== 0){
+        errorMessage = response["errorList"][0].message;
+    }else{
+        errorMessage = response.message;
+    }
+
+    console.log(errorMessage);
 };
 
 const deleteProc = () => {
@@ -131,7 +147,7 @@ const deleteProc = () => {
  *  deleteProcSuccess : deleteProc successCallback
  */
 const deleteProcSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         alert(result.header.message);
         location.href = `/page/board/qna/list/back/${$('#boardId').val()}`;
     }
@@ -148,15 +164,15 @@ const deleteProcError = response => {
 
 const setBoardBox = boardId => {
     const option = {
-        oTxt: 'board_title',
-        oVal: 'board_id',
+        oTxt: 'boardTitle',
+        oVal: 'boardId',
     };
 
     const params = {};
 
     setCommSelBox(
         'boardId',
-        '/api/item/board/qna/Y',
+        '/api/item/board/QNA',
         'POST',
         '',
         boardId,
@@ -179,6 +195,18 @@ $(document).ready(() => {
     $('#deleteBtn').click(() => {
         if (confirm('QNA를 삭제하시겠습니까?')) {
             deleteProc();
+        }
+    });
+
+
+
+    $('#hiddenYn').change(() => {
+        $('#qnaPw').val("");
+
+        if($('#hiddenYn').val()==="Y"){
+            $('#qnaPw').show();
+        }else{
+            $('#qnaPw').hide();
         }
     });
 });

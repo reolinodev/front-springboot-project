@@ -12,23 +12,23 @@
 <div layout:fragment="content" id="container">
     <!-- 조회 화면 -->
     <form id="userViewFrm" name="userViewFrm">
-        <input type="hidden" id="pagePer" name="page_per" th:value="10"/>
+        <input type="hidden" id="size" name="size" th:value="10"/>
 
         <div class="card">
             <div class="card-body">
                 <div class="row">
                     <div class="col-4">
                         <label for="loginId">아이디</label>
-                        <input type="text" class="form-control" id="loginId" name="login_id">
+                        <input type="text" class="form-control" id="loginId" name="loginId">
                     </div>
                     <div class="col-4">
                         <label for="userNm">이름</label>
-                        <input type="text" class="form-control" id="userNm" name="user_nm">
+                        <input type="text" class="form-control" id="userNm" name="userNm">
                     </div>
                     <div class="col-4">
                         <input type="text" class="form-control" style="display: none"> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
                         <label for="viewUseYn">사용여부</label>
-                        <select class="custom-select rounded-0" id="viewUseYn" name="use_yn"></select>
+                        <select class="custom-select rounded-0" id="viewUseYn" name="useYn"></select>
                     </div>
                 </div>
             </div>
@@ -68,19 +68,19 @@
                                 <div class="form-group row">
                                     <div class="col-12">
                                         <label for="writeLoginId">* 아이디</label>
-                                        <input type="text" class="form-control" id="writeLoginId" name="login_id" placeholder="아이디">
+                                        <input type="text" class="form-control" id="writeLoginId" name="loginId" placeholder="아이디">
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-12">
                                         <label for="writeUserNm">* 이름</label>
-                                        <input type="text" class="form-control" id="writeUserNm" name="user_nm" placeholder="이름">
+                                        <input type="text" class="form-control" id="writeUserNm" name="userNm" placeholder="이름">
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-12">
                                         <label for="writeTelNo">휴대폰번호</label>
-                                        <input type="text" class="form-control" id="writeTelNo" name="tel_no" placeholder="전화번호">
+                                        <input type="text" class="form-control" id="writeTelNo" name="telNo" placeholder="전화번호">
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -118,26 +118,26 @@
                                 <div class="form-group row">
                                     <div class="col-12">
                                         <label for="editLoginId">* 아이디</label>
-                                        <input type="text" class="form-control" id="editLoginId" name="login_id" placeholder="아이디" readonly>
-                                        <input type="hidden" class="form-control" id="editUserId" name="user_id" readonly>
+                                        <input type="text" class="form-control" id="editLoginId" name="loginId" placeholder="아이디" readonly>
+                                        <input type="hidden" class="form-control" id="editUserId" name="userId" readonly>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-12">
                                         <label for="editTelno">휴대폰번호</label>
-                                        <input type="text" class="form-control" id="editTelno" name="tel_no" placeholder="휴대폰번호">
+                                        <input type="text" class="form-control" id="editTelno" name="telNo" placeholder="휴대폰번호">
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-12">
                                         <label for="editPwInitYn">패스워드초기화여부</label>
-                                        <input type="text" class="form-control" id="editPwInitYn" name="pw_init_yn" placeholder="패스워드초기화여부"  readonly>
+                                        <input type="text" class="form-control" id="editPwInitYn" name="pwInitYn" placeholder="패스워드초기화여부"  readonly>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-12">
                                         <label for="editUseYn">* 사용여부</label>
-                                        <select class="custom-select rounded-0" id="editUseYn" name="use_yn"></select>
+                                        <select class="custom-select rounded-0" id="editUseYn" name="useYn"></select>
                                     </div>
                                 </div>
                             </div>
@@ -146,19 +146,19 @@
                                 <div class="form-group row">
                                     <div class="col-12">
                                         <label for="editUserNm">* 이름</label>
-                                        <input type="text" class="form-control" id="editUserNm" name="user_nm" placeholder="이름">
+                                        <input type="text" class="form-control" id="editUserNm" name="userNm" placeholder="이름">
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-12">
                                         <label for="editLastLoginAt">최근접속일시</label>
-                                        <input type="text" class="form-control" id="editLastLoginAt" name="last_login_at" placeholder="최근접속일시"  readonly>
+                                        <input type="text" class="form-control" id="editLastLoginAt" name="lastLoginAt" placeholder="최근접속일시"  readonly>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-12">
                                         <label for="editPwFailCnt">패스워드실패회수</label>
-                                        <input type="text" class="form-control" id="editPwFailCnt" name="pw_fail_cnt" placeholder="패스워드실패회수"  readonly>
+                                        <input type="text" class="form-control" id="editPwFailCnt" name="pwFailCnt" placeholder="패스워드실패회수"  readonly>
                                     </div>
                                 </div>
                             </div>

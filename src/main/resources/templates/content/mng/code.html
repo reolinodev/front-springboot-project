@@ -3,6 +3,7 @@
     xmlns:th="http://www.thymeleaf.org"
     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     layout:decorate="~{layouts/defaultLayout}"
+    lang="ko"
 >
 <head>
     <title>코드정보</title>
@@ -24,22 +25,36 @@
                     </div>
                     <div class="card-header">
                         <div class="row justify-content-end">
-                            <div class="col-5">
+                            <div class="col-6">
                                 <div class="input-group input-group-sm">
-                                    <input type="text" class="form-control" id="searchStr" name="search_str" placeholder="코드그룹명/코드그룹값">
-                                    <input type="text" class="form-control" style="display: none"> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
+                                    <label for="codeGrpNm"></label><input type="text" class="form-control" id="codeGrpNm" name="codeGrpNm" placeholder="코드그룹명">
+                                    <label>
+                                        <input type="text" class="form-control" style="display: none">
+                                    </label> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
                                 </div>
                             </div>
-                            <div class="col-4">
-                                <select class="custom-select rounded-0" id="useYn" name="use_yn"></select>
+                            <div class="col-6">
+                                <div class="input-group input-group-sm">
+                                    <label for="codeGrpVal"></label><input type="text" class="form-control" id="codeGrpVal" name="codeGrpVal" placeholder="코드그룹값">
+                                    <label>
+                                        <input type="text" class="form-control" style="display: none">
+                                    </label> <!-- 엔터 이벤트 오류로 임의로 넣음 -->
+                                </div>
                             </div>
-                            <div class="col-3">
+                        </div>
+                    </div>
+                    <div class="card-header">
+                        <div class="row justify-content-end">
+                            <div class="col-6">
+                                <label for="useYn"></label><select class="custom-select rounded-0" id="useYn" name="useYn"></select>
+                            </div>
+                            <div class="col-6">
                                 <button type="button" class="btn btn-block btn-primary btn-sm" id="searchGrpBtn">조회</button>
                             </div>
                         </div>
                     </div>
                     <div class="card-body">
-                        <input type="hidden" class="form-control" id="pagePer" name="page_per" value="10">
+                        <input type="hidden" class="form-control" id="size" name="size" value="10">
 
                         <!-- 그리드 영역-->
                         <div id="grid"></div>
@@ -89,10 +104,10 @@
                     <div class="modal-body">
                         <div class="form-group row">
                             <div class="col-6">
-                                <input type="text" class="form-control" id="writeCodeGrpNm" name="cd_grp_nm" placeholder="코드그룹명을 입력하세요.">
+                                <label for="writeCodeGrpNm"></label><input type="text" class="form-control" id="writeCodeGrpNm" name="cd_grp_nm" placeholder="코드그룹명을 입력하세요.">
                             </div>
                             <div class="col-6">
-                                <input type="text" class="form-control" id="writeCodeGrpVal" name="cd_grp_val" placeholder="코드그룹값을 입력하세요.">
+                                <label for="writeCodeGrpVal"></label><input type="text" class="form-control" id="writeCodeGrpVal" name="cd_grp_val" placeholder="코드그룹값을 입력하세요.">
                             </div>
                         </div>
                         <div class="form-group row">
@@ -122,14 +137,14 @@
                     <div class="modal-body">
                         <div class="form-group row">
                             <div class="col-4">
-                                <input type="text" class="form-control" id="editCodeGrpNm" name="cd_grp_nm" placeholder="코드 그룹명을 입력하세요.">
+                                <label for="editCodeGrpNm"></label><input type="text" class="form-control" id="editCodeGrpNm" name="cd_grp_nm" placeholder="코드 그룹명을 입력하세요.">
                                 <input type="hidden" class="form-control" id="editCodeGrpId" name="cd_grp_id">
                             </div>
                             <div class="col-4">
-                                <input type="text" class="form-control" id="editCodeGrpVal" name="cd_grp_val" readonly>
+                                <label for="editCodeGrpVal"></label><input type="text" class="form-control" id="editCodeGrpVal" name="cd_grp_val" readonly>
                             </div>
-                            <div class="col-4">
-                                <select class="custom-select rounded-0" id="editUseYn" name="use_yn"></select>
+                            <div class="col-4" style="padding-top: 22px;">
+                                <label for="editUseYn"></label><select class="custom-select rounded-0" id="editUseYn" name="useYn"></select>
                             </div>
                         </div>
                         <div class="form-group row">

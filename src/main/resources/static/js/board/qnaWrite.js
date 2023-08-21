@@ -46,7 +46,7 @@ const save = () => {
  *  saveSuccess : save successCallback
  */
 const saveSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         alert(result.header.message);
         spinnerHide();
         location.href = `/page/board/qna/list/init/` + boardKey;
@@ -61,21 +61,29 @@ const saveSuccess = result => {
  *  saveError : save errorCallback
  */
 const saveError = response => {
+
+    let errorMessage = '';
+    if(response["errorList"] !== undefined && response["errorList"].length !== 0){
+        errorMessage = response["errorList"][0].message;
+    }else{
+        errorMessage = response.message;
+    }
+
     spinnerHide();
-    alert(response.message);
+    alert(errorMessage);
 };
 
 const setBoardBox = () => {
     const option = {
-        oTxt: 'board_title',
-        oVal: 'board_id',
+        oTxt: 'boardTitle',
+        oVal: 'boardId',
     };
 
     const params = {};
 
     setCommSelBox(
         'boardId',
-        '/api/item/board/qna/Y',
+        '/api/item/board/QNA',
         'POST',
         'SEL',
         boardKey,
@@ -97,5 +105,15 @@ $(document).ready(() => {
 
     $('#saveBtn').click(() => {
         save();
+    });
+
+    $('#hiddenYn').change(() => {
+        $('#qnaPw').val("");
+
+        if($('#hiddenYn').val()==="Y"){
+            $('#qnaPw').show();
+        }else{
+            $('#qnaPw').hide();
+        }
     });
 });

@@ -17,7 +17,7 @@ let sessionParam;
 const status = $('#status').val();
 
 const pageInit = () => {
-    page = new Page(1, false, Number($('#pagePer').val()), 0);
+    page = new Page(1, false, Number($('#size').val()), 0);
 };
 
 /**
@@ -26,18 +26,16 @@ const pageInit = () => {
 const setGridLayout = () => {
     // 헤더 생성
     const columns = [
-        {header: 'No', name: 'rnum', width: 50, align: 'center'},
         {
-            header: 'SEQ',
-            name: 'post_id',
-            width: 100,
+            header: 'ID',
+            name: 'postId',
+            width: 50,
             align: 'center',
-            hidden: true,
         },
-        {header: '게시판', name: 'board_title', width: 200, align: 'center'},
+        {header: '게시판', name: 'boardTitle', width: 200, align: 'center'},
         {
             header: '게시글명',
-            name: 'post_title',
+            name: 'postTitle',
             align: 'center',
             renderer: {
                 styles: {
@@ -47,9 +45,9 @@ const setGridLayout = () => {
                 },
             },
         },
-        {header: '작성자', name: 'created_nm', width: 200, align: 'center'},
-        {header: '작성일', name: 'created_at', width: 200, align: 'center'},
-        {header: '사용여부', name: 'use_yn_nm', width: 150, align: 'center'},
+        {header: '작성자', name: 'createdIdLabel', width: 200, align: 'center'},
+        {header: '작성일', name: 'createdAtLabel', width: 200, align: 'center'},
+        {header: '사용여부', name: 'useYnLabel', width: 150, align: 'center'},
     ];
     // 데이터
     const gridData = [];
@@ -74,8 +72,8 @@ const search = () => {
     const type = 'POST';
 
     const params = serializeFormJson('postViewFrm');
-    params.current_page = page.currentPage;
-    params.page_per = page.pagePer;
+    params.page = page.page;
+    params.size = page.size;
     window.sessionStorage.setItem('params', JSON.stringify(params));
 
     callApi(url, type, params, searchSuccess, searchError);
@@ -85,14 +83,14 @@ const search = () => {
  *  searchSuccess : search successCallback
  */
 const searchSuccess = result => {
-    if (result.header.result_code === 'ok') {
+    if (result.header["resultCode"] === 'ok') {
         const gridData = result.data;
-        page.totalCount = result.total;
+        page.totalCount = result.totalCount;
         grid.resetData(gridData);
 
         if (page.pageInit === false) {
-            setGridClickEvent(grid, 'post_title', 'post_id', postView);
-            pagination.reset(result.total);
+            setGridClickEvent(grid, 'postTitle', 'postId', postView);
+            pagination.reset(result.totalCount);
             page.pageInit = true;
         }
     }
@@ -112,7 +110,7 @@ const searchError = response => {
  * pagingCallback : 페이징 콜백
  */
 const pagingCallback = returnPage => {
-    page.currentPage = returnPage;
+    page.page = returnPage;
     search();
 };
 
@@ -120,13 +118,13 @@ const setBoardBoxCall = (selected, callback) => {
     const params = {};
 
     const option = {
-        oTxt: 'board_title',
-        oVal: 'board_id',
+        oTxt: 'boardTitle',
+        oVal: 'boardId',
     };
 
     setCommSelBoxCall(
         'boardId',
-        '/api/item/board/post/Y',
+        '/api/item/board/POST',
         'POST',
         'ALL',
         selected,
@@ -141,17 +139,17 @@ const setUseYnCall = () => {
         'useYn',
         'USE_YN',
         'ALL',
-        sessionParam.use_yn,
+        sessionParam.useYn,
         setMoveToPagination
     );
 };
 
 const setMoveToPagination = () => {
-    pagination.movePageTo(sessionParam.current_page);
+    pagination.movePageTo(sessionParam.page);
 };
 
 $(document).ready(() => {
-    setBasicDataRange('start_date', 'end_date', '1years');
+    setBasicDataRange('startDate', 'endDate', '1years');
 
     grid = setGridLayout();
     pagination = setPagination(page, pagingCallback);
@@ -162,7 +160,7 @@ $(document).ready(() => {
     });
 
     $('#writeBtn').click(() => {
-        location.href = '/page/board/post/write/manage/0000000000';
+        location.href = '/page/board/post/write/manage/0';
     });
 
     $('#boardId').change(() => {
@@ -175,9 +173,18 @@ $(document).ready(() => {
         search();
     });
 
-    const searchStrInput = document.getElementById('searchStr');
+    const postTitle = document.getElementById('postTitle');
 
-    searchStrInput.addEventListener('keyup', function (event) {
+    postTitle.addEventListener('keyup', function (event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            document.getElementById('searchBtn').click();
+        }
+    });
+
+    const createdNm = document.getElementById('createdNm');
+
+    createdNm.addEventListener('keyup', function (event) {
         if (event.keyCode === 13) {
             event.preventDefault();
             document.getElementById('searchBtn').click();
@@ -192,13 +199,14 @@ $(document).ready(() => {
     } else {
         sessionParam = JSON.parse(window.sessionStorage.getItem('params'));
 
-        $('input[name=start_date]').val(sessionParam.start_date);
-        $('input[name=end_date]').val(sessionParam.end_date);
-        $('input[name=search_str]').val(sessionParam.search_str);
+        $('input[name=startDate]').val(sessionParam.startDate);
+        $('input[name=endDate]').val(sessionParam.endDate);
+        $('input[name=postTitle]').val(sessionParam.postTitle);
+        $('input[name=createdNm]').val(sessionParam.createdNm);
 
-        page.currentPage = sessionParam.current_page;
-        page.page_per = sessionParam.page_per;
+        page.page = sessionParam.page;
+        page.size = sessionParam.size;
 
-        setBoardBoxCall(sessionParam.board_id, setUseYnCall);
+        setBoardBoxCall(sessionParam.boardId, setUseYnCall);
     }
 });
