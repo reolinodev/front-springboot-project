@@ -1,6 +1,6 @@
 import {setCommSelBox} from '../module/component';
 import {framePageRouter} from '../module/router';
-import {callApi, callApiWithoutBody} from '../module/async';
+import {callApiWithoutBody} from '../module/async';
 
 let mainUrl;
 
@@ -100,6 +100,7 @@ const getNavListError = response => {
  * setNavigation : 네비게이션 구성
  */
 const setNavis = data => {
+    console.log('aaa', data);
     const menuUrl = data.menuUrl;
     mainUrl = menuUrl;
     const menuLv1List = data.menuLv1List;
@@ -217,6 +218,10 @@ $(document).ready(() => {
     $('#frm #authId').change(() => {
         const authId = $('#frm #authId').val();
         sessionStorage.setItem('authId', authId);
+        sessionStorage.removeItem('url');
+        sessionStorage.removeItem('childMenuName');
+        sessionStorage.removeItem('parentMenuName');
+
         getNavList(authId);
     });
 

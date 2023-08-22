@@ -379,11 +379,11 @@ $(document).ready(() => {
 
         if (boardId !== '') {
             const arr = boardId.split('/');
-            const boardIdStr = arr[0].toLowerCase();
-            const boardTypeStr = arr[1];
+            const boardIdStr = arr[0];
+            const boardTypeStr = arr[1].toLowerCase();
 
             $('#url').val(
-                `/page/board/${boardTypeStr.lo}/list/init/` + boardIdStr
+                `/page/board/${boardTypeStr}/list/init/` + boardIdStr
             );
         }
     });

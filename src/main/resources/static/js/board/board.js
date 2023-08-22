@@ -197,6 +197,7 @@ const initWrite = () => {
     $('#writeMemo').val('');
     writeAuthArr = [];
     setAuth('write', '');
+    setCodeSelBox('writeBoardType', 'BOARD_TYPE', '', '');
     setCodeSelBox('writeAttachYn', 'USE_YN', 'SEL', '');
     setCodeSelBox('writeCommentYn', 'USE_YN', 'SEL', '');
     $writeMsg.html('');
