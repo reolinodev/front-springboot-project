@@ -52,9 +52,11 @@ const getUserError = response => {
  * setMyAuthItem : 내가 가진 권한을 셀렉트박스에 표현
  */
 const setMyAuthItem = () => {
-    const userId = $('#userId').val();
 
-    const params = {};
+    const params = {
+        userId :  $('#userId').val(),
+        authRole : 'WEB'
+    };
     const option = {
         oTxt: 'authNm',
         oVal: 'authId',
@@ -62,7 +64,7 @@ const setMyAuthItem = () => {
 
     setCommSelBox(
         'authId',
-        `/api/item/auth/mine/${userId}`,
+        `/api/item/auth/mine`,
         'POST',
         '',
         '',

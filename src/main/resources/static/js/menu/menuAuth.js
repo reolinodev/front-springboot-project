@@ -118,7 +118,7 @@ const getAuthData = () => {
     spinnerShow();
 
     callApiWithoutBody(
-        `/api/menuAuth/${$menuId.val()}`,
+        `/api/menuAuth/${$authRole.val()}/${$menuId.val()}`,
         'GET',
         getAuthDataSuccess,
         getAuthDataError
@@ -204,5 +204,9 @@ $(document).ready(() => {
         }
 
         save(updatedRows);
+    });
+
+    $('#authRole').change(() => {
+        search();
     });
 });

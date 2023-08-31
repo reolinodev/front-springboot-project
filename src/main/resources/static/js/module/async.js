@@ -43,7 +43,7 @@ export function callApiWithoutToken(
 export function callApi(url, type, params, successCallback, errorCallback) {
     const apiDomain = getApi();
     const accessToken = localStorage.getItem('accessToken');
-
+    
     $.ajax({
         url: `${apiDomain}${url}`,
         type: type,

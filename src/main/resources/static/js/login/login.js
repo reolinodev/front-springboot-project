@@ -32,6 +32,7 @@ const certification = () => {
     const params = {
         loginId: $loginId.val(),
         userPw: $userPw.val(),
+        authRole: 'WEB',
     };
 
     callApiWithoutToken(
@@ -108,6 +109,7 @@ const login = () => {
         userPw: $userPw.val(),
         loginDevice: $loginDevice.val(),
         deviceBrowser: $deviceBrowser.val(),
+        authRole: 'WEB',
     };
 
     callApi(url, type, params, loginSuccess, loginError);

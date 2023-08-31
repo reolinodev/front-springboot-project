@@ -105,7 +105,6 @@ export function setCommSelBox(
         params = {};
     }
 
-
     if (url === '') {
         str += '</select>';
         $(`#${id}`).html(str);
@@ -114,6 +113,9 @@ export function setCommSelBox(
             url: `${apiDomain}${url}`,
             type: urlType,
             data: JSON.stringify(params),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('Content-type', 'application/json');
+            },
             success(result) {
                 const list = result.data;
 
