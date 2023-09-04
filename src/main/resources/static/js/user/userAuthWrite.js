@@ -263,6 +263,11 @@ $(document).ready(() => {
         }
     });
 
+    $('#authRole').change(() => {
+        setAuthIdSelBox();
+    });
+
+
     // 추가 버튼 클릭 이벤트
     $('#addBtn').click(() => {
         setUserAuth();
